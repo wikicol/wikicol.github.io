@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+
+
+<html lang="zh-CN">
+  
+
+    <head>
+      <meta charset="utf-8" />
+        
+      <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1"
+      />
+      <title>scrapy入门课件 |  山城冰荔枝</title>
+  <meta name="generator" content="hexo-theme-ayer">
+       
+<link rel="stylesheet" href="/dist/main.css">
+
+      
+<link rel="stylesheet" href="/css/fonts/remixicon.css">
+
+      
+<link rel="stylesheet" href="/css/custom.css">
+ 
+      <script src="https://cdn.staticfile.org/pace/1.2.4/pace.min.js"></script>
+       
+ 
+
+      <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bulma@5.0.1/bulma.min.css"
+      />
+      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.min.js"></script>
+
+      <!-- mermaid -->
+      
+      <script src="https://cdn.staticfile.org/mermaid/8.14.0/mermaid.min.js"></script>
+      
+      <style>
+        .swal2-styled.swal2-confirm {
+          font-size: 1.6rem;
+        }
+      </style>
+    <link rel="alternate" href="/atom.xml" title="山城冰荔枝" type="application/atom+xml">
+</head>
+  </html>
+</html>
+
+
+<body>
+  <div id="app">
+    
+      
+    <main class="content on">
+      <section class="outer">
+  <article
+  id="post-scrapy入门课件"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h1 class="article-title sea-center" style="border-left:0" itemprop="name">
+  scrapy入门课件
+</h1>
+ 
+
+      
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2023/12/03/scrapy%E5%85%A5%E9%97%A8%E8%AF%BE%E4%BB%B6/" class="article-date">
+  <time datetime="2023-12-03T03:53:32.000Z" itemprop="datePublished">2023-12-03</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E7%88%AC%E8%99%AB%E5%BC%80%E5%8F%91/">爬虫开发</a>
+  </div>
+  
+<div class="word_count">
+    <span class="post-time">
+        <span class="post-meta-item-icon">
+            <i class="ri-quill-pen-line"></i>
+            <span class="post-meta-item-text"> 字数统计:</span>
+            <span class="post-count">2.7k</span>
+        </span>
+    </span>
+
+    <span class="post-time">
+        &nbsp; | &nbsp;
+        <span class="post-meta-item-icon">
+            <i class="ri-book-open-line"></i>
+            <span class="post-meta-item-text"> 阅读时长≈</span>
+            <span class="post-count">10 分钟</span>
+        </span>
+    </span>
+</div>
+ 
+    </div>
+      
+    <div class="tocbot"></div>
+
+
+
+
+  
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h1 id="Scrapy-基本介绍与使用"><a href="#Scrapy-基本介绍与使用" class="headerlink" title="Scrapy 基本介绍与使用"></a>Scrapy 基本介绍与使用</h1><h2 id="一-爬虫工程化"><a href="#一-爬虫工程化" class="headerlink" title="一, 爬虫工程化"></a>一, 爬虫工程化</h2><p>​		在之前的学习中我们已经掌握了爬虫这门技术需要的大多数的技术点, 但是我们现在写的代码还很流程化, 很难进行商用的. 想要我们的爬虫达到商用级别, 必须要对我们现在编写的爬虫代码进行大刀阔斧式的重组, 已达到工程化的爬虫. 何为工程化, 就是让你的程序更加的有体系, 有逻辑, 更加的模块化. </p>
+<p>​		就好比, 我们家里以前做过鞋子, 我妈妈给我做鞋, 她需要从画图纸到裁剪到最后的缝合, 一步一步的完成一双鞋子的制作. 这种手工鞋子如果每年做个几双, 没问题. 我妈妈辛苦一点, 也能搞定. 但是, 如果现在我想去售卖这个鞋子. 再依靠妈妈一双一双的缝制. 你不赔死, 也得让你妈打死. 为什么? 第一, 产能跟不上. 一个人的力量是有限的, 第二, 一个人要完整的把制作鞋子的工艺从头搞到尾. 就算你想招人分担一下. 貌似也不好找这样厉害的手艺人. 怎么办? 聪明的你可能已经想到了. 从头到尾完成一双鞋的人不好找. 那我就把这个工艺过程分开. 分成4份, 画图, 裁剪, 缝合, 验收.  招4个人. 每个人就负责一小部分. 并且这一小部分是很容易完成的. 最终只要有一个人(我)来做一个总指挥. 我的制鞋小工厂就建起来了. </p>
+<p>​		上述逻辑同样适用于我们的爬虫, 想想, 到目前为止, 我们所编写的爬虫我们都是从头到尾的每一步都要亲力亲为. 这样做固然有其优点(可控性更好), 但是各位请认真思考. 这样的代码逻辑是不能形成批量生产的效果的(写100个爬虫). 很多具有共通性的代码逻辑都没有进行重复利用. 那我们就可以考虑看看, 能不能把一些共性的问题(获取页面源代码, 数据存储), 单独搞成一个功能. 如果我们把这些功能单独进行编写. 并且产生类似单独的功能模块, 将大大的提高我们爬虫的效率.  已达到我们爬虫工程化开发的效果. </p>
+<p>​		爬虫工程化: 对爬虫的功能进行模块化的开发. 并达到可以批量生产的效果(不论是开发还是数据产出)</p>
+<h2 id="二-scrapy简介"><a href="#二-scrapy简介" class="headerlink" title="二, scrapy简介"></a>二, scrapy简介</h2><p>​		Scrapy到目前为止依然是这个星球上最流行的爬虫框架. 摘一下官方给出对scrapy的介绍</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">An open source and collaborative framework for extracting the data you need from websites.</span><br><span class="line"></span><br><span class="line">In a fast, simple, yet extensible way.</span><br></pre></td></tr></table></figure>
+
+<p>​		scrapy的特点: 速度快, 简单, 可扩展性强. </p>
+<p>​		scrapy的官方文档: <a target="_blank" rel="noopener" href="https://docs.scrapy.org/en/latest/">https://docs.scrapy.org/en/latest/</a></p>
+<h2 id="三-scrapy工作流程-重点"><a href="#三-scrapy工作流程-重点" class="headerlink" title="三, scrapy工作流程(重点)"></a>三, scrapy工作流程(重点)</h2><p>​		之前我们所编写的爬虫的逻辑: </p>
+<p><img src="/images/scrapy01/image-20210803105808636.png" alt="images/scrapy01/image-20210803105808636"></p>
+<p>​		scrapy的工作流程: </p>
+<p><img src="/images/scrapy01/image-20210803113438252.png" alt="images/scrapy01/image-20210803113438252"></p>
+<p>整个工作流程, </p>
+<ol>
+<li><p>爬虫中起始的url构造成request对象, 并传递给调度器. </p>
+</li>
+<li><p><code>引擎</code>从<code>调度器</code>中获取到request对象. 然后交给<code>下载器</code></p>
+</li>
+<li><p>由<code>下载器</code>来获取到页面源代码, 并封装成response对象. 并回馈给<code>引擎</code></p>
+</li>
+<li><p><code>引擎</code>将获取到的response对象传递给<code>spider</code>, 由<code>spider</code>对数据进行解析(parse). 并回馈给<code>引擎</code></p>
+</li>
+<li><p><code>引擎</code>将数据传递给pipeline进行数据持久化保存或进一步的数据处理. </p>
+</li>
+<li><p>在此期间如果spider中提取到的并不是数据. 而是子页面url. 可以进一步提交给调度器, 进而重复<code>步骤2</code>的过程</p>
+</li>
+</ol>
+<p>上述过程中一直在重复着几个东西, </p>
+<ol>
+<li><p>引擎(engine)</p>
+<p>scrapy的核心, 所有模块的衔接, 数据流程梳理.</p>
+</li>
+<li><p>调度器(scheduler)</p>
+<p>本质上这东西可以看成是一个队列. 里面存放着一堆我们即将要发送的请求. 可以看成是一个url的容器. 它决定了下一步要去爬取哪一个url. 通常我们在这里可以对url进行去重操作.  </p>
+</li>
+<li><p>下载器(downloader)</p>
+<p>它的本质就是用来发动请求的一个模块. 小白们完全可以把它理解成是一个get_page_source()的功能. 只不过这货返回的是一个response对象. </p>
+</li>
+<li><p>爬虫(spider)</p>
+<p>这是我们要写的第一个部分的内容, 负责解析下载器返回的response对象.从中提取到我们需要的数据. </p>
+</li>
+<li><p>管道(pipeline)</p>
+<p>这是我们要写的第二个部分的内容, 主要负责数据的存储和各种持久化操作.</p>
+</li>
+</ol>
+<p>经过上述的介绍来看, scrapy其实就是把我们平时写的爬虫进行了四分五裂式的改造. 对每个功能进行了单独的封装, 并且, 各个模块之间互相的不做依赖. 一切都由引擎进行调配. 这种思想希望你能知道–解耦. 让模块与模块之间的关联性更加的松散. 这样我们如果希望替换某一模块的时候会非常的容易. 对其他模块也不会产生任何的影响. </p>
+<p>到目前为止, 我们对scrapy暂时了解这么多就够了. 后面会继续在这个图上进一步展开. </p>
+<h2 id="四-scrapy安装"><a href="#四-scrapy安装" class="headerlink" title="四, scrapy安装"></a>四, scrapy安装</h2><p>​	在windows上安装scrapy是一个很痛苦的事情. 可能会出现各种各样的异常BUG. </p>
+<p>​	先使用pip直接安装看看报错不</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install -i https://pypi.tuna.tsinghua.edu.cn/simple scrapy </span><br></pre></td></tr></table></figure>
+
+<p>​	如果安装成功, 直接去创建项目即可. 如果报错可能需要安装VC++14.0库才可以. 安装的时候一定不要死记安装步骤, 要观察报错信息. 根据报错信息进行一点点的调整, 多试几次pip. 直至success. </p>
+<p>如果上述过程还是无法正常安装scrapy, 可以考虑用下面的方案来安装:</p>
+<ol>
+<li><p>安装wheel</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install wheel</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>下载twisted安装包, <a target="_blank" rel="noopener" href="https://www.lfd.uci.edu/~gohlke/pythonlibs/#twisted">https://www.lfd.uci.edu/~gohlke/pythonlibs/#twisted</a></p>
+<p><img src="/images/scrapy01/image-20210803144429440.png" alt="images/scrapy01/image-20210803144429440"></p>
+<ol start="3">
+<li>用wheel安装twisted.</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install Twisted‑<span class="number">21.7</span><span class="number">.0</span>‑py3‑none‑<span class="built_in">any</span>.whl</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>安装pywin32</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install pywin32</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>安装scrapy</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install scrapy</span><br></pre></td></tr></table></figure></li>
+</ol>
+<p>总之, 最终你的控制台输入<code>scrapy version</code>能显示版本号. 就算成功了</p>
+<h2 id="五-scrapy实例"><a href="#五-scrapy实例" class="headerlink" title="五, scrapy实例"></a>五, scrapy实例</h2><p>​	接下来, 我们用scrapy来完成一个超级简单的爬虫, 目标: 深入理解Scrapy工作的流程, 以及各个模块之间是如何搭配工作的. </p>
+<ol>
+<li><p>创建项目</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">scrapy startproject 项目名称</span><br></pre></td></tr></table></figure>
+
+<p>示例:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">scrapy startproject mySpider_2</span><br></pre></td></tr></table></figure>
+
+<p>创建好项目后, 我们可以在pycharm里观察到scrapy帮我们创建了一个文件夹, 里面的目录结构如下:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">mySpider_2   <span class="comment"># 项目所在文件夹, 建议用pycharm打开该文件夹</span></span><br><span class="line">    ├── mySpider_2  		<span class="comment"># 项目跟目录</span></span><br><span class="line">    │   ├── __init__.py</span><br><span class="line">    │   ├── items.py  		<span class="comment"># 封装数据的格式</span></span><br><span class="line">    │   ├── middlewares.py  <span class="comment"># 所有中间件</span></span><br><span class="line">    │   ├── pipelines.py	<span class="comment"># 所有的管道</span></span><br><span class="line">    │   ├── settings.py		<span class="comment"># 爬虫配置信息</span></span><br><span class="line">    │   └── spiders			<span class="comment"># 爬虫文件夹, 稍后里面会写入爬虫代码</span></span><br><span class="line">    │       └── __init__.py</span><br><span class="line">    └── scrapy.cfg			<span class="comment"># scrapy项目配置信息,不要删它,别动它,善待它. </span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>创建爬虫</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cd 文件夹  <span class="comment"># 进入项目所在文件夹</span></span><br><span class="line">scrapy genspider 爬虫名称 允许抓取的域名范围</span><br></pre></td></tr></table></figure>
+
+<p>示例:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cd mySpider_2</span><br><span class="line">scrapy genspider youxi 4399.com</span><br></pre></td></tr></table></figure>
+
+<p>效果:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">(base) sylardeMBP:第七章 sylar$ cd mySpider_2</span><br><span class="line">(base) sylardeMBP:mySpider_2 sylar$ ls</span><br><span class="line">mySpider_2      scrapy.cfg</span><br><span class="line">(base) sylardeMBP:mySpider_2 sylar$ scrapy genspider youxi http://www<span class="number">.4399</span>.com/</span><br><span class="line">Created spider <span class="string">&#x27;youxi&#x27;</span> using template <span class="string">&#x27;basic&#x27;</span> <span class="keyword">in</span> module:</span><br><span class="line">  mySpider_2.spiders.youxi</span><br><span class="line">(base) sylardeMBP:mySpider_2 sylar$ </span><br></pre></td></tr></table></figure>
+
+<p>至此, 爬虫创建完毕, 我们打开文件夹看一下. </p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">├── mySpider_2</span><br><span class="line">│   ├── __init__.py</span><br><span class="line">│   ├── items.py</span><br><span class="line">│   ├── middlewares.py</span><br><span class="line">│   ├── pipelines.py</span><br><span class="line">│   ├── settings.py</span><br><span class="line">│   └── spiders</span><br><span class="line">│       ├── __init__.py</span><br><span class="line">│       └── youxi.py   <span class="comment"># 多了一个这个. </span></span><br><span class="line">└── scrapy.cfg</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+</li>
+<li><p>编写数据解析过程</p>
+<p>完善youxi.py中的内容. </p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> scrapy</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">YouxiSpider</span>(scrapy.Spider):</span><br><span class="line">    name = <span class="string">&#x27;youxi&#x27;</span>  <span class="comment"># 该名字非常关键, 我们在启动该爬虫的时候需要这个名字</span></span><br><span class="line">    allowed_domains = [<span class="string">&#x27;4399.com&#x27;</span>]  <span class="comment"># 爬虫抓取的域.</span></span><br><span class="line">    start_urls = [<span class="string">&#x27;http://www.4399.com/flash/&#x27;</span>]  <span class="comment"># 起始页</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">parse</span>(<span class="params">self, response, **kwargs</span>):</span><br><span class="line">        <span class="comment"># response.text  # 页面源代码</span></span><br><span class="line">        <span class="comment"># response.xpath()  # 通过xpath方式提取</span></span><br><span class="line">        <span class="comment"># response.css()  # 通过css方式提取</span></span><br><span class="line">        <span class="comment"># response.json() # 提取json数据</span></span><br><span class="line"></span><br><span class="line">        <span class="comment"># 用我们最熟悉的方式: xpath提取游戏名称, 游戏类别, 发布时间等信息</span></span><br><span class="line">        li_list = response.xpath(<span class="string">&quot;//ul[@class=&#x27;n-game cf&#x27;]/li&quot;</span>)</span><br><span class="line">        <span class="keyword">for</span> li <span class="keyword">in</span> li_list:</span><br><span class="line">            name = li.xpath(<span class="string">&quot;./a/b/text()&quot;</span>).extract_first()</span><br><span class="line">            category = li.xpath(<span class="string">&quot;./em/a/text()&quot;</span>).extract_first()</span><br><span class="line">            date = li.xpath(<span class="string">&quot;./em/text()&quot;</span>).extract_first()</span><br><span class="line"></span><br><span class="line">            dic = &#123;</span><br><span class="line">                <span class="string">&quot;name&quot;</span>: name,</span><br><span class="line">                <span class="string">&quot;category&quot;</span>: category,</span><br><span class="line">                <span class="string">&quot;date&quot;</span>: date</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="comment"># 将提取到的数据提交到管道内.</span></span><br><span class="line">            <span class="comment"># 注意, 这里只能返回 request对象, 字典, item数据, or None</span></span><br><span class="line">            <span class="keyword">yield</span> dic</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>注意: </p>
+<p>&#x3D;&#x3D;spider返回的内容只能是字典, requestes对象, item数据或者None. 其他内容一律报错&#x3D;&#x3D;</p>
+<p>运行爬虫: </p>
+<figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">scrapy crawl 爬虫名字</span><br></pre></td></tr></table></figure>
+
+<p>实例:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">scrapy crawl youxi</span><br></pre></td></tr></table></figure>
+
+
+</li>
+<li><p>编写pipeline.对数据进行简单的保存</p>
+<p>数据传递到pipeline, 我们先看一下在pipeline中的样子. </p>
+<p>首先修改settings.py文件中的pipeline信息</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ITEM_PIPELINES = &#123;</span><br><span class="line">    <span class="comment"># 前面是pipeline的类名地址               </span></span><br><span class="line">    <span class="comment"># 后面是优先级, 优先级月低越先执行</span></span><br><span class="line">   <span class="string">&#x27;mySpider_2.pipelines.Myspider2Pipeline&#x27;</span>: <span class="number">300</span>,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后我们修改一下pipeline中的代码:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Myspider2Pipeline</span>:</span><br><span class="line">    <span class="comment"># 这个方法的声明不能动!!! 在spider返回的数据会自动的调用这里的process_item方法. </span></span><br><span class="line">    <span class="comment"># 你把它改了. 管道就断了</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">process_item</span>(<span class="params">self, item, spider</span>):</span><br><span class="line">        <span class="built_in">print</span>(item)</span><br><span class="line">        <span class="keyword">return</span> item</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h2 id="六-自定义数据传输结构item"><a href="#六-自定义数据传输结构item" class="headerlink" title="六, 自定义数据传输结构item"></a>六, 自定义数据传输结构item</h2><p>​		在上述案例中, 我们使用字典作为数据传递的载体, 但是如果数据量非常大. 由于字典的key是随意创建的. 极易出现问题,  此时再用字典就不合适了. Scrapy中提供item作为数据格式的声明位置. 我们可以在items.py文件提前定义好该爬虫在进行数据传输时的数据格式. 然后再写代码的时候就有了数据名称的依据了. </p>
+<p>item.py文件</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> scrapy</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">GameItem</span>(scrapy.Item):</span><br><span class="line">    <span class="comment"># 定义数据结构</span></span><br><span class="line">    name = scrapy.Field()</span><br><span class="line">    category = scrapy.Field()</span><br><span class="line">    date = scrapy.Field()</span><br></pre></td></tr></table></figure>
+
+<p>spider中. 这样来使用:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> mySpider_2.items <span class="keyword">import</span> GameItem</span><br><span class="line"></span><br><span class="line"><span class="comment"># 以下代码在spider中的parse替换掉原来的字典</span></span><br><span class="line">item = GameItem()</span><br><span class="line">item[<span class="string">&quot;name&quot;</span>] = name</span><br><span class="line">item[<span class="string">&quot;category&quot;</span>] = category</span><br><span class="line">item[<span class="string">&quot;date&quot;</span>] = date</span><br><span class="line"><span class="keyword">yield</span> item</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="七-scrapy使用小总结"><a href="#七-scrapy使用小总结" class="headerlink" title="七, scrapy使用小总结"></a>七, scrapy使用小总结</h2><p>至此, 我们对scrapy有了一个非常初步的了解和使用. 快速总结一下. scrapy框架的使用流程: </p>
+<ol>
+<li>创建爬虫项目.   <code>scrapy startproject xxx     </code></li>
+<li>进入项目目录.    <code>cd xxx  </code></li>
+<li>创建爬虫            <code>scrapy genspider 名称 抓取域</code></li>
+<li>编写<code>item.py</code> 文件, 定义好数据item</li>
+<li>修改spider中的parse方法. 对返回的响应response对象进行解析. 返回item</li>
+<li>在pipeline中对数据进行保存工作. </li>
+<li>修改<code>settings.py</code>文件, 将pipeline设置为生效, 并设置好优先级</li>
+<li>启动爬虫   <code>scrapy crawl 名称</code></li>
+</ol>
+ 
+      <!-- reward -->
+      
+      <div id="reword-out">
+        <div id="reward-btn">
+          打赏
+        </div>
+      </div>
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <div class="declare">
+      <ul class="post-copyright">
+        <li>
+          <i class="ri-copyright-line"></i>
+          <strong>版权声明： </strong>
+          
+          本博客所有文章除特别声明外，著作权归作者所有。转载请注明出处！
+          
+        </li>
+      </ul>
+    </div>
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Scrapy%E7%88%AC%E8%99%AB/" rel="tag">Scrapy爬虫</a></li></ul>
+
+    </footer>
+  </div>
+
+   
+  <nav class="article-nav">
+    
+      <a href="/2023/12/03/09-Scrapy-%E7%AE%A1%E9%81%93/" class="article-nav-link">
+        <strong class="article-nav-caption">上一篇</strong>
+        <div class="article-nav-title">
+          
+            Scrapy_管道
+          
+        </div>
+      </a>
+    
+    
+      <a href="/2023/12/03/%E6%90%AD%E5%BB%BAgithub%E5%8D%9A%E5%AE%A2%E6%95%99%E7%A8%8B/" class="article-nav-link">
+        <strong class="article-nav-caption">下一篇</strong>
+        <div class="article-nav-title">搭建github博客教程</div>
+      </a>
+    
+  </nav>
+
+  
+   
+     
+</article>
+
+</section>
+      <footer class="footer">
+  <div class="outer">
+    <ul>
+      <li>
+        Copyrights &copy;
+        2015-2023
+        <i class="ri-heart-fill heart_icon"></i> 山城冰荔枝
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+        
+        <span>
+  <span><i class="ri-user-3-fill"></i>访问人数:<span id="busuanzi_value_site_uv"></span></span>
+  <span class="division">|</span>
+  <span><i class="ri-eye-fill"></i>浏览次数:<span id="busuanzi_value_page_pv"></span></span>
+</span>
+        
+      </li>
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      <li>
+        <!-- cnzz统计 -->
+        
+        <script type="text/javascript" src='https://s9.cnzz.com/z_stat.php?id=1278069914&amp;web_id=1278069914'></script>
+        
+      </li>
+    </ul>
+  </div>
+</footer>    
+    </main>
+    <div class="float_btns">
+      <div class="totop" id="totop">
+  <i class="ri-arrow-up-line"></i>
+</div>
+
+<div class="todark" id="todark">
+  <i class="ri-moon-line"></i>
+</div>
+
+    </div>
+    <aside class="sidebar on">
+      <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">主页</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/archives">归档</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/categories">分类</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags">标签</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/photos">图库</a>
+    </li>
+    
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+    </aside>
+    <div id="mask"></div>
+
+<!-- #reward -->
+<div id="reward">
+  <span class="close"><i class="ri-close-line"></i></span>
+  <p class="reward-p"><i class="ri-cup-line"></i>请我喝杯咖啡吧~</p>
+  <div class="reward-box">
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/alipay.jpg">
+      <span class="reward-type">支付宝</span>
+    </div>
+    
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/wechat.jpg">
+      <span class="reward-type">微信</span>
+    </div>
+    
+  </div>
+</div>
+    
+<script src="/js/jquery-3.6.0.min.js"></script>
+ 
+<script src="/js/lazyload.min.js"></script>
+
+<!-- Tocbot -->
+ 
+<script src="/js/tocbot.min.js"></script>
+
+<script>
+  tocbot.init({
+    tocSelector: ".tocbot",
+    contentSelector: ".article-entry",
+    headingSelector: "h1, h2, h3, h4, h5, h6",
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    scrollContainer: "main",
+    positionFixedSelector: ".tocbot",
+    positionFixedClass: "is-position-fixed",
+    fixedSidebarOffset: "auto",
+  });
+</script>
+
+<script src="https://cdn.staticfile.org/jquery-modal/0.9.2/jquery.modal.min.js"></script>
+<link
+  rel="stylesheet"
+  href="https://cdn.staticfile.org/jquery-modal/0.9.2/jquery.modal.min.css"
+/>
+<script src="https://cdn.staticfile.org/justifiedGallery/3.8.1/js/jquery.justifiedGallery.min.js"></script>
+
+<script src="/dist/main.js"></script>
+
+<!-- ImageViewer -->
+ <!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" style="display:none" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<link rel="stylesheet" href="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.css">
+<link rel="stylesheet" href="https://cdn.staticfile.org/photoswipe/4.1.3/default-skin/default-skin.min.css">
+<script src="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.js"></script>
+<script src="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe-ui-default.min.js"></script>
+
+<script>
+    function viewer_init() {
+        let pswpElement = document.querySelectorAll('.pswp')[0];
+        let $imgArr = document.querySelectorAll(('.article-entry img:not(.reward-img)'))
+
+        $imgArr.forEach(($em, i) => {
+            $em.onclick = () => {
+                // slider展开状态
+                // todo: 这样不好，后面改成状态
+                if (document.querySelector('.left-col.show')) return
+                let items = []
+                $imgArr.forEach(($em2, i2) => {
+                    let img = $em2.getAttribute('data-idx', i2)
+                    let src = $em2.getAttribute('data-target') || $em2.getAttribute('src')
+                    let title = $em2.getAttribute('alt')
+                    // 获得原图尺寸
+                    const image = new Image()
+                    image.src = src
+                    items.push({
+                        src: src,
+                        w: image.width || $em2.width,
+                        h: image.height || $em2.height,
+                        title: title
+                    })
+                })
+                var gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, {
+                    index: parseInt(i)
+                });
+                gallery.init()
+            }
+        })
+    }
+    viewer_init()
+</script> 
+<!-- MathJax -->
+
+<!-- Katex -->
+
+<!-- busuanzi  -->
+ 
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+ 
+<!-- ClickLove -->
+
+<!-- ClickBoom1 -->
+
+<!-- ClickBoom2 -->
+
+<!-- CodeCopy -->
+ 
+<link rel="stylesheet" href="/css/clipboard.css">
+ <script src="https://cdn.staticfile.org/clipboard.js/2.0.10/clipboard.min.js"></script>
+<script>
+  function wait(callback, seconds) {
+    var timelag = null;
+    timelag = window.setTimeout(callback, seconds);
+  }
+  !function (e, t, a) {
+    var initCopyCode = function(){
+      var copyHtml = '';
+      copyHtml += '<button class="btn-copy" data-clipboard-snippet="">';
+      copyHtml += '<i class="ri-file-copy-2-line"></i><span>COPY</span>';
+      copyHtml += '</button>';
+      $(".highlight .code pre").before(copyHtml);
+      $(".article pre code").before(copyHtml);
+      var clipboard = new ClipboardJS('.btn-copy', {
+        target: function(trigger) {
+          return trigger.nextElementSibling;
+        }
+      });
+      clipboard.on('success', function(e) {
+        let $btn = $(e.trigger);
+        $btn.addClass('copied');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-checkbox-circle-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPIED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-checkbox-circle-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+      clipboard.on('error', function(e) {
+        e.clearSelection();
+        let $btn = $(e.trigger);
+        $btn.addClass('copy-failed');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-time-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPY FAILED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-time-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+    }
+    initCopyCode();
+  }(window, document);
+</script>
+ 
+<!-- CanvasBackground -->
+
+<script>
+  if (window.mermaid) {
+    mermaid.initialize({ theme: "forest" });
+  }
+</script>
+
+
+    
+    <div id="music">
+    
+    
+    
+    <iframe frameborder="no" border="1" marginwidth="0" marginheight="0" width="200" height="52"
+        src="//music.163.com/outchain/player?type=2&id=22707008&auto=1&height=32"></iframe>
+</div>
+
+<style>
+    #music {
+        position: fixed;
+        right: 15px;
+        bottom: 0;
+        z-index: 998;
+    }
+</style>
+    
+    
+
+  </div>
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"/live2dw/assets/assets/hijiki.model.json"},"display":{"position":"right","width":150,"height":300,"hOffset":400,"vOffset":-38},"mobile":{"show":true},"react":"opacity:1","dialog":{"enable":true,"script":{"every idle 10s":"text1","tap face":"text2","tap body":"text3"}},"log":false});</script></body>
+
+</html>

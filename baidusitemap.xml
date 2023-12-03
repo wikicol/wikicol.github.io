@@ -1,8 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>http://blog.ioimp.top/2023/11/26/test/</loc>
-    <lastmod>2023-11-26</lastmod>
+    <loc>http://blog.ioimp.top/2023/12/03/Scarpy-%E5%88%86%E5%B8%83%E5%BC%8F%E7%88%AC%E8%99%AB/</loc>
+    <lastmod>2023-12-03</lastmod>
+  </url>
+  <url>
+    <loc>http://blog.ioimp.top/2023/12/03/13-Scrapy-Splash%E7%9A%84%E4%BD%BF%E7%94%A8/</loc>
+    <lastmod>2023-12-03</lastmod>
+  </url>
+  <url>
+    <loc>http://blog.ioimp.top/2023/12/03/crawlSpider/</loc>
+    <lastmod>2023-12-03</lastmod>
+  </url>
+  <url>
+    <loc>http://blog.ioimp.top/2023/12/03/Scrapy-%E6%A8%A1%E6%8B%9F%E7%99%BB%E5%BD%95%E4%B8%8E%E4%B8%AD%E9%97%B4%E4%BB%B6/</loc>
+    <lastmod>2023-12-03</lastmod>
+  </url>
+  <url>
+    <loc>http://blog.ioimp.top/2023/12/03/09-Scrapy-%E7%AE%A1%E9%81%93/</loc>
+    <lastmod>2023-12-03</lastmod>
+  </url>
+  <url>
+    <loc>http://blog.ioimp.top/2023/12/03/scrapy%E5%85%A5%E9%97%A8%E8%AF%BE%E4%BB%B6/</loc>
+    <lastmod>2023-12-03</lastmod>
+  </url>
+  <url>
+    <loc>http://blog.ioimp.top/2023/12/03/%E6%90%AD%E5%BB%BAgithub%E5%8D%9A%E5%AE%A2%E6%95%99%E7%A8%8B/</loc>
+    <lastmod>2023-12-03</lastmod>
   </url>
   <url>
     <loc>http://blog.ioimp.top/2023/11/24/kubernetes%E6%A0%B8%E5%BF%83%E6%A6%82%E5%BF%B5/</loc>

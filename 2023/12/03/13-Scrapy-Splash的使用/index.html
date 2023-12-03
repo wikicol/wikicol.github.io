@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+
+
+<html lang="zh-CN">
+  
+
+    <head>
+      <meta charset="utf-8" />
+        
+      <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1"
+      />
+      <title>Scrapy_Splash的使用 |  山城冰荔枝</title>
+  <meta name="generator" content="hexo-theme-ayer">
+       
+<link rel="stylesheet" href="/dist/main.css">
+
+      
+<link rel="stylesheet" href="/css/fonts/remixicon.css">
+
+      
+<link rel="stylesheet" href="/css/custom.css">
+ 
+      <script src="https://cdn.staticfile.org/pace/1.2.4/pace.min.js"></script>
+       
+ 
+
+      <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bulma@5.0.1/bulma.min.css"
+      />
+      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.min.js"></script>
+
+      <!-- mermaid -->
+      
+      <script src="https://cdn.staticfile.org/mermaid/8.14.0/mermaid.min.js"></script>
+      
+      <style>
+        .swal2-styled.swal2-confirm {
+          font-size: 1.6rem;
+        }
+      </style>
+    <link rel="alternate" href="/atom.xml" title="山城冰荔枝" type="application/atom+xml">
+</head>
+  </html>
+</html>
+
+
+<body>
+  <div id="app">
+    
+      
+    <main class="content on">
+      <section class="outer">
+  <article
+  id="post-13-Scrapy-Splash的使用"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h1 class="article-title sea-center" style="border-left:0" itemprop="name">
+  Scrapy_Splash的使用
+</h1>
+ 
+
+      
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2023/12/03/13-Scrapy-Splash%E7%9A%84%E4%BD%BF%E7%94%A8/" class="article-date">
+  <time datetime="2023-12-03T04:00:18.000Z" itemprop="datePublished">2023-12-03</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E7%88%AC%E8%99%AB%E5%BC%80%E5%8F%91/">爬虫开发</a>
+  </div>
+  
+<div class="word_count">
+    <span class="post-time">
+        <span class="post-meta-item-icon">
+            <i class="ri-quill-pen-line"></i>
+            <span class="post-meta-item-text"> 字数统计:</span>
+            <span class="post-count">2.4k</span>
+        </span>
+    </span>
+
+    <span class="post-time">
+        &nbsp; | &nbsp;
+        <span class="post-meta-item-icon">
+            <i class="ri-book-open-line"></i>
+            <span class="post-meta-item-text"> 阅读时长≈</span>
+            <span class="post-count">10 分钟</span>
+        </span>
+    </span>
+</div>
+ 
+    </div>
+      
+    <div class="tocbot"></div>
+
+
+
+
+  
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h1 id="Scrapy-splash模块使用"><a href="#Scrapy-splash模块使用" class="headerlink" title="Scrapy_splash模块使用"></a>Scrapy_splash模块使用</h1><h2 id="一-Splash"><a href="#一-Splash" class="headerlink" title="一. Splash"></a>一. Splash</h2><p>后续的爬虫的课程. 随便随时来听.  – 樵夫说的. </p>
+<p>splash是一个可以动态渲染js的工具. 有助于我们完成复杂的js内容加载工作.  你可以理解为另一个没有界面的selenium.</p>
+<h3 id="1-1-splash安装"><a href="#1-1-splash安装" class="headerlink" title="1.1 splash安装"></a>1.1 splash安装</h3><p>splash的安装过程十分复杂. 复杂到官方都不推荐你去手动安装它. </p>
+<p>官方建议. 用docker去安装splash. 所以. 你需要先去安装docker. 但是docker这玩意在windows上支持非常不好. 各种各样的问题. 外加上后期我们要把爬虫部署到linux. 那干脆. 我们就安装一个linux. 在linux上搞docker是非常easy的. </p>
+<p>有能力, 不怕苦的同学可以在windows上搞一个docker试试. 我这里就不带你们找坑踩了. 直接上Linux. </p>
+<h4 id="1-1-1安装VM"><a href="#1-1-1安装VM" class="headerlink" title="1.1.1安装VM"></a>1.1.1安装VM</h4><p><img src="/images/scrapy02/17561629196138_.pic_hd.jpg" alt="17561629196138_.pic_hd"></p>
+<p><img src="/images/scrapy02/17561629196138_.pic.jpg" alt="17561629196138_.pic"></p>
+<p><img src="/images/scrapy02/17581629196184_.pic.jpg" alt="17581629196184_.pic"></p>
+<p><img src="/images/scrapy02/17571629196155_.pic-9199960.jpg" alt="17571629196155_.pic"></p>
+<p><img src="/images/scrapy02/17581629196184_.pic-9199973.jpg" alt="17581629196184_.pic"></p>
+<p><img src="/images/scrapy02/17591629196208_.pic.jpg" alt="17591629196208_.pic"></p>
+<p><img src="/images/scrapy02/17601629196228_.pic.jpg" alt="17601629196228_.pic"></p>
+<p><img src="/images/scrapy02/17611629196237_.pic.jpg" alt="17611629196237_.pic"></p>
+<p><img src="/images/scrapy02/17621629196250_.pic_hd.jpg" alt="17621629196250_.pic_hd"></p>
+<p><img src="/images/scrapy02/17631629196343_.pic_hd.jpg" alt="17631629196343_.pic_hd"></p>
+<p><img src="/images/scrapy02/17641629196362_.pic_hd.jpg" alt="17641629196362_.pic_hd"></p>
+<p><img src="/images/scrapy02/17651629196369_.pic_hd.jpg" alt="17651629196369_.pic_hd"></p>
+<p><img src="/images/scrapy02/17661629196398_.pic_hd.jpg" alt="17661629196398_.pic_hd"></p>
+<p><img src="/images/scrapy02/17671629196461_.pic_hd.jpg" alt="17671629196461_.pic_hd"></p>
+<p><img src="/images/scrapy02/17681629196491_.pic_hd.jpg" alt="17681629196491_.pic_hd"></p>
+<p><img src="/images/scrapy02/17691629196532_.pic_hd.jpg" alt="17691629196532_.pic_hd"></p>
+<p><img src="/images/scrapy02/17701629196571_.pic_hd.jpg" alt="17701629196571_.pic_hd"></p>
+<p><img src="/images/scrapy02/17711629196622_.pic_hd.jpg" alt="17711629196622_.pic_hd"></p>
+<p><img src="/images/scrapy02/17721629196663_.pic_hd.jpg" alt="17721629196663_.pic_hd"></p>
+<p><img src="/images/scrapy02/17731629196679_.pic_hd.jpg" alt="17731629196679_.pic_hd"></p>
+<h4 id="1-1-2-安装Linux"><a href="#1-1-2-安装Linux" class="headerlink" title="1.1.2 安装Linux"></a>1.1.2 安装Linux</h4><img src="image-20210817140222006.png" alt="image-20210817140222006" style="zoom:50%;" />
+
+<img src="image-20210817140422074.png" alt="image-20210817140422074" style="zoom:40%;" />
+
+<img src="image-20210817140631614.png" alt="image-20210817140631614" style="zoom:40%;" />
+
+<img src="image-20210817140748141.png" alt="image-20210817140748141" style="zoom:40%;" />
+
+<img src="image-20210817140818074.png" alt="image-20210817140818074" style="zoom:40%;" />
+
+<img src="image-20210817140849908.png" alt="image-20210817140849908" style="zoom:40%;" />
+
+<img src="image-20210817140925752.png" alt="image-20210817140925752" style="zoom:40%;" />
+
+<img src="image-20210817141200195.png" alt="image-20210817141200195" style="zoom:50%;" />
+
+<img src="image-20210817141307223.png" alt="image-20210817141307223" style="zoom:50%;" />
+
+<img src="image-20210817141415716.png" alt="image-20210817141415716" style="zoom:40%;" />
+
+<img src="image-20210817141552531.png" alt="image-20210817141552531" style="zoom:40%;" />
+
+<img src="image-20210817141643259.png" alt="image-20210817141643259" style="zoom:40%;" />
+
+<img src="image-20210817141729496.png" alt="image-20210817141729496" style="zoom:40%;" />
+
+<img src="image-20210817141824889.png" alt="image-20210817141824889" style="zoom:40%;" />
+
+<img src="image-20210817141850749.png" alt="image-20210817141850749" style="zoom:40%;" />
+
+<img src="image-20210817142347367.png" alt="image-20210817142347367" style="zoom:40%;" />
+
+<img src="image-20210817142421655.png" alt="image-20210817142421655" style="zoom:50%;" />
+
+<img src="image-20210817142519453.png" alt="image-20210817142519453" style="zoom:40%;" />
+
+<img src="image-20210817142634663.png" alt="image-20210817142634663" style="zoom:40%;" />
+
+<p>安装好的linux后,我们需要学会使用linux的一个工具. 叫yum, 我们需要用它来帮我们完成各种软件的安装. 十分的方便. 我们先用<code>ifconfig</code>来做一个测试. </p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">yum search ifconfig   // 搜索出ifconfig的包</span><br><span class="line"></span><br><span class="line">yum install net-tools.x86_64  // 安装该软件, 安装过程中会出现很多个询问. 直接y即可</span><br></pre></td></tr></table></figure>
+
+<p>发现了吧, 在linux这个破黑窗口里. 属实难受+憋屈. 所以, 我们这里选择用ssh远程连接linux. </p>
+<p>mac版本:  打开终端. 输入</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ssh root@服务器ip地址</span><br><span class="line">输入密码</span><br></pre></td></tr></table></figure>
+
+<p>就可以顺利的链接到你的linux服务器. 接下来. 我们可以使用各种命令来操纵linux了. </p>
+<p>Windows: </p>
+<p><img src="/images/scrapy02/17751629199547_.pic_hd.jpg" alt="17751629199547_.pic_hd"></p>
+<p><img src="/images/scrapy02/17791629200276_.pic_hd.jpg" alt="17791629200276_.pic_hd"></p>
+<p><img src="/images/scrapy02/17761629199585_.pic_hd.jpg" alt="17761629199585_.pic_hd"></p>
+<p><img src="/images/scrapy02/17771629199596_.pic_hd.jpg" alt="17771629199596_.pic_hd"></p>
+<p><img src="/images/scrapy02/17781629199688_.pic_hd.jpg" alt="17781629199688_.pic_hd"></p>
+<h4 id="1-1-3-安装docker"><a href="#1-1-3-安装docker" class="headerlink" title="1.1.3 安装docker"></a>1.1.3 安装docker</h4><p>​	安装docker就一条例命令就好了</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@sylar-centos-2 ~]# yum install docker</span><br></pre></td></tr></table></figure>
+
+<p>​	配置docker的源. </p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[root@sylar-centos-2 ~]# vi /etc/docker/daemon.json</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">写入一下内容, 注意.先按<span class="string">&#x27;i&#x27;</span>, 更换为输入模式. 然后再填写内容</span></span><br><span class="line">&#123;</span><br><span class="line">	&quot;registry-mirrors&quot;: [&quot;https://registry.docker-cn.com/&quot;]</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">保存: 先按esc. 退出输入模式, 然后输入<span class="string">&quot;:wq&quot;</span> 表示写入, 退出. 就完事儿了</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@sylar-centos-2 ~]# systemctl start docker    # 启动docker</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@sylar-centos-2 ~]# docker ps      # 查看docker运行状态</span><br></pre></td></tr></table></figure>
+
+<p>如需关闭或者重新启动docker:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">systemctl stop docker   # 停止docker服务</span><br><span class="line">systemctl restart docker  # 重启docker服务</span><br></pre></td></tr></table></figure>
+
+
+
+<p>Vm -&gt; cenos -&gt; ssh -&gt; docker -&gt; splash </p>
+<h4 id="1-1-4-安装splash"><a href="#1-1-4-安装splash" class="headerlink" title="1.1.4 安装splash"></a>1.1.4 安装splash</h4><ol>
+<li><p>拉取splash镜像</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker pull scrapinghub/splash</span><br></pre></td></tr></table></figure>
+
+<p>splash比较大. 大概2个G左右. 有点儿耐心等会儿就好了</p>
+</li>
+<li><p>运行splash</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run -p 8050:8050 scrapinghub/splash</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>打开浏览器访问splash</p>
+<p><a target="_blank" rel="noopener" href="http://192.168.31.82:8050/">http://192.168.31.82:8050/</a></p>
+<p><img src="/images/scrapy02/image-20210817153337076.png" alt="image-20210817153337076"></p>
+</li>
+</ol>
+<h3 id="1-2-splash简单使用"><a href="#1-2-splash简单使用" class="headerlink" title="1.2 splash简单使用"></a>1.2 splash简单使用</h3><p>​	我们可以在文本框内输入百度的网址. 然后点击render. 可以看到splash会对我们的网页进行动态的加载. 并返回截图. 运行状况. 以及页面代码(经过js渲染后的)</p>
+<p><img src="/images/scrapy02/image-20210817153704882.png" alt="image-20210817153704882"></p>
+<p><img src="/images/scrapy02/image-20210817153711026.png" alt="image-20210817153711026"></p>
+<p>快速解释一下, script中的脚本. 这里面用的是lua的脚本语法. 所以看起来会有些难受. </p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">main</span><span class="params">(splash, args)</span></span>  <span class="comment">-- 主函数</span></span><br><span class="line">  <span class="built_in">assert</span>(splash:go(args.url))  <span class="comment">-- 进入xxx页面</span></span><br><span class="line">  <span class="built_in">assert</span>(splash:wait(<span class="number">0.5</span>))   <span class="comment">-- 等待0.5秒</span></span><br><span class="line">  <span class="keyword">return</span> &#123;  <span class="comment">-- 返回</span></span><br><span class="line">    html = splash:html(),  <span class="comment">-- splash:html() 页面源代码</span></span><br><span class="line">    png = splash:png(),   <span class="comment">-- splash:png() 页面截图</span></span><br><span class="line">    har = splash:har(),   <span class="comment">-- splash:har() 页面加载过程</span></span><br><span class="line">  &#125;</span><br><span class="line"><span class="keyword">end</span>   <span class="comment">-- 函数结束</span></span><br></pre></td></tr></table></figure>
+
+<p>有必要说明一下. 在lua中, <code>.</code>表示的是属性(变量), <code>:</code>表示的是方法(函数)的调用. </p>
+<p>常见操作符都一样. 剩下的. 我们到案例里看. </p>
+<h3 id="1-3-splash的http-api接口"><a href="#1-3-splash的http-api接口" class="headerlink" title="1.3 splash的http-api接口"></a>1.3 splash的http-api接口</h3><p>splash提供了对外的http-api接口. 我们可以像访问一个普通url一样访问splash. 并由splash帮助我们渲染好页面内容. </p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://<span class="number">192.168</span><span class="number">.31</span><span class="number">.82</span>:<span class="number">8050</span>/render.html?url=http://www.baidu.com</span><br></pre></td></tr></table></figure>
+
+<p>虽然看不出任何差别. 但是你心里要清楚一个事情. 此时拿到的直接是经过js渲染后的html</p>
+<p>我们换个url你就知道了</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://<span class="number">192.168</span><span class="number">.31</span><span class="number">.82</span>:<span class="number">8050</span>/render.html?url=https://www.endata.com.cn/BoxOffice/BO/Year/index.html&amp;wait=<span class="number">5</span></span><br></pre></td></tr></table></figure>
+
+<p>endata这个网站. 它的数据是后期经过ajax请求二次加载进来的. 我们通过splash可以等待它后期加载完再拿html. </p>
+<p>综上, splash的工作机制:</p>
+<p><img src="/images/scrapy02/image-20210817155156714.png" alt="image-20210817155156714"></p>
+<p>整个一个代理服务器的逻辑. ~~~~</p>
+<h2 id="二-python中使用splash"><a href="#二-python中使用splash" class="headerlink" title="二. python中使用splash"></a>二. python中使用splash</h2><h3 id="2-1-splash在python中如何使用"><a href="#2-1-splash在python中如何使用" class="headerlink" title="2.1 splash在python中如何使用"></a>2.1 splash在python中如何使用</h3><p>既然splash提供了http-api接口. 那我们就可以像请求普通网站一样去请求到splash.<br>在python中, 我们最熟悉的能发送http请求的东西就是requests了. </p>
+<p>接下来.我们就用requests来完成splash的对接. </p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string"># splash提供的api接口</span></span><br><span class="line"><span class="string">渲染html的接口</span></span><br><span class="line"><span class="string">http://192.168.31.184:8050/render.html?url=你的url&amp;wait=等待时间&amp;time_out=超时时间</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">截图的接口</span></span><br><span class="line"><span class="string">http://192.168.31.184:8050/render.png  参数和render.html基本一致, 可选width, height</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">加载过程接口</span></span><br><span class="line"><span class="string">http://192.168.31.184:8050/render.har  参数和render.html基本一致</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">json接口</span></span><br><span class="line"><span class="string">http://192.168.31.184:8050/render.json  参数和render.html基本一致</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">执行lua脚本的接口</span></span><br><span class="line"><span class="string">http://192.168.31.184:8050/execute?lua_source=你要执行的lua脚本</span></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 最简单的调用splash的render.html</span></span><br><span class="line">url = <span class="string">&quot;http://192.168.31.184:8050/render.html?url=https://www.baidu.com&amp;wait=5&quot;</span></span><br><span class="line">resp = requests.get(url)</span><br><span class="line"><span class="built_in">print</span>(resp.text)</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="2-2-我们以网易新闻首页要闻为例"><a href="#2-2-我们以网易新闻首页要闻为例" class="headerlink" title="2.2 我们以网易新闻首页要闻为例."></a>2.2 我们以网易新闻首页<code>要闻</code>为例.</h3><p>先搞定脚本部分.</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">main</span><span class="params">(splash, args)</span></span></span><br><span class="line">    <span class="built_in">assert</span>(splash:go(args.url))</span><br><span class="line">    <span class="built_in">assert</span>(splash:wait(<span class="number">1</span>))</span><br><span class="line">    <span class="comment">-- 加载一段js, 后面作为lua函数进行调用. </span></span><br><span class="line">    <span class="comment">-- 在这个脚本中, 主要返回了&quot;加载更多&quot;按钮的状态</span></span><br><span class="line">    get_display_style = splash:jsfunc(<span class="string">[[</span></span><br><span class="line"><span class="string">      function()&#123;</span></span><br><span class="line"><span class="string">        return document.getElementsByClassName(&#x27;load_more_btn&#x27;)[0].style.display;</span></span><br><span class="line"><span class="string">      &#125;</span></span><br><span class="line"><span class="string">    ]]</span>)</span><br><span class="line">    <span class="comment">-- lua中的循环语句. 和python的while功能一样. </span></span><br><span class="line">    <span class="keyword">while</span> (<span class="literal">true</span>)</span><br><span class="line">    <span class="keyword">do</span>  <span class="comment">-- 语法规定. 相当于开始</span></span><br><span class="line">        <span class="comment">-- 直接运行js代码, 滚动到&#x27;加载更多&#x27;按钮</span></span><br><span class="line">        splash:runjs(<span class="string">&quot;document.getElementsByClassName(&#x27;load_more_btn&#x27;)[0].scrollIntoView(true)&quot;</span>)</span><br><span class="line">        <span class="comment">-- 等待</span></span><br><span class="line">        splash:wait(<span class="number">1</span>)</span><br><span class="line">        <span class="comment">-- 找到该按钮. 点击它</span></span><br><span class="line">        splash:<span class="built_in">select</span>(<span class="string">&quot;.load_more_btn&quot;</span>).click()</span><br><span class="line">        <span class="comment">-- 调用上方预制的js脚本, 获取&#x27;正在加载按钮&#x27;的状态</span></span><br><span class="line">        display_style = get_display_style()</span><br><span class="line">        <span class="comment">-- 如果不显示了. 也就结束了</span></span><br><span class="line">        <span class="keyword">if</span>(display_style== <span class="string">&#x27;none&#x27;</span>)</span><br><span class="line">        <span class="keyword">then</span></span><br><span class="line">            <span class="keyword">break</span>  <span class="comment">-- 同python中的break. 打断循环</span></span><br><span class="line">        <span class="keyword">end</span></span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line">    <span class="built_in">assert</span>(splash:wait(<span class="number">2</span>)) <span class="comment">-- 不在乎多等2秒</span></span><br><span class="line">    <span class="keyword">return</span> &#123;</span><br><span class="line">        html = splash:html(),</span><br><span class="line">        png = splash:png(),</span><br><span class="line">        har = splash:har(),</span><br><span class="line">    &#125;</span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+
+<p>到了python里面就可以使用这个脚本了</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 执行lua脚本</span></span><br><span class="line">lua = <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">function main(splash, args)</span></span><br><span class="line"><span class="string">    assert(splash:go(args.url))</span></span><br><span class="line"><span class="string">    assert(splash:wait(0.5))</span></span><br><span class="line"><span class="string">    -- 加载一段js, 后面作为lua函数进行调用. </span></span><br><span class="line"><span class="string">    -- 在这个脚本中, 主要返回了&quot;加载更多&quot;按钮的状态</span></span><br><span class="line"><span class="string">    get_display_style = splash:jsfunc([[</span></span><br><span class="line"><span class="string">      function()&#123;</span></span><br><span class="line"><span class="string">        return document.getElementsByClassName(&#x27;load_more_btn&#x27;)[0].style.display;</span></span><br><span class="line"><span class="string">      &#125;</span></span><br><span class="line"><span class="string">    ]])</span></span><br><span class="line"><span class="string">    -- lua中的循环语句. 和python的while功能一样. </span></span><br><span class="line"><span class="string">    while (true)</span></span><br><span class="line"><span class="string">    do  -- 语法规定. 相当于开始</span></span><br><span class="line"><span class="string">        -- 直接运行js代码, 滚动到&#x27;加载更多&#x27;按钮</span></span><br><span class="line"><span class="string">        splash:runjs(&quot;document.getElementsByClassName(&#x27;load_more_btn&#x27;)[0].scrollIntoView(true)&quot;)</span></span><br><span class="line"><span class="string">        -- 等待</span></span><br><span class="line"><span class="string">        splash:wait(1)</span></span><br><span class="line"><span class="string">        -- 找到该按钮. 点击它</span></span><br><span class="line"><span class="string">        splash:select(&quot;.load_more_btn&quot;).click()</span></span><br><span class="line"><span class="string">        -- 调用上方预制的js脚本, 获取&#x27;正在加载按钮&#x27;的状态</span></span><br><span class="line"><span class="string">        display_style = get_display_style()</span></span><br><span class="line"><span class="string">        -- 如果不显示了. 也就结束了</span></span><br><span class="line"><span class="string">        if(display_style== &#x27;none&#x27;)</span></span><br><span class="line"><span class="string">        then</span></span><br><span class="line"><span class="string">            break  -- 同python中的break. 打断循环</span></span><br><span class="line"><span class="string">        end</span></span><br><span class="line"><span class="string">    end</span></span><br><span class="line"><span class="string">    assert(splash:wait(2)) -- 不在乎多等2秒</span></span><br><span class="line"><span class="string">    return &#123;</span></span><br><span class="line"><span class="string">        html = splash:html(),    -- 拿到页面源代码</span></span><br><span class="line"><span class="string">        cookies = splash:get_cookies()  -- 拿到cookies</span></span><br><span class="line"><span class="string">    &#125;</span></span><br><span class="line"><span class="string">end</span></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># 准备能够执行lua脚本的url  -&gt; splash服务地址</span></span><br><span class="line">url = <span class="string">&quot;http://192.168.31.82:8050/execute&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> lxml <span class="keyword">import</span> etree</span><br><span class="line"></span><br><span class="line"><span class="comment"># 远程访问splash, 执行脚本</span></span><br><span class="line">resp = requests.get(url, params=&#123;</span><br><span class="line">    <span class="string">&quot;url&quot;</span>:<span class="string">&quot;https://news.163.com&quot;</span>,</span><br><span class="line">    <span class="string">&quot;lua_source&quot;</span>: lua</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">result = resp.json()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 提取结果</span></span><br><span class="line">tree = etree.HTML(result.get(<span class="string">&#x27;html&#x27;</span>))</span><br><span class="line"><span class="comment"># print(resp.text)</span></span><br><span class="line">divs = tree.xpath(<span class="string">&quot;//ul[@class=&#x27;newsdata_list fixed_bar_padding noloading&#x27;]/li[1]/div[2]/div&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> div <span class="keyword">in</span> divs:</span><br><span class="line">    a = div.xpath(<span class="string">&quot;./div/div/h3/a&quot;</span>)</span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> a:</span><br><span class="line">        <span class="keyword">continue</span></span><br><span class="line">    a = a[<span class="number">0</span>]</span><br><span class="line">    href = a.xpath(<span class="string">&#x27;./@href&#x27;</span>)</span><br><span class="line">    title = a.xpath(<span class="string">&#x27;./text()&#x27;</span>)</span><br><span class="line"></span><br><span class="line">    <span class="built_in">print</span>(title, href)</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(result.get(<span class="string">&quot;cookies&quot;</span>))</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<p>##三. scrapy_splash</p>
+<p>安装scrapy_splash模块</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install scrapy_splash</span><br></pre></td></tr></table></figure>
+
+<p>创建一个普通的scrapy项目, 然后把scrapy_splash配置到settings文件中</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Crawl responsibly by identifying yourself (and your website) on the user-agent</span></span><br><span class="line">USER_AGENT = <span class="string">&#x27;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.36&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Obey robots.txt rules</span></span><br><span class="line">ROBOTSTXT_OBEY = <span class="literal">False</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># scrapy_splash</span></span><br><span class="line"><span class="comment"># 渲染服务的url, 这里换成你自己的</span></span><br><span class="line">SPLASH_URL = <span class="string">&#x27;http://192.168.31.82:8050&#x27;</span></span><br><span class="line"><span class="comment"># 下载器中间件, 这个必须要配置</span></span><br><span class="line">DOWNLOADER_MIDDLEWARES = &#123;</span><br><span class="line">    <span class="string">&#x27;scrapy_splash.SplashCookiesMiddleware&#x27;</span>: <span class="number">723</span>,</span><br><span class="line">    <span class="string">&#x27;scrapy_splash.SplashMiddleware&#x27;</span>: <span class="number">725</span>,</span><br><span class="line">    <span class="string">&#x27;scrapy.downloadermiddlewares.httpcompression.HttpCompressionMiddleware&#x27;</span>: <span class="number">810</span>,</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 这个可由可无</span></span><br><span class="line"><span class="comment"># SPIDER_MIDDLEWARES = &#123;</span></span><br><span class="line"><span class="comment">#     &#x27;scrapy_splash.SplashDeduplicateArgsMiddleware&#x27;: 100,</span></span><br><span class="line"><span class="comment"># &#125;</span></span><br><span class="line"><span class="comment"># 去重过滤器, 这个必须要配置</span></span><br><span class="line">DUPEFILTER_CLASS = <span class="string">&#x27;scrapy_splash.SplashAwareDupeFilter&#x27;</span></span><br><span class="line"><span class="comment"># 使用Splash的Http缓存, 这个必须要配置</span></span><br><span class="line">HTTPCACHE_STORAGE = <span class="string">&#x27;scrapy_splash.SplashAwareFSCacheStorage&#x27;</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>最后. 整理修改一下spider</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> scrapy</span><br><span class="line"><span class="keyword">from</span> scrapy_splash.request <span class="keyword">import</span> SplashRequest</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># splash的lua脚本</span></span><br><span class="line">lua_source = <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">function main(splash, args)  -- 主函数</span></span><br><span class="line"><span class="string">    assert(splash:go(&quot;https://news.163.com/&quot;))  -- 访问url</span></span><br><span class="line"><span class="string">    assert(splash:wait(2))  -- 等待</span></span><br><span class="line"><span class="string">    -- 预存一个js函数</span></span><br><span class="line"><span class="string">    get_btn_display = splash:jsfunc([[</span></span><br><span class="line"><span class="string">        function()&#123;</span></span><br><span class="line"><span class="string">            return document.getElementsByClassName(&#x27;load_more_btn&#x27;)[0].style.display;</span></span><br><span class="line"><span class="string">        &#125;</span></span><br><span class="line"><span class="string">    ]])</span></span><br><span class="line"><span class="string">    -- lua的while循环</span></span><br><span class="line"><span class="string">    while(true)</span></span><br><span class="line"><span class="string">    do</span></span><br><span class="line"><span class="string">        -- 直接执行一个js脚本</span></span><br><span class="line"><span class="string">        -- 向下拉动滚动条. </span></span><br><span class="line"><span class="string">        splash:runjs(&quot;document.getElementsByClassName(&#x27;load_more_btn&#x27;)[0].scrollIntoView(true)&quot;)</span></span><br><span class="line"><span class="string">        assert(splash:wait(1))</span></span><br><span class="line"><span class="string">        -- 选择 &quot;加载更多&quot;</span></span><br><span class="line"><span class="string">        btn = splash:select(&quot;.load_more_btn&quot;)</span></span><br><span class="line"><span class="string">        -- 点它</span></span><br><span class="line"><span class="string">        btn:click()</span></span><br><span class="line"><span class="string">        -- 判断是否可见 调用上方预制的js函数</span></span><br><span class="line"><span class="string">        ss = get_btn_display()</span></span><br><span class="line"><span class="string">        -- 如果是none. 就没有数据了(网易自己设计的)</span></span><br><span class="line"><span class="string">        if (ss == &#x27;none&#x27;)</span></span><br><span class="line"><span class="string">        then</span></span><br><span class="line"><span class="string">            break</span></span><br><span class="line"><span class="string">        end</span></span><br><span class="line"><span class="string">    end</span></span><br><span class="line"><span class="string">    return &#123;</span></span><br><span class="line"><span class="string">        html = splash:html(),</span></span><br><span class="line"><span class="string">        cookies = splash:get_cookies()</span></span><br><span class="line"><span class="string">    &#125;</span></span><br><span class="line"><span class="string">    end</span></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">WangyiSpider</span>(scrapy.Spider):</span><br><span class="line">    name = <span class="string">&#x27;wangyi&#x27;</span></span><br><span class="line">    allowed_domains = [<span class="string">&#x27;163.com&#x27;</span>]</span><br><span class="line">    start_urls = [<span class="string">&#x27;http://news.163.com/&#x27;</span>]</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">start_requests</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="comment"># 发送splash请求</span></span><br><span class="line">        <span class="keyword">yield</span> SplashRequest(</span><br><span class="line">            url=self.start_urls[<span class="number">0</span>],</span><br><span class="line">            callback=self.parse,</span><br><span class="line">            endpoint=<span class="string">&quot;execute&quot;</span>,</span><br><span class="line">            args=&#123;<span class="string">&quot;lua_source&quot;</span>: lua_source, &#125;</span><br><span class="line">        )</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">parse</span>(<span class="params">self, resp, **kwargs</span>):</span><br><span class="line">        divs = resp.xpath(<span class="string">&quot;//ul[@class=&#x27;newsdata_list fixed_bar_padding noloading&#x27;]/li[1]/div[2]/div&quot;</span>)</span><br><span class="line">        <span class="keyword">for</span> div <span class="keyword">in</span> divs:</span><br><span class="line">            a = div.xpath(<span class="string">&quot;./div/div/h3/a&quot;</span>)</span><br><span class="line">            <span class="keyword">if</span> <span class="keyword">not</span> a:</span><br><span class="line">                <span class="keyword">continue</span></span><br><span class="line"></span><br><span class="line">            href = a.xpath(<span class="string">&#x27;./@href&#x27;</span>).extract_first()</span><br><span class="line">            title = a.xpath(<span class="string">&#x27;./text()&#x27;</span>).extract_first()</span><br><span class="line">            <span class="built_in">print</span>(href)</span><br><span class="line">            <span class="comment"># 可以采用正常的抓取方案</span></span><br><span class="line">            <span class="keyword">yield</span> scrapy.Request(</span><br><span class="line">                url=href,</span><br><span class="line">                callback=self.details</span><br><span class="line">            )</span><br><span class="line"></span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">details</span>(<span class="params">self, resp</span>):</span><br><span class="line">        <span class="keyword">with</span> <span class="built_in">open</span>(<span class="string">&quot;data.txt&quot;</span>, mode=<span class="string">&#x27;w&#x27;</span>) <span class="keyword">as</span> f:</span><br><span class="line">            f.write(<span class="string">&quot;____&quot;</span>.join(resp.xpath(<span class="string">&quot;//div[@class=&#x27;post_body&#x27;]//p/text()&quot;</span>).extract()))</span><br><span class="line"></span><br></pre></td></tr></table></figure> 
+      <!-- reward -->
+      
+      <div id="reword-out">
+        <div id="reward-btn">
+          打赏
+        </div>
+      </div>
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <div class="declare">
+      <ul class="post-copyright">
+        <li>
+          <i class="ri-copyright-line"></i>
+          <strong>版权声明： </strong>
+          
+          本博客所有文章除特别声明外，著作权归作者所有。转载请注明出处！
+          
+        </li>
+      </ul>
+    </div>
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Scrapy%E7%88%AC%E8%99%AB/" rel="tag">Scrapy爬虫</a></li></ul>
+
+    </footer>
+  </div>
+
+   
+  <nav class="article-nav">
+    
+    
+      <a href="/2023/12/03/Scarpy-%E5%88%86%E5%B8%83%E5%BC%8F%E7%88%AC%E8%99%AB/" class="article-nav-link">
+        <strong class="article-nav-caption">下一篇</strong>
+        <div class="article-nav-title">Scarpy_分布式爬虫</div>
+      </a>
+    
+  </nav>
+
+  
+   
+     
+</article>
+
+</section>
+      <footer class="footer">
+  <div class="outer">
+    <ul>
+      <li>
+        Copyrights &copy;
+        2015-2023
+        <i class="ri-heart-fill heart_icon"></i> 山城冰荔枝
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+        
+        <span>
+  <span><i class="ri-user-3-fill"></i>访问人数:<span id="busuanzi_value_site_uv"></span></span>
+  <span class="division">|</span>
+  <span><i class="ri-eye-fill"></i>浏览次数:<span id="busuanzi_value_page_pv"></span></span>
+</span>
+        
+      </li>
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      <li>
+        <!-- cnzz统计 -->
+        
+        <script type="text/javascript" src='https://s9.cnzz.com/z_stat.php?id=1278069914&amp;web_id=1278069914'></script>
+        
+      </li>
+    </ul>
+  </div>
+</footer>    
+    </main>
+    <div class="float_btns">
+      <div class="totop" id="totop">
+  <i class="ri-arrow-up-line"></i>
+</div>
+
+<div class="todark" id="todark">
+  <i class="ri-moon-line"></i>
+</div>
+
+    </div>
+    <aside class="sidebar on">
+      <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">主页</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/archives">归档</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/categories">分类</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags">标签</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/photos">图库</a>
+    </li>
+    
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+    </aside>
+    <div id="mask"></div>
+
+<!-- #reward -->
+<div id="reward">
+  <span class="close"><i class="ri-close-line"></i></span>
+  <p class="reward-p"><i class="ri-cup-line"></i>请我喝杯咖啡吧~</p>
+  <div class="reward-box">
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/alipay.jpg">
+      <span class="reward-type">支付宝</span>
+    </div>
+    
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/wechat.jpg">
+      <span class="reward-type">微信</span>
+    </div>
+    
+  </div>
+</div>
+    
+<script src="/js/jquery-3.6.0.min.js"></script>
+ 
+<script src="/js/lazyload.min.js"></script>
+
+<!-- Tocbot -->
+ 
+<script src="/js/tocbot.min.js"></script>
+
+<script>
+  tocbot.init({
+    tocSelector: ".tocbot",
+    contentSelector: ".article-entry",
+    headingSelector: "h1, h2, h3, h4, h5, h6",
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    scrollContainer: "main",
+    positionFixedSelector: ".tocbot",
+    positionFixedClass: "is-position-fixed",
+    fixedSidebarOffset: "auto",
+  });
+</script>
+
+<script src="https://cdn.staticfile.org/jquery-modal/0.9.2/jquery.modal.min.js"></script>
+<link
+  rel="stylesheet"
+  href="https://cdn.staticfile.org/jquery-modal/0.9.2/jquery.modal.min.css"
+/>
+<script src="https://cdn.staticfile.org/justifiedGallery/3.8.1/js/jquery.justifiedGallery.min.js"></script>
+
+<script src="/dist/main.js"></script>
+
+<!-- ImageViewer -->
+ <!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" style="display:none" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<link rel="stylesheet" href="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.css">
+<link rel="stylesheet" href="https://cdn.staticfile.org/photoswipe/4.1.3/default-skin/default-skin.min.css">
+<script src="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.js"></script>
+<script src="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe-ui-default.min.js"></script>
+
+<script>
+    function viewer_init() {
+        let pswpElement = document.querySelectorAll('.pswp')[0];
+        let $imgArr = document.querySelectorAll(('.article-entry img:not(.reward-img)'))
+
+        $imgArr.forEach(($em, i) => {
+            $em.onclick = () => {
+                // slider展开状态
+                // todo: 这样不好，后面改成状态
+                if (document.querySelector('.left-col.show')) return
+                let items = []
+                $imgArr.forEach(($em2, i2) => {
+                    let img = $em2.getAttribute('data-idx', i2)
+                    let src = $em2.getAttribute('data-target') || $em2.getAttribute('src')
+                    let title = $em2.getAttribute('alt')
+                    // 获得原图尺寸
+                    const image = new Image()
+                    image.src = src
+                    items.push({
+                        src: src,
+                        w: image.width || $em2.width,
+                        h: image.height || $em2.height,
+                        title: title
+                    })
+                })
+                var gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, {
+                    index: parseInt(i)
+                });
+                gallery.init()
+            }
+        })
+    }
+    viewer_init()
+</script> 
+<!-- MathJax -->
+
+<!-- Katex -->
+
+<!-- busuanzi  -->
+ 
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+ 
+<!-- ClickLove -->
+
+<!-- ClickBoom1 -->
+
+<!-- ClickBoom2 -->
+
+<!-- CodeCopy -->
+ 
+<link rel="stylesheet" href="/css/clipboard.css">
+ <script src="https://cdn.staticfile.org/clipboard.js/2.0.10/clipboard.min.js"></script>
+<script>
+  function wait(callback, seconds) {
+    var timelag = null;
+    timelag = window.setTimeout(callback, seconds);
+  }
+  !function (e, t, a) {
+    var initCopyCode = function(){
+      var copyHtml = '';
+      copyHtml += '<button class="btn-copy" data-clipboard-snippet="">';
+      copyHtml += '<i class="ri-file-copy-2-line"></i><span>COPY</span>';
+      copyHtml += '</button>';
+      $(".highlight .code pre").before(copyHtml);
+      $(".article pre code").before(copyHtml);
+      var clipboard = new ClipboardJS('.btn-copy', {
+        target: function(trigger) {
+          return trigger.nextElementSibling;
+        }
+      });
+      clipboard.on('success', function(e) {
+        let $btn = $(e.trigger);
+        $btn.addClass('copied');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-checkbox-circle-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPIED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-checkbox-circle-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+      clipboard.on('error', function(e) {
+        e.clearSelection();
+        let $btn = $(e.trigger);
+        $btn.addClass('copy-failed');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-time-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPY FAILED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-time-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+    }
+    initCopyCode();
+  }(window, document);
+</script>
+ 
+<!-- CanvasBackground -->
+
+<script>
+  if (window.mermaid) {
+    mermaid.initialize({ theme: "forest" });
+  }
+</script>
+
+
+    
+    <div id="music">
+    
+    
+    
+    <iframe frameborder="no" border="1" marginwidth="0" marginheight="0" width="200" height="52"
+        src="//music.163.com/outchain/player?type=2&id=22707008&auto=1&height=32"></iframe>
+</div>
+
+<style>
+    #music {
+        position: fixed;
+        right: 15px;
+        bottom: 0;
+        z-index: 998;
+    }
+</style>
+    
+    
+
+  </div>
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"/live2dw/assets/assets/hijiki.model.json"},"display":{"position":"right","width":150,"height":300,"hOffset":400,"vOffset":-38},"mobile":{"show":true},"react":"opacity:1","dialog":{"enable":true,"script":{"every idle 10s":"text1","tap face":"text2","tap body":"text3"}},"log":false});</script></body>
+
+</html>

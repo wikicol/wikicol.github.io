@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+
+
+<html lang="zh-CN">
+  
+
+    <head>
+      <meta charset="utf-8" />
+        
+      <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1"
+      />
+      <title>crawlSpider |  山城冰荔枝</title>
+  <meta name="generator" content="hexo-theme-ayer">
+       
+<link rel="stylesheet" href="/dist/main.css">
+
+      
+<link rel="stylesheet" href="/css/fonts/remixicon.css">
+
+      
+<link rel="stylesheet" href="/css/custom.css">
+ 
+      <script src="https://cdn.staticfile.org/pace/1.2.4/pace.min.js"></script>
+       
+ 
+
+      <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bulma@5.0.1/bulma.min.css"
+      />
+      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.min.js"></script>
+
+      <!-- mermaid -->
+      
+      <script src="https://cdn.staticfile.org/mermaid/8.14.0/mermaid.min.js"></script>
+      
+      <style>
+        .swal2-styled.swal2-confirm {
+          font-size: 1.6rem;
+        }
+      </style>
+    <link rel="alternate" href="/atom.xml" title="山城冰荔枝" type="application/atom+xml">
+</head>
+  </html>
+</html>
+
+
+<body>
+  <div id="app">
+    
+      
+    <main class="content on">
+      <section class="outer">
+  <article
+  id="post-crawlSpider"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h1 class="article-title sea-center" style="border-left:0" itemprop="name">
+  crawlSpider
+</h1>
+ 
+
+      
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2023/12/03/crawlSpider/" class="article-date">
+  <time datetime="2023-12-03T03:58:31.000Z" itemprop="datePublished">2023-12-03</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E7%88%AC%E8%99%AB%E5%BC%80%E5%8F%91/">爬虫开发</a>
+  </div>
+  
+<div class="word_count">
+    <span class="post-time">
+        <span class="post-meta-item-icon">
+            <i class="ri-quill-pen-line"></i>
+            <span class="post-meta-item-text"> 字数统计:</span>
+            <span class="post-count">2.6k</span>
+        </span>
+    </span>
+
+    <span class="post-time">
+        &nbsp; | &nbsp;
+        <span class="post-meta-item-icon">
+            <i class="ri-book-open-line"></i>
+            <span class="post-meta-item-text"> 阅读时长≈</span>
+            <span class="post-count">11 分钟</span>
+        </span>
+    </span>
+</div>
+ 
+    </div>
+      
+    <div class="tocbot"></div>
+
+
+
+
+  
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h1 id="Scrapy抓取全网站数据"><a href="#Scrapy抓取全网站数据" class="headerlink" title="Scrapy抓取全网站数据"></a>Scrapy抓取全网站数据</h1><h2 id="一-使用常规Spider"><a href="#一-使用常规Spider" class="headerlink" title="一. 使用常规Spider"></a>一. 使用常规Spider</h2><p>我们把目光对准汽车之家. 抓取二手车信息.</p>
+<p>注意, 汽车之家的访问频率要控制一下. 要不然会跳验证的. </p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">DOWNLOAD_DELAY = <span class="number">3</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">ErshouSpider</span>(scrapy.Spider):</span><br><span class="line">    name = <span class="string">&#x27;ershou&#x27;</span></span><br><span class="line">    allowed_domains = [<span class="string">&#x27;che168.com&#x27;</span>]</span><br><span class="line">    start_urls = [<span class="string">&#x27;https://www.che168.com/beijing/a0_0msdgscncgpi1ltocsp100exx0/?pvareaid=102179#currengpostion&#x27;</span>]</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">parse</span>(<span class="params">self, resp, **kwargs</span>):</span><br><span class="line">        <span class="comment"># print(resp.text)</span></span><br><span class="line">        <span class="comment"># 链接提取器</span></span><br><span class="line">        le = LinkExtractor(restrict_xpaths=(<span class="string">&quot;//ul[@class=&#x27;viewlist_ul&#x27;]/li/a&quot;</span>,), deny_domains=(<span class="string">&quot;topicm.che168.com&quot;</span>,) )</span><br><span class="line">        links = le.extract_links(resp)</span><br><span class="line">        <span class="keyword">for</span> link <span class="keyword">in</span> links:</span><br><span class="line">            <span class="keyword">yield</span> scrapy.Request(</span><br><span class="line">                url=link.url,</span><br><span class="line">                callback=self.parse_detail</span><br><span class="line">            )</span><br><span class="line">        <span class="comment"># 翻页功能</span></span><br><span class="line">        le2 = LinkExtractor(restrict_xpaths=(<span class="string">&quot;//div[@id=&#x27;listpagination&#x27;]/a&quot;</span>,))</span><br><span class="line">        pages = le2.extract_links(resp)</span><br><span class="line">        <span class="keyword">for</span> page <span class="keyword">in</span> pages:</span><br><span class="line">            <span class="keyword">yield</span> scrapy.Request(url=page.url, callback=self.parse_detail)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">parse_detail</span>(<span class="params">self, resp, **kwargs</span>):</span><br><span class="line">        title = resp.xpath(<span class="string">&#x27;/html/body/div[5]/div[2]/h3/text()&#x27;</span>).extract_first()</span><br><span class="line">        <span class="built_in">print</span>(title)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>LinkExtractor: 链接提取器. 可以非常方便的帮助我们从一个响应页面中提取到url链接. 我们只需要提前定义好规则即可. </p>
+<p>参数: </p>
+<p>​	allow, 接收一堆正则表达式, 可以提取出符合该正则的链接<br>​	deny, 接收一堆正则表达式, 可以剔除符合该正则的链接<br>​	allow_domains: 接收一堆域名, 符合里面的域名的链接被提取<br>​	deny_domains: 接收一堆域名, 剔除不符合该域名的链接<br>​	restrict_xpaths: 接收一堆xpath, 可以提取符合要求xpath的链接<br>​	restrict_css: 接收一堆css选择器, 可以提取符合要求的css选择器的链接<br>​	tags: 接收一堆标签名, 从某个标签中提取链接, 默认a, area<br>​	attrs: 接收一堆属性名, 从某个属性中提取链接, 默认href</p>
+<p>值得注意的, &#x3D;&#x3D;在提取到的url中, 是有重复的内容的. 但是我们不用管. scrapy会自动帮我们过滤掉重复的url请求.&#x3D;&#x3D; </p>
+<h2 id="二-使用CrawlSpider"><a href="#二-使用CrawlSpider" class="headerlink" title="二. 使用CrawlSpider"></a>二. 使用CrawlSpider</h2><p>在scrapy中提供了CrawlSpider来完成全站数据抓取. </p>
+<ol>
+<li><p>创建项目</p>
+<p><code>scrapy startproject qichezhijia</code></p>
+</li>
+<li><p>进入项目</p>
+<p><code>cd qichezhijia</code></p>
+</li>
+<li><p>创建爬虫(CrawlSpider)</p>
+<p><code>scrapy genspider </code>&#x3D;&#x3D;-t crawl&#x3D;&#x3D;<code> ershouche che168.com</code></p>
+<p>和以往的爬虫不同. 该爬虫需要用到crawl的模板来创建爬虫. </p>
+</li>
+<li><p>修改spider中的rules和回调函数</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">ErshoucheSpider</span>(<span class="title class_ inherited__">CrawlSpider</span>):</span><br><span class="line">    name = <span class="string">&#x27;ershouche&#x27;</span></span><br><span class="line">    allowed_domains = [<span class="string">&#x27;che168.com&#x27;</span>, <span class="string">&#x27;autohome.com.cn&#x27;</span>]</span><br><span class="line">    start_urls = [<span class="string">&#x27;https://www.che168.com/beijing/a0_0msdgscncgpi1ltocsp1exx0/&#x27;</span>]</span><br><span class="line"></span><br><span class="line">    le = LinkExtractor(restrict_xpaths=(<span class="string">&quot;//ul[@class=&#x27;viewlist_ul&#x27;]/li/a&quot;</span>,), deny_domains=(<span class="string">&quot;topicm.che168.com&quot;</span>,) )</span><br><span class="line">    le1 = LinkExtractor(restrict_xpaths=(<span class="string">&quot;//div[@id=&#x27;listpagination&#x27;]/a&quot;</span>,))</span><br><span class="line">    rules = (</span><br><span class="line">        Rule(le1, follow=<span class="literal">True</span>),  <span class="comment"># 单纯为了做分页</span></span><br><span class="line">        Rule(le, callback=<span class="string">&#x27;parse_item&#x27;</span>, follow=<span class="literal">False</span>), <span class="comment"># 单纯提取数据</span></span><br><span class="line">    )</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">parse_item</span>(<span class="params">self, response</span>):</span><br><span class="line">        <span class="built_in">print</span>(response.url)</span><br></pre></td></tr></table></figure>
+
+<p>CrawlSpider的工作流程. </p>
+<p>前期和普通的spider是一致的. 在第一次请求回来之后. 会自动的将返回的response按照rules中订制的规则来提取链接. 并进一步执行callback中的回调. 如果follow是True, 则继续在响应的内容中继续使用该规则提取链接.  相当于在parse中的scrapy.request(xxx, callback&#x3D;self.parse)</p>
+</li>
+</ol>
+<h2 id="三-Redis简单使用"><a href="#三-Redis简单使用" class="headerlink" title="三. Redis简单使用"></a>三. Redis简单使用</h2><p>​		redis作为一款目前这个星球上性能最高的非关系型数据库之一. 拥有每秒近十万次的读写能力. 其实力只能用恐怖来形容. </p>
+<ol>
+<li><p>安装redis</p>
+<p>redis是我见过这个星球上最好安装的软件了. 比起前面的那一坨. 它简直了…</p>
+<p>直接把压缩包解压. 然后配置一下环境变量就可以了. </p>
+<p><img src="/images/scrapy01/image-20210810184227132.png" alt="images/scrapy01/image-20210810184227132"></p>
+<p><img src="/images/scrapy01/image-20210810184318301.png" alt="images/scrapy01/image-20210810184318301"></p>
+<p>接下来, 在环境变量中将该文件夹配置到path中. </p>
+<p><img src="/images/scrapy01/image-20210810184649037.png" alt="images/scrapy01/image-20210810184649037"></p>
+<p>win7的同学自求多福吧…</p>
+<p>我们给redis多配置几个东西(修改redis的配置文件, mac是: redis.conf, windows是: )</p>
+<ol>
+<li><p>关闭bind</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># bind 127.0.0.1 ::1  # 注释掉它</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>关闭保护模式  windows不用设置</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">protected-mode no    <span class="comment"># 设置为no</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>设置密码</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">requirepass <span class="number">123456</span>   <span class="comment"># 设置密码</span></span><br></pre></td></tr></table></figure></li>
+</ol>
+<p>将redis怼到windows服务&#x3D;&#x3D;必须进入到redis目录后才可以&#x3D;&#x3D;</p>
+<p><img src="/images/scrapy01/image-20210810185306517.png" alt="images/scrapy01/image-20210810185306517"></p>
+<figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"># 将redis安装到windows服务</span><br><span class="line">redis-server.exe --service-install redis.windows.conf --loglevel verbose</span><br><span class="line"># 卸载服务：</span><br><span class="line">redis-server --service-uninstall</span><br><span class="line"># 开启服务：</span><br><span class="line">redis-server --service-<span class="built_in">start</span></span><br><span class="line"># 停止服务：</span><br><span class="line">redis-server --service-stop</span><br></pre></td></tr></table></figure>
+
+
+
+<p>使用redis-cli链接redis</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">redis-cli -h ip地址 -p 端口 --raw   <span class="comment"># raw可以让redis显示出中文</span></span><br><span class="line">auth 密码   <span class="comment"># 如果有密码可以这样来登录, 如果没有.不用这一步</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/scrapy01/image-20210810185605290.png" alt="images/scrapy01/image-20210810185605290"></p>
+<p>附赠RDM, redis desktop manager. 可以帮我们完成redis数据库的可视化操作(需要就装, 不需要就算)</p>
+<p><img src="/images/scrapy01/image-20210810185659813.png" alt="images/scrapy01/image-20210810185659813"></p>
+</li>
+<li><p>redis常见数据类型</p>
+<p>redis中常见的数据类型有5个. </p>
+<p>命令规则:  <code>命令 key 参数</code></p>
+<ol>
+<li><p>string</p>
+<p>字符串(它自己认为是字符串, 我认为是任何东西. ), redis最基础的数据类型. </p>
+<p>常用命令</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">set</span> key value  <span class="comment"># 添加一条数据</span></span><br><span class="line">get key		   <span class="comment"># 查看一条数据</span></span><br><span class="line">incr key       <span class="comment"># 让该key对应的数据自增1(原子性, 安全)</span></span><br><span class="line">incrby key count     <span class="comment"># 让该key对应的value自增 count </span></span><br><span class="line"><span class="built_in">type</span> key		<span class="comment"># 查看数据类型(set进去的东西一律全是字符串)</span></span><br></pre></td></tr></table></figure>
+
+<p>例如</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">set</span> name zhangsan  <span class="comment"># 添加数据  name = zhangsan</span></span><br><span class="line">get name		<span class="comment"># 查看数据 zhangsan</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">set</span> age <span class="number">10</span></span><br><span class="line">get age 	<span class="comment"># 10</span></span><br><span class="line">incr age	<span class="comment"># 11</span></span><br><span class="line">get age 	<span class="comment"># 11</span></span><br><span class="line">incrby age <span class="number">5</span>	<span class="comment"># 16</span></span><br></pre></td></tr></table></figure>
+
+
+</li>
+<li><p>hash</p>
+<p>哈希, 相当于字典. </p>
+<p>常见操作</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">hset key k1 v1   <span class="comment"># 将k1, v1存储在key上</span></span><br><span class="line">hget key k1      <span class="comment"># 将key上的k1提取出来</span></span><br><span class="line">hmset key k1 v1 k2 v2 k3 v3....  <span class="comment"># 一次性将多个k,v存储在key</span></span><br><span class="line">hmget key k1 k2....<span class="comment"># 一次性将key中的k1, k2...提取出来</span></span><br><span class="line">hgetall key 	<span class="comment"># 一次性将key中所有内容全部提取</span></span><br><span class="line">hkeys key		<span class="comment"># 将key中所有的k全部提取</span></span><br><span class="line">hvals key 		<span class="comment"># 将key中所有的v全部提取</span></span><br></pre></td></tr></table></figure>
+
+<p>示例:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">HMSET stu <span class="built_in">id</span> <span class="number">1</span> name sylar age <span class="number">18</span></span><br><span class="line">HMGET stu name age   <span class="comment"># syalr 18</span></span><br><span class="line">HGETALL stu		    <span class="comment"># id 1 name sylar age 18</span></span><br><span class="line">HKEYS stu 	<span class="comment"># id name age</span></span><br><span class="line">HVALS stu   <span class="comment"># 1 syalr 18</span></span><br></pre></td></tr></table></figure>
+
+
+</li>
+<li><p>list</p>
+<p>列表, 底层是一个双向链表. 可以从左边和右边进行插入. 记住每次插入都要记得这货是个&#x3D;&#x3D;双向链表&#x3D;&#x3D;</p>
+<p>常见操作</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">LPUSH key 数据<span class="number">1</span> 数据<span class="number">2</span> 数据<span class="number">3.</span>... <span class="comment"># 从左边插入数据</span></span><br><span class="line">RPUSH key 数据<span class="number">1</span> 数据<span class="number">2</span> 数据<span class="number">3.</span>... <span class="comment"># 从右边插入数据</span></span><br><span class="line">LRANGE key start stop     <span class="comment"># 从start到stop提取数据. </span></span><br><span class="line"></span><br><span class="line">LLEN key	<span class="comment"># 返回key对应列表的长度</span></span><br><span class="line">LPOP key        <span class="comment"># 从左边删除一个.并返回被删除元素</span></span><br><span class="line">RPOP key		<span class="comment"># 从右边删除一个.并返回被删除元素</span></span><br></pre></td></tr></table></figure>
+
+<p>示例:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">LPUSH banji yiban erban sanban siban</span><br><span class="line">LRANGE banji <span class="number">0</span> -<span class="number">1</span>   <span class="comment"># yiban erban sanban siban</span></span><br><span class="line">RPUSH ban ban1 ban2 ban3</span><br><span class="line">LRANGE ban <span class="number">0</span> -<span class="number">1</span>     <span class="comment"># ban1 ban2 ban3</span></span><br><span class="line">LPOP ban  <span class="comment"># ban1</span></span><br><span class="line">LLEN key  <span class="comment"># 2</span></span><br></pre></td></tr></table></figure>
+
+
+</li>
+<li><p>set</p>
+<p>set是无序的超大集合. 无序, 不重复. </p>
+<p>常见操作</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">SADD key 值   <span class="comment"># 向集合内存入数据</span></span><br><span class="line">SMEMBERS key  <span class="comment"># 查看集合内所有元素</span></span><br><span class="line">SCARD key <span class="comment"># 查看key中元素的个数</span></span><br><span class="line">SISMEMBER key val  <span class="comment"># 查看key中是否包含val</span></span><br><span class="line">SUNION key1 key2  <span class="comment"># 并集</span></span><br><span class="line">SDIFF key1 key2  <span class="comment"># 差集合, 在key1中, 但不在key2中的数据</span></span><br><span class="line">SINTER key1 key2 <span class="comment"># 计算交集, 在key1和key2中都出现了的</span></span><br><span class="line">SPOP key  <span class="comment"># 随机从key中删除一个数据</span></span><br><span class="line">SRANDMEMBER key count <span class="comment"># 随机从key中查询count个数据</span></span><br></pre></td></tr></table></figure>
+
+<p>实例:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">SADD stars 柯震东 吴亦凡 张默 房祖名   <span class="comment"># 4</span></span><br><span class="line">SADD stars 吴亦凡    <span class="comment"># 0. 重复的数据是存储不进去的.</span></span><br><span class="line">SMEMBERS stars   <span class="comment"># 柯震东 吴亦凡 张默 房祖名</span></span><br><span class="line">SISMEMBER stars 吴亦凡  <span class="comment"># 吴亦凡在 stars里么?  1 在  0 不在</span></span><br><span class="line"></span><br><span class="line">SADD my 周杰伦 吴亦凡 房祖名  </span><br><span class="line">SINTER stars my  <span class="comment"># 计算交集  吴亦凡 房祖名</span></span><br><span class="line"></span><br><span class="line">SPOP my  <span class="comment"># 随机删除一个</span></span><br><span class="line">SRANDMEMEBER my <span class="number">2</span>   <span class="comment"># 从集合总随机查看2个</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+</li>
+<li><p>zset</p>
+<p>有序集合, 有序集合中的内容也是不可以重复的. 并且存储的数据也是redis最基础的string数据. 但是在存储数据的同时还增加了一个score. 表示分值. redis就是通过这个score作为排序的规则的. </p>
+<p>常用操作</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">ZADD key s1 m1 s2 m2 ... <span class="comment"># 向key中存入 m1 m2 分数分别为s1 s2</span></span><br><span class="line">ZRANGE key start stop [withscores]   <span class="comment"># 查看从start 到stop中的所有数据 [是否要分数]</span></span><br><span class="line">ZREVRANGE key start stop <span class="comment"># 倒叙查看start到stop的数据</span></span><br><span class="line">ZCARD key   <span class="comment"># 查看zset的数据个数</span></span><br><span class="line">ZCOUNT key <span class="built_in">min</span> <span class="built_in">max</span>  <span class="comment"># 查看分数在min和max之间的数据量</span></span><br><span class="line">ZINCRBY key score member  <span class="comment"># 将key中member的分值score</span></span><br><span class="line">ZSCORE key m  <span class="comment"># 查看key中m的分值</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>示例:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">ZADD fam <span class="number">1</span> sylar <span class="number">2</span> alex <span class="number">3</span> tory  <span class="comment"># 添加三个数据</span></span><br><span class="line">ZRANGE fam <span class="number">0</span> -<span class="number">1</span> WITHSCORES <span class="comment"># 正序查看</span></span><br><span class="line">ZREVRANGE fam <span class="number">0</span> -<span class="number">1</span> WITHSCORES   <span class="comment"># 倒叙查看</span></span><br><span class="line">ZINCRBY fam <span class="number">10</span> alex  <span class="comment"># 给alex加10分</span></span><br><span class="line">ZADD fam <span class="number">100</span> alex   <span class="comment"># 给alex修改分数为100分</span></span><br><span class="line">ZSCORE fam alex   <span class="comment"># 查看alex的分数</span></span><br><span class="line">ZCARD fam    <span class="comment"># 查看fam的数据个数</span></span><br></pre></td></tr></table></figure></li>
+</ol>
+<p>redis还有非常非常多的操作. 我们就不一一列举了. 各位可以在网络上找到非常多的资料. </p>
+<p>&#x3D;&#x3D;各位大佬们注意. 数据保存完一定要save一下, 避免数据没有写入硬盘而产生的数据丢失&#x3D;&#x3D;</p>
+</li>
+</ol>
+<h2 id="四-python搞定redis"><a href="#四-python搞定redis" class="headerlink" title="四. python搞定redis"></a>四. python搞定redis</h2><p>​	python处理redis使用专用的redis模块. 同样的, 它也是一个第三方库.</p>
+<figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install redis</span><br></pre></td></tr></table></figure>
+
+<p>​	获取连接(1)</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> redis <span class="keyword">import</span> Redis</span><br><span class="line"></span><br><span class="line">red = Redis(host=<span class="string">&quot;127.0.0.1&quot;</span>,  <span class="comment"># 地址</span></span><br><span class="line">            port=<span class="number">6379</span>,   <span class="comment"># 端口</span></span><br><span class="line">            db=<span class="number">0</span>,   <span class="comment"># 数据库</span></span><br><span class="line">            password=<span class="number">123456</span>,  <span class="comment"># 密码</span></span><br><span class="line">            decode_responses=<span class="literal">True</span>)  <span class="comment"># 是否自动解码</span></span><br></pre></td></tr></table></figure>
+
+<p>​	获取连接(2)</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">pool = redis.ConnectionPool(</span><br><span class="line">        host=<span class="string">&quot;127.0.0.1&quot;</span>,  <span class="comment"># 地址</span></span><br><span class="line">        port=<span class="number">6379</span>,   <span class="comment"># 端口</span></span><br><span class="line">        db=<span class="number">0</span>,   <span class="comment"># 数据库</span></span><br><span class="line">        password=<span class="number">123456</span>,  <span class="comment"># 密码</span></span><br><span class="line">        decode_responses=<span class="literal">True</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">r = redis.Redis(connection_pool=pool)</span><br><span class="line"><span class="built_in">print</span>(r.keys())</span><br></pre></td></tr></table></figure>
+
+
+
+<p>​	我们以一个免费代理IP池能用到的操作来尝试一下redis</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 存入数据</span></span><br><span class="line">red.<span class="built_in">set</span>(<span class="string">&quot;sylar&quot;</span>, <span class="string">&quot;邱彦涛&quot;</span>)</span><br><span class="line"><span class="comment"># 获取数据</span></span><br><span class="line"><span class="built_in">print</span>(red.get(<span class="string">&quot;sylar&quot;</span>))</span><br><span class="line"></span><br><span class="line">lst = [<span class="string">&quot;张三丰&quot;</span>, <span class="string">&quot;张无忌&quot;</span>, <span class="string">&quot;张翠山&quot;</span>, <span class="string">&quot;张娜拉&quot;</span>]</span><br><span class="line">red.lpush(<span class="string">&quot;names&quot;</span>, *lst)  <span class="comment"># 将所有的名字都存入names</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># # 查询所有数据</span></span><br><span class="line">result = red.lrange(<span class="string">&quot;names&quot;</span>, <span class="number">0</span>, -<span class="number">1</span>)</span><br><span class="line"><span class="built_in">print</span>(result)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 从上面的操作上可以看出. python中的redis和redis-cli中的操作是几乎一样的</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 接下来, 咱们站在一个代理IP池的角度来分析各个功能</span></span><br><span class="line"><span class="comment"># 抓取到了IP. 保存入库</span></span><br><span class="line">red.zadd(<span class="string">&quot;proxy&quot;</span>, &#123;<span class="string">&quot;192.168.1.1&quot;</span>: <span class="number">10</span>, <span class="string">&quot;192.168.1.2&quot;</span>: <span class="number">10</span>&#125;)</span><br><span class="line">red.zadd(<span class="string">&quot;proxy&quot;</span>, &#123;<span class="string">&quot;192.168.1.3&quot;</span>: <span class="number">10</span>, <span class="string">&quot;192.168.1.6&quot;</span>: <span class="number">10</span>&#125;)</span><br><span class="line">red.zadd(<span class="string">&quot;proxy&quot;</span>, &#123;<span class="string">&quot;192.168.1.4&quot;</span>: <span class="number">10</span>, <span class="string">&quot;192.168.1.7&quot;</span>: <span class="number">10</span>&#125;)</span><br><span class="line">red.zadd(<span class="string">&quot;proxy&quot;</span>, &#123;<span class="string">&quot;192.168.1.5&quot;</span>: <span class="number">10</span>, <span class="string">&quot;192.168.1.8&quot;</span>: <span class="number">10</span>&#125;)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 给某一个ip增加到100分</span></span><br><span class="line">red.zadd(<span class="string">&quot;proxy&quot;</span>, &#123;<span class="string">&quot;192.168.1.4&quot;</span>: <span class="number">100</span>&#125;)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 给&quot;192.168.1.4&quot; 扣10分</span></span><br><span class="line">red.zincrby(<span class="string">&quot;proxy&quot;</span>, -<span class="number">10</span>, <span class="string">&quot;192.168.1.4&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 分扣没了. 删除掉它</span></span><br><span class="line">red.zrem(<span class="string">&quot;proxy&quot;</span>, <span class="string">&quot;192.168.1.4&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 可用的代理数量</span></span><br><span class="line">c = red.zcard(<span class="string">&quot;proxy&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(c)</span><br><span class="line"><span class="comment"># 根据分值进行查询(0~100)之间</span></span><br><span class="line">r = red.zrangebyscore(<span class="string">&quot;proxy&quot;</span>, <span class="number">0</span>, <span class="number">100</span>)</span><br><span class="line"><span class="built_in">print</span>(r)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 查询前100个数据(分页查询)</span></span><br><span class="line">r = red.zrevrange(<span class="string">&#x27;proxy&#x27;</span>, <span class="number">0</span>, <span class="number">100</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 判断proxy是否存在, 如果是None就是不存在</span></span><br><span class="line">r = red.zscore(<span class="string">&quot;proxy&quot;</span>, <span class="string">&quot;192.168.1.4&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(r)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+ 
+      <!-- reward -->
+      
+      <div id="reword-out">
+        <div id="reward-btn">
+          打赏
+        </div>
+      </div>
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <div class="declare">
+      <ul class="post-copyright">
+        <li>
+          <i class="ri-copyright-line"></i>
+          <strong>版权声明： </strong>
+          
+          本博客所有文章除特别声明外，著作权归作者所有。转载请注明出处！
+          
+        </li>
+      </ul>
+    </div>
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Scrapy%E7%88%AC%E8%99%AB/" rel="tag">Scrapy爬虫</a></li></ul>
+
+    </footer>
+  </div>
+
+   
+  <nav class="article-nav">
+    
+      <a href="/2023/12/03/Scarpy-%E5%88%86%E5%B8%83%E5%BC%8F%E7%88%AC%E8%99%AB/" class="article-nav-link">
+        <strong class="article-nav-caption">上一篇</strong>
+        <div class="article-nav-title">
+          
+            Scarpy_分布式爬虫
+          
+        </div>
+      </a>
+    
+    
+      <a href="/2023/12/03/Scrapy-%E6%A8%A1%E6%8B%9F%E7%99%BB%E5%BD%95%E4%B8%8E%E4%B8%AD%E9%97%B4%E4%BB%B6/" class="article-nav-link">
+        <strong class="article-nav-caption">下一篇</strong>
+        <div class="article-nav-title">Scrapy_模拟登录与中间件</div>
+      </a>
+    
+  </nav>
+
+  
+   
+     
+</article>
+
+</section>
+      <footer class="footer">
+  <div class="outer">
+    <ul>
+      <li>
+        Copyrights &copy;
+        2015-2023
+        <i class="ri-heart-fill heart_icon"></i> 山城冰荔枝
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+        
+        <span>
+  <span><i class="ri-user-3-fill"></i>访问人数:<span id="busuanzi_value_site_uv"></span></span>
+  <span class="division">|</span>
+  <span><i class="ri-eye-fill"></i>浏览次数:<span id="busuanzi_value_page_pv"></span></span>
+</span>
+        
+      </li>
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      <li>
+        <!-- cnzz统计 -->
+        
+        <script type="text/javascript" src='https://s9.cnzz.com/z_stat.php?id=1278069914&amp;web_id=1278069914'></script>
+        
+      </li>
+    </ul>
+  </div>
+</footer>    
+    </main>
+    <div class="float_btns">
+      <div class="totop" id="totop">
+  <i class="ri-arrow-up-line"></i>
+</div>
+
+<div class="todark" id="todark">
+  <i class="ri-moon-line"></i>
+</div>
+
+    </div>
+    <aside class="sidebar on">
+      <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">主页</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/archives">归档</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/categories">分类</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags">标签</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/photos">图库</a>
+    </li>
+    
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+    </aside>
+    <div id="mask"></div>
+
+<!-- #reward -->
+<div id="reward">
+  <span class="close"><i class="ri-close-line"></i></span>
+  <p class="reward-p"><i class="ri-cup-line"></i>请我喝杯咖啡吧~</p>
+  <div class="reward-box">
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/alipay.jpg">
+      <span class="reward-type">支付宝</span>
+    </div>
+    
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/wechat.jpg">
+      <span class="reward-type">微信</span>
+    </div>
+    
+  </div>
+</div>
+    
+<script src="/js/jquery-3.6.0.min.js"></script>
+ 
+<script src="/js/lazyload.min.js"></script>
+
+<!-- Tocbot -->
+ 
+<script src="/js/tocbot.min.js"></script>
+
+<script>
+  tocbot.init({
+    tocSelector: ".tocbot",
+    contentSelector: ".article-entry",
+    headingSelector: "h1, h2, h3, h4, h5, h6",
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    scrollContainer: "main",
+    positionFixedSelector: ".tocbot",
+    positionFixedClass: "is-position-fixed",
+    fixedSidebarOffset: "auto",
+  });
+</script>
+
+<script src="https://cdn.staticfile.org/jquery-modal/0.9.2/jquery.modal.min.js"></script>
+<link
+  rel="stylesheet"
+  href="https://cdn.staticfile.org/jquery-modal/0.9.2/jquery.modal.min.css"
+/>
+<script src="https://cdn.staticfile.org/justifiedGallery/3.8.1/js/jquery.justifiedGallery.min.js"></script>
+
+<script src="/dist/main.js"></script>
+
+<!-- ImageViewer -->
+ <!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" style="display:none" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<link rel="stylesheet" href="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.css">
+<link rel="stylesheet" href="https://cdn.staticfile.org/photoswipe/4.1.3/default-skin/default-skin.min.css">
+<script src="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.js"></script>
+<script src="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe-ui-default.min.js"></script>
+
+<script>
+    function viewer_init() {
+        let pswpElement = document.querySelectorAll('.pswp')[0];
+        let $imgArr = document.querySelectorAll(('.article-entry img:not(.reward-img)'))
+
+        $imgArr.forEach(($em, i) => {
+            $em.onclick = () => {
+                // slider展开状态
+                // todo: 这样不好，后面改成状态
+                if (document.querySelector('.left-col.show')) return
+                let items = []
+                $imgArr.forEach(($em2, i2) => {
+                    let img = $em2.getAttribute('data-idx', i2)
+                    let src = $em2.getAttribute('data-target') || $em2.getAttribute('src')
+                    let title = $em2.getAttribute('alt')
+                    // 获得原图尺寸
+                    const image = new Image()
+                    image.src = src
+                    items.push({
+                        src: src,
+                        w: image.width || $em2.width,
+                        h: image.height || $em2.height,
+                        title: title
+                    })
+                })
+                var gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, {
+                    index: parseInt(i)
+                });
+                gallery.init()
+            }
+        })
+    }
+    viewer_init()
+</script> 
+<!-- MathJax -->
+
+<!-- Katex -->
+
+<!-- busuanzi  -->
+ 
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+ 
+<!-- ClickLove -->
+
+<!-- ClickBoom1 -->
+
+<!-- ClickBoom2 -->
+
+<!-- CodeCopy -->
+ 
+<link rel="stylesheet" href="/css/clipboard.css">
+ <script src="https://cdn.staticfile.org/clipboard.js/2.0.10/clipboard.min.js"></script>
+<script>
+  function wait(callback, seconds) {
+    var timelag = null;
+    timelag = window.setTimeout(callback, seconds);
+  }
+  !function (e, t, a) {
+    var initCopyCode = function(){
+      var copyHtml = '';
+      copyHtml += '<button class="btn-copy" data-clipboard-snippet="">';
+      copyHtml += '<i class="ri-file-copy-2-line"></i><span>COPY</span>';
+      copyHtml += '</button>';
+      $(".highlight .code pre").before(copyHtml);
+      $(".article pre code").before(copyHtml);
+      var clipboard = new ClipboardJS('.btn-copy', {
+        target: function(trigger) {
+          return trigger.nextElementSibling;
+        }
+      });
+      clipboard.on('success', function(e) {
+        let $btn = $(e.trigger);
+        $btn.addClass('copied');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-checkbox-circle-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPIED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-checkbox-circle-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+      clipboard.on('error', function(e) {
+        e.clearSelection();
+        let $btn = $(e.trigger);
+        $btn.addClass('copy-failed');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-time-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPY FAILED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-time-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+    }
+    initCopyCode();
+  }(window, document);
+</script>
+ 
+<!-- CanvasBackground -->
+
+<script>
+  if (window.mermaid) {
+    mermaid.initialize({ theme: "forest" });
+  }
+</script>
+
+
+    
+    <div id="music">
+    
+    
+    
+    <iframe frameborder="no" border="1" marginwidth="0" marginheight="0" width="200" height="52"
+        src="//music.163.com/outchain/player?type=2&id=22707008&auto=1&height=32"></iframe>
+</div>
+
+<style>
+    #music {
+        position: fixed;
+        right: 15px;
+        bottom: 0;
+        z-index: 998;
+    }
+</style>
+    
+    
+
+  </div>
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"/live2dw/assets/assets/hijiki.model.json"},"display":{"position":"right","width":150,"height":300,"hOffset":400,"vOffset":-38},"mobile":{"show":true},"react":"opacity:1","dialog":{"enable":true,"script":{"every idle 10s":"text1","tap face":"text2","tap body":"text3"}},"log":false});</script></body>
+
+</html>

@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+
+
+<html lang="zh-CN">
+  
+
+    <head>
+      <meta charset="utf-8" />
+        
+      <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1"
+      />
+      <title>Scrapy_管道 |  山城冰荔枝</title>
+  <meta name="generator" content="hexo-theme-ayer">
+       
+<link rel="stylesheet" href="/dist/main.css">
+
+      
+<link rel="stylesheet" href="/css/fonts/remixicon.css">
+
+      
+<link rel="stylesheet" href="/css/custom.css">
+ 
+      <script src="https://cdn.staticfile.org/pace/1.2.4/pace.min.js"></script>
+       
+ 
+
+      <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bulma@5.0.1/bulma.min.css"
+      />
+      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.min.js"></script>
+
+      <!-- mermaid -->
+      
+      <script src="https://cdn.staticfile.org/mermaid/8.14.0/mermaid.min.js"></script>
+      
+      <style>
+        .swal2-styled.swal2-confirm {
+          font-size: 1.6rem;
+        }
+      </style>
+    <link rel="alternate" href="/atom.xml" title="山城冰荔枝" type="application/atom+xml">
+</head>
+  </html>
+</html>
+
+
+<body>
+  <div id="app">
+    
+      
+    <main class="content on">
+      <section class="outer">
+  <article
+  id="post-09-Scrapy-管道"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h1 class="article-title sea-center" style="border-left:0" itemprop="name">
+  Scrapy_管道
+</h1>
+ 
+
+      
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2023/12/03/09-Scrapy-%E7%AE%A1%E9%81%93/" class="article-date">
+  <time datetime="2023-12-03T03:56:22.000Z" itemprop="datePublished">2023-12-03</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E7%88%AC%E8%99%AB%E5%BC%80%E5%8F%91/">爬虫开发</a>
+  </div>
+  
+<div class="word_count">
+    <span class="post-time">
+        <span class="post-meta-item-icon">
+            <i class="ri-quill-pen-line"></i>
+            <span class="post-meta-item-text"> 字数统计:</span>
+            <span class="post-count">1.7k</span>
+        </span>
+    </span>
+
+    <span class="post-time">
+        &nbsp; | &nbsp;
+        <span class="post-meta-item-icon">
+            <i class="ri-book-open-line"></i>
+            <span class="post-meta-item-text"> 阅读时长≈</span>
+            <span class="post-count">8 分钟</span>
+        </span>
+    </span>
+</div>
+ 
+    </div>
+      
+    <div class="tocbot"></div>
+
+
+
+
+  
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h1 id="Scrapy管道"><a href="#Scrapy管道" class="headerlink" title="Scrapy管道"></a>Scrapy管道</h1><p>在上一小节中, 我们初步掌握了Scrapy的基本运行流程以及基本开发流程. 本节继续讨论关于Scrapy更多的内容. </p>
+<h2 id="一-关于管道"><a href="#一-关于管道" class="headerlink" title="一. 关于管道"></a>一. 关于管道</h2><p>上一节内容, 我们已经可以从spider中提取到数据. 然后通过引擎将数据传递给pipeline, 那么在pipeline中如何对数据进行保存呢? 我们主要针对四种数据存储展开讲解. </p>
+<p>前三个案例以<a target="_blank" rel="noopener" href="http://datachart.500.com/ssq/%E4%B8%BA%E6%A1%88%E4%BE%8B%E5%9F%BA%E7%A1%80">http://datachart.500.com/ssq/为案例基础</a>. 最后一个以<a target="_blank" rel="noopener" href="https://www.tupianzj.com/bizhi/DNmeinv/%E4%B8%BA%E6%A1%88%E4%BE%8B%E5%9F%BA%E7%A1%80">https://www.tupianzj.com/bizhi/DNmeinv/为案例基础</a>. </p>
+<h3 id="1-csv文件写入"><a href="#1-csv文件写入" class="headerlink" title="1. csv文件写入"></a>1. csv文件写入</h3><p>​		写入文件是一个非常简单的事情. 直接在pipeline中开启文件即可. 但这里要说明的是. 如果我们只在process_item中进行处理文件是不够优雅的.  总不能有一条数据就open一次吧</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">CaipiaoFilePipeline</span>:</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">process_item</span>(<span class="params">self, item, spider</span>):</span><br><span class="line">        <span class="keyword">with</span> <span class="built_in">open</span>(<span class="string">&quot;caipiao.txt&quot;</span>, mode=<span class="string">&quot;a&quot;</span>, encoding=<span class="string">&#x27;utf-8&#x27;</span>) <span class="keyword">as</span> f:</span><br><span class="line">            <span class="comment"># 写入文件</span></span><br><span class="line">            f.write(<span class="string">f&quot;<span class="subst">&#123;item[<span class="string">&#x27;qihao&#x27;</span>]&#125;</span>, <span class="subst">&#123;<span class="string">&#x27;_&#x27;</span>.join(item[<span class="string">&#x27;red_ball&#x27;</span>])&#125;</span>, <span class="subst">&#123;<span class="string">&#x27;_&#x27;</span>.join(item[<span class="string">&#x27;blue_ball&#x27;</span>])&#125;</span>\n&quot;</span>)</span><br><span class="line">        <span class="keyword">return</span> item</span><br></pre></td></tr></table></figure>
+
+<p>​		我们希望的是, 能不能打开一个文件, 然后就用这一个文件句柄来完成数据的保存. 答案是可以的. 我们可以在pipeline中创建两个方法, 一个是open_spider(), 另一个是close_spider(). 看名字也能明白其含义: </p>
+<p>​		open_spider(), 在爬虫开始的时候执行一次<br>​		close_spider(), 在爬虫结束的时候执行一次</p>
+<p>​		有了这俩货, 我们就可以很简单的去处理这个问题</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">CaipiaoFilePipeline</span>:</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">open_spider</span>(<span class="params">self, spider</span>):</span><br><span class="line">        self.f = <span class="built_in">open</span>(<span class="string">&quot;caipiao.txt&quot;</span>, mode=<span class="string">&quot;a&quot;</span>, encoding=<span class="string">&#x27;utf-8&#x27;</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">close_spider</span>(<span class="params">self, spider</span>):</span><br><span class="line">        <span class="keyword">if</span> self.f:</span><br><span class="line">            self.f.close()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">process_item</span>(<span class="params">self, item, spider</span>):</span><br><span class="line">        <span class="comment"># 写入文件</span></span><br><span class="line">        self.f.write(<span class="string">f&quot;<span class="subst">&#123;item[<span class="string">&#x27;qihao&#x27;</span>]&#125;</span>, <span class="subst">&#123;<span class="string">&#x27;_&#x27;</span>.join(item[<span class="string">&#x27;red_ball&#x27;</span>])&#125;</span>, <span class="subst">&#123;<span class="string">&#x27;_&#x27;</span>.join(item[<span class="string">&#x27;blue_ball&#x27;</span>])&#125;</span>\n&quot;</span>)</span><br><span class="line">        <span class="keyword">return</span> item</span><br></pre></td></tr></table></figure>
+
+<p>​		在爬虫开始的时候打开一个文件, 在爬虫结束的时候关闭这个文件. 满分~</p>
+<p>​		对了, 别忘了设置settings</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ITEM_PIPELINES = &#123;</span><br><span class="line">   <span class="string">&#x27;caipiao.pipelines.CaipiaoFilePipeline&#x27;</span>: <span class="number">300</span>,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="2-mysql数据库写入"><a href="#2-mysql数据库写入" class="headerlink" title="2. mysql数据库写入"></a>2. mysql数据库写入</h3><p>​		有了上面的示例, 写入数据库其实也就很顺其自然了, 首先, 在open_spider中创建好数据库连接. 在close_spider中关闭链接. 在proccess_item中对数据进行保存工作. </p>
+<p>先把mysql相关设置丢到settings里</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># MYSQL配置信息</span></span><br><span class="line">MYSQL_CONFIG = &#123;</span><br><span class="line">   <span class="string">&quot;host&quot;</span>: <span class="string">&quot;localhost&quot;</span>,</span><br><span class="line">   <span class="string">&quot;port&quot;</span>: <span class="number">3306</span>,</span><br><span class="line">   <span class="string">&quot;user&quot;</span>: <span class="string">&quot;root&quot;</span>,</span><br><span class="line">   <span class="string">&quot;password&quot;</span>: <span class="string">&quot;test123456&quot;</span>,</span><br><span class="line">   <span class="string">&quot;database&quot;</span>: <span class="string">&quot;spider&quot;</span>,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> caipiao.settings <span class="keyword">import</span> MYSQL_CONFIG <span class="keyword">as</span> mysql</span><br><span class="line"><span class="keyword">import</span> pymysql</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">CaipiaoMySQLPipeline</span>:</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">open_spider</span>(<span class="params">self, spider</span>):</span><br><span class="line">        self.conn = pymysql.connect(host=mysql[<span class="string">&quot;host&quot;</span>], port=mysql[<span class="string">&quot;port&quot;</span>], user=mysql[<span class="string">&quot;user&quot;</span>], password=mysql[<span class="string">&quot;password&quot;</span>], database=mysql[<span class="string">&quot;database&quot;</span>])</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">close_spider</span>(<span class="params">self, spider</span>):</span><br><span class="line">        self.conn.close()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">process_item</span>(<span class="params">self, item, spider</span>):</span><br><span class="line">        <span class="comment"># 写入文件</span></span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            cursor = self.conn.cursor()</span><br><span class="line">            sql = <span class="string">&quot;insert into caipiao(qihao, red, blue) values(%s, %s, %s)&quot;</span></span><br><span class="line">            red = <span class="string">&quot;,&quot;</span>.join(item[<span class="string">&#x27;red_ball&#x27;</span>])</span><br><span class="line">            blue = <span class="string">&quot;,&quot;</span>.join(item[<span class="string">&#x27;blue_ball&#x27;</span>])</span><br><span class="line">            cursor.execute(sql, (item[<span class="string">&#x27;qihao&#x27;</span>], red, blue))</span><br><span class="line">            self.conn.commit()</span><br><span class="line">            spider.logger.info(<span class="string">f&quot;保存数据<span class="subst">&#123;item&#125;</span>&quot;</span>)</span><br><span class="line">        <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">            self.conn.rollback()</span><br><span class="line">            spider.logger.error(<span class="string">f&quot;保存数据库失败!&quot;</span>, e, <span class="string">f&quot;数据是: <span class="subst">&#123;item&#125;</span>&quot;</span>)  <span class="comment"># 记录错误日志</span></span><br><span class="line">        <span class="keyword">return</span> item</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>别忘了把pipeline设置一下</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ITEM_PIPELINES = &#123;</span><br><span class="line">   <span class="string">&#x27;caipiao.pipelines.CaipiaoMySQLPipeline&#x27;</span>: <span class="number">301</span>,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="3-mongodb数据库写入"><a href="#3-mongodb数据库写入" class="headerlink" title="3. mongodb数据库写入"></a>3. mongodb数据库写入</h3><p>​		mongodb数据库写入和mysql写入如出一辙…不废话直接上代码吧</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">MONGO_CONFIG = &#123;</span><br><span class="line">   <span class="string">&quot;host&quot;</span>: <span class="string">&quot;localhost&quot;</span>,</span><br><span class="line">   <span class="string">&quot;port&quot;</span>: <span class="number">27017</span>,</span><br><span class="line">   <span class="string">&#x27;has_user&#x27;</span>: <span class="literal">True</span>,</span><br><span class="line">   <span class="string">&#x27;user&#x27;</span>: <span class="string">&quot;python_admin&quot;</span>,</span><br><span class="line">   <span class="string">&quot;password&quot;</span>: <span class="string">&quot;123456&quot;</span>,</span><br><span class="line">   <span class="string">&quot;db&quot;</span>: <span class="string">&quot;python&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> caipiao.settings <span class="keyword">import</span> MONGO_CONFIG <span class="keyword">as</span> mongo</span><br><span class="line"><span class="keyword">import</span> pymongo</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">CaipiaoMongoDBPipeline</span>:</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">open_spider</span>(<span class="params">self, spider</span>):</span><br><span class="line">        client = pymongo.MongoClient(host=mongo[<span class="string">&#x27;host&#x27;</span>],</span><br><span class="line">                                     port=mongo[<span class="string">&#x27;port&#x27;</span>])</span><br><span class="line">        db = client[mongo[<span class="string">&#x27;db&#x27;</span>]]</span><br><span class="line">        <span class="keyword">if</span> mongo[<span class="string">&#x27;has_user&#x27;</span>]:</span><br><span class="line">            db.authenticate(mongo[<span class="string">&#x27;user&#x27;</span>], mongo[<span class="string">&#x27;password&#x27;</span>])</span><br><span class="line">        self.client = client</span><br><span class="line">        self.collection = db[<span class="string">&#x27;caipiao&#x27;</span>]</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">close_spider</span>(<span class="params">self, spider</span>):</span><br><span class="line">        self.client.close()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">process_item</span>(<span class="params">self, item, spider</span>):</span><br><span class="line">        self.collection.insert(&#123;<span class="string">&quot;qihao&quot;</span>: item[<span class="string">&#x27;qihao&#x27;</span>], <span class="string">&#x27;red&#x27;</span>: item[<span class="string">&quot;red_ball&quot;</span>], <span class="string">&#x27;blue&#x27;</span>: item[<span class="string">&#x27;blue_ball&#x27;</span>]&#125;)</span><br><span class="line">        <span class="keyword">return</span> item</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">ITEM_PIPELINES = &#123;</span><br><span class="line">    <span class="comment"># 三个管道可以共存~</span></span><br><span class="line">   <span class="string">&#x27;caipiao.pipelines.CaipiaoFilePipeline&#x27;</span>: <span class="number">300</span>,</span><br><span class="line">   <span class="string">&#x27;caipiao.pipelines.CaipiaoMySQLPipeline&#x27;</span>: <span class="number">301</span>,</span><br><span class="line">   <span class="string">&#x27;caipiao.pipelines.CaipiaoMongoDBPipeline&#x27;</span>: <span class="number">302</span>,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="4-文件保存"><a href="#4-文件保存" class="headerlink" title="4. 文件保存"></a>4. 文件保存</h3><p>接下来我们来尝试使用scrapy来下载一些图片, 看看效果如何. </p>
+<p>首先, 随便找个图片网站(安排好的). <a target="_blank" rel="noopener" href="https://www.tupianzj.com/bizhi/DNmeinv/">https://www.tupianzj.com/bizhi/DNmeinv/</a>. 可以去看看, 妹子们还是很漂亮的. </p>
+<p>接下来. 创建好项目,  定义好数据结构</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">MeinvItem</span>(scrapy.Item):</span><br><span class="line">    name = scrapy.Field()</span><br><span class="line">    img_url = scrapy.Field()</span><br><span class="line">    img_path = scrapy.Field()</span><br></pre></td></tr></table></figure>
+
+
+
+<p>完善spider, 注意看yield scrapy.Request()</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> scrapy</span><br><span class="line"><span class="keyword">from</span> meinv.items <span class="keyword">import</span> MeinvItem</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">TupianzhijiaSpider</span>(scrapy.Spider):</span><br><span class="line">    name = <span class="string">&#x27;tupianzhijia&#x27;</span></span><br><span class="line">    allowed_domains = [<span class="string">&#x27;tupianzj.com&#x27;</span>]</span><br><span class="line">    start_urls = [<span class="string">&#x27;https://www.tupianzj.com/bizhi/DNmeinv/&#x27;</span>]</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">parse</span>(<span class="params">self, resp, **kwargs</span>):</span><br><span class="line">        li_list = resp.xpath(<span class="string">&quot;//ul[@class=&#x27;list_con_box_ul&#x27;]/li&quot;</span>)</span><br><span class="line">        <span class="keyword">for</span> li <span class="keyword">in</span> li_list:</span><br><span class="line">            href = li.xpath(<span class="string">&quot;./a/@href&quot;</span>).extract_first()</span><br><span class="line">            <span class="comment"># 拿到href为了什么? 进入详情页啊</span></span><br><span class="line">            <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">            url: 请求地址</span></span><br><span class="line"><span class="string">            method: 请求方式</span></span><br><span class="line"><span class="string">            callback: 回调函数</span></span><br><span class="line"><span class="string">            errback: 报错回调</span></span><br><span class="line"><span class="string">            dont_filter: 默认False, 表示&quot;不过滤&quot;, 该请求会重新进行发送</span></span><br><span class="line"><span class="string">            headers: 请求头. </span></span><br><span class="line"><span class="string">            cookies: cookie信息</span></span><br><span class="line"><span class="string">            &quot;&quot;&quot;</span></span><br><span class="line">            <span class="keyword">yield</span> scrapy.Request(</span><br><span class="line">                url=resp.urljoin(href),  <span class="comment"># scrapy的url拼接</span></span><br><span class="line">                method=<span class="string">&#x27;get&#x27;</span>,</span><br><span class="line">                callback=self.parse_detail,</span><br><span class="line">            )</span><br><span class="line">        <span class="comment"># 下一页</span></span><br><span class="line">        next_page = resp.xpath(<span class="string">&#x27;//div[@class=&quot;pages&quot;]/ul/li/a[contains(text(), &quot;下一页&quot;)]/@href&#x27;</span>).extract_first()</span><br><span class="line">        <span class="keyword">if</span> next_page:</span><br><span class="line">            <span class="keyword">yield</span> scrapy.Request(</span><br><span class="line">                url=resp.urljoin(next_page),</span><br><span class="line">                method=<span class="string">&#x27;get&#x27;</span>,</span><br><span class="line">                callback=self.parse</span><br><span class="line">            )</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">parse_detail</span>(<span class="params">self, resp</span>):</span><br><span class="line">        img_src = resp.xpath(<span class="string">&#x27;//*[@id=&quot;bigpic&quot;]/a[1]/img/@src&#x27;</span>).extract_first()</span><br><span class="line">        name = resp.xpath(<span class="string">&#x27;//*[@id=&quot;container&quot;]/div/div/div[2]/h1/text()&#x27;</span>).extract_first()</span><br><span class="line">        meinv = MeinvItem()</span><br><span class="line">        meinv[<span class="string">&#x27;name&#x27;</span>] = name</span><br><span class="line">        meinv[<span class="string">&#x27;img_url&#x27;</span>] = img_src</span><br><span class="line">        <span class="keyword">yield</span> meinv</span><br><span class="line">        </span><br></pre></td></tr></table></figure>
+
+<p>​		关于Request()的参数:<br>​			url: 请求地址<br>​            method: 请求方式<br>​            callback: 回调函数<br>​            errback: 报错回调<br>​            dont_filter: 默认False, 表示”不过滤”, 该请求会重新进行发送<br>​            headers: 请求头.<br>​            cookies: cookie信息</p>
+<p>​		接下来就是下载问题了. 如何在pipeline中下载一张图片呢? Scrapy早就帮你准备好了. 在Scrapy中有一个ImagesPipeline可以实现自动图片下载功能. </p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> scrapy.pipelines.images <span class="keyword">import</span> ImagesPipeline, FilesPipeline</span><br><span class="line"><span class="keyword">import</span> pymysql</span><br><span class="line"><span class="keyword">from</span> meinv.settings <span class="keyword">import</span> MYSQL</span><br><span class="line"><span class="keyword">import</span> scrapy</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MeinvPipeline</span>:</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">open_spider</span>(<span class="params">self, spider</span>):</span><br><span class="line">        self.conn = pymysql.connect(</span><br><span class="line">            host=MYSQL[<span class="string">&#x27;host&#x27;</span>],</span><br><span class="line">            port=MYSQL[<span class="string">&#x27;port&#x27;</span>],</span><br><span class="line">            user=MYSQL[<span class="string">&#x27;user&#x27;</span>],</span><br><span class="line">            password=MYSQL[<span class="string">&#x27;password&#x27;</span>],</span><br><span class="line">            database=MYSQL[<span class="string">&#x27;database&#x27;</span>]</span><br><span class="line">        )</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">close_spider</span>(<span class="params">self, spider</span>):</span><br><span class="line">        <span class="keyword">if</span> self.conn:</span><br><span class="line">            self.conn.close()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">process_item</span>(<span class="params">self, item, spider</span>):</span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            cursor = self.conn.cursor()</span><br><span class="line">            sql = <span class="string">&quot;insert into tu (name, img_src, img_path) values (%s, %s, %s)&quot;</span></span><br><span class="line">            cursor.execute(sql, (item[<span class="string">&#x27;name&#x27;</span>], item[<span class="string">&#x27;img_src&#x27;</span>], item[<span class="string">&#x27;img_path&#x27;</span>]))</span><br><span class="line">            self.conn.commit()</span><br><span class="line">        <span class="keyword">except</span>:</span><br><span class="line">            self.conn.rollback()</span><br><span class="line">        <span class="keyword">finally</span>:</span><br><span class="line">            <span class="keyword">if</span> cursor:</span><br><span class="line">                cursor.close()</span><br><span class="line">        <span class="keyword">return</span> item</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MeinvSavePipeline</span>(<span class="title class_ inherited__">ImagesPipeline</span>):</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">get_media_requests</span>(<span class="params">self, item, info</span>):</span><br><span class="line">        <span class="comment"># 发送请求去下载图片</span></span><br><span class="line">        <span class="comment"># 如果是一堆图片. 可以使用循环去得到每一个url, 然后在yield每一个图片对应的Request对象</span></span><br><span class="line">        <span class="keyword">return</span> scrapy.Request(item[<span class="string">&#x27;img_url&#x27;</span>])</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">file_path</span>(<span class="params">self, request, response=<span class="literal">None</span>, info=<span class="literal">None</span></span>):</span><br><span class="line">        <span class="comment"># 准备好图片的名称</span></span><br><span class="line">        filename = request.url.split(<span class="string">&quot;/&quot;</span>)[-<span class="number">1</span>]</span><br><span class="line">        <span class="keyword">return</span> <span class="string">f&quot;img/<span class="subst">&#123;filename&#125;</span>&quot;</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">item_completed</span>(<span class="params">self, results, item, info</span>):</span><br><span class="line">        <span class="comment"># 文件存储的路径</span></span><br><span class="line">        ok, res = results[<span class="number">0</span>]</span><br><span class="line">        <span class="comment"># print(res[&#x27;path&#x27;])</span></span><br><span class="line">        item[<span class="string">&#x27;img_path&#x27;</span>] = res[<span class="string">&quot;path&quot;</span>]</span><br><span class="line">        <span class="keyword">return</span> item</span><br></pre></td></tr></table></figure>
+
+<p>最后, 需要在settings中设置以下内容:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">MYSQL = &#123;</span><br><span class="line">   <span class="string">&quot;host&quot;</span>: <span class="string">&quot;localhost&quot;</span>,</span><br><span class="line">   <span class="string">&quot;port&quot;</span>: <span class="number">3306</span>,</span><br><span class="line">   <span class="string">&quot;user&quot;</span>: <span class="string">&quot;root&quot;</span>,</span><br><span class="line">   <span class="string">&quot;password&quot;</span>: <span class="string">&quot;test123456&quot;</span>,</span><br><span class="line">   <span class="string">&quot;database&quot;</span>: <span class="string">&#x27;spider&#x27;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">ITEM_PIPELINES = &#123;</span><br><span class="line">    <span class="string">&#x27;meinv.pipelines.MeinvPipeline&#x27;</span>: <span class="number">303</span>,</span><br><span class="line">    <span class="string">&#x27;meinv.pipelines.MeinvSavePipeline&#x27;</span>: <span class="number">301</span>,</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment"># 图片保存路径  -&gt; ImagesPipeline</span></span><br><span class="line">IMAGES_STORE= <span class="string">&#x27;./my_tu&#x27;</span></span><br><span class="line"><span class="comment"># 文件保存路径 -&gt; FilesPipeline</span></span><br><span class="line">FILES_STORE = <span class="string">&#x27;./my_tu&#x27;</span></span><br></pre></td></tr></table></figure>
+
+ 
+      <!-- reward -->
+      
+      <div id="reword-out">
+        <div id="reward-btn">
+          打赏
+        </div>
+      </div>
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <div class="declare">
+      <ul class="post-copyright">
+        <li>
+          <i class="ri-copyright-line"></i>
+          <strong>版权声明： </strong>
+          
+          本博客所有文章除特别声明外，著作权归作者所有。转载请注明出处！
+          
+        </li>
+      </ul>
+    </div>
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Scrapy%E7%88%AC%E8%99%AB/" rel="tag">Scrapy爬虫</a></li></ul>
+
+    </footer>
+  </div>
+
+   
+  <nav class="article-nav">
+    
+      <a href="/2023/12/03/Scrapy-%E6%A8%A1%E6%8B%9F%E7%99%BB%E5%BD%95%E4%B8%8E%E4%B8%AD%E9%97%B4%E4%BB%B6/" class="article-nav-link">
+        <strong class="article-nav-caption">上一篇</strong>
+        <div class="article-nav-title">
+          
+            Scrapy_模拟登录与中间件
+          
+        </div>
+      </a>
+    
+    
+      <a href="/2023/12/03/scrapy%E5%85%A5%E9%97%A8%E8%AF%BE%E4%BB%B6/" class="article-nav-link">
+        <strong class="article-nav-caption">下一篇</strong>
+        <div class="article-nav-title">scrapy入门课件</div>
+      </a>
+    
+  </nav>
+
+  
+   
+     
+</article>
+
+</section>
+      <footer class="footer">
+  <div class="outer">
+    <ul>
+      <li>
+        Copyrights &copy;
+        2015-2023
+        <i class="ri-heart-fill heart_icon"></i> 山城冰荔枝
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+        
+        <span>
+  <span><i class="ri-user-3-fill"></i>访问人数:<span id="busuanzi_value_site_uv"></span></span>
+  <span class="division">|</span>
+  <span><i class="ri-eye-fill"></i>浏览次数:<span id="busuanzi_value_page_pv"></span></span>
+</span>
+        
+      </li>
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      <li>
+        <!-- cnzz统计 -->
+        
+        <script type="text/javascript" src='https://s9.cnzz.com/z_stat.php?id=1278069914&amp;web_id=1278069914'></script>
+        
+      </li>
+    </ul>
+  </div>
+</footer>    
+    </main>
+    <div class="float_btns">
+      <div class="totop" id="totop">
+  <i class="ri-arrow-up-line"></i>
+</div>
+
+<div class="todark" id="todark">
+  <i class="ri-moon-line"></i>
+</div>
+
+    </div>
+    <aside class="sidebar on">
+      <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">主页</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/archives">归档</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/categories">分类</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags">标签</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/photos">图库</a>
+    </li>
+    
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+    </aside>
+    <div id="mask"></div>
+
+<!-- #reward -->
+<div id="reward">
+  <span class="close"><i class="ri-close-line"></i></span>
+  <p class="reward-p"><i class="ri-cup-line"></i>请我喝杯咖啡吧~</p>
+  <div class="reward-box">
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/alipay.jpg">
+      <span class="reward-type">支付宝</span>
+    </div>
+    
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/wechat.jpg">
+      <span class="reward-type">微信</span>
+    </div>
+    
+  </div>
+</div>
+    
+<script src="/js/jquery-3.6.0.min.js"></script>
+ 
+<script src="/js/lazyload.min.js"></script>
+
+<!-- Tocbot -->
+ 
+<script src="/js/tocbot.min.js"></script>
+
+<script>
+  tocbot.init({
+    tocSelector: ".tocbot",
+    contentSelector: ".article-entry",
+    headingSelector: "h1, h2, h3, h4, h5, h6",
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    scrollContainer: "main",
+    positionFixedSelector: ".tocbot",
+    positionFixedClass: "is-position-fixed",
+    fixedSidebarOffset: "auto",
+  });
+</script>
+
+<script src="https://cdn.staticfile.org/jquery-modal/0.9.2/jquery.modal.min.js"></script>
+<link
+  rel="stylesheet"
+  href="https://cdn.staticfile.org/jquery-modal/0.9.2/jquery.modal.min.css"
+/>
+<script src="https://cdn.staticfile.org/justifiedGallery/3.8.1/js/jquery.justifiedGallery.min.js"></script>
+
+<script src="/dist/main.js"></script>
+
+<!-- ImageViewer -->
+ <!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" style="display:none" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<link rel="stylesheet" href="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.css">
+<link rel="stylesheet" href="https://cdn.staticfile.org/photoswipe/4.1.3/default-skin/default-skin.min.css">
+<script src="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.js"></script>
+<script src="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe-ui-default.min.js"></script>
+
+<script>
+    function viewer_init() {
+        let pswpElement = document.querySelectorAll('.pswp')[0];
+        let $imgArr = document.querySelectorAll(('.article-entry img:not(.reward-img)'))
+
+        $imgArr.forEach(($em, i) => {
+            $em.onclick = () => {
+                // slider展开状态
+                // todo: 这样不好，后面改成状态
+                if (document.querySelector('.left-col.show')) return
+                let items = []
+                $imgArr.forEach(($em2, i2) => {
+                    let img = $em2.getAttribute('data-idx', i2)
+                    let src = $em2.getAttribute('data-target') || $em2.getAttribute('src')
+                    let title = $em2.getAttribute('alt')
+                    // 获得原图尺寸
+                    const image = new Image()
+                    image.src = src
+                    items.push({
+                        src: src,
+                        w: image.width || $em2.width,
+                        h: image.height || $em2.height,
+                        title: title
+                    })
+                })
+                var gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, {
+                    index: parseInt(i)
+                });
+                gallery.init()
+            }
+        })
+    }
+    viewer_init()
+</script> 
+<!-- MathJax -->
+
+<!-- Katex -->
+
+<!-- busuanzi  -->
+ 
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+ 
+<!-- ClickLove -->
+
+<!-- ClickBoom1 -->
+
+<!-- ClickBoom2 -->
+
+<!-- CodeCopy -->
+ 
+<link rel="stylesheet" href="/css/clipboard.css">
+ <script src="https://cdn.staticfile.org/clipboard.js/2.0.10/clipboard.min.js"></script>
+<script>
+  function wait(callback, seconds) {
+    var timelag = null;
+    timelag = window.setTimeout(callback, seconds);
+  }
+  !function (e, t, a) {
+    var initCopyCode = function(){
+      var copyHtml = '';
+      copyHtml += '<button class="btn-copy" data-clipboard-snippet="">';
+      copyHtml += '<i class="ri-file-copy-2-line"></i><span>COPY</span>';
+      copyHtml += '</button>';
+      $(".highlight .code pre").before(copyHtml);
+      $(".article pre code").before(copyHtml);
+      var clipboard = new ClipboardJS('.btn-copy', {
+        target: function(trigger) {
+          return trigger.nextElementSibling;
+        }
+      });
+      clipboard.on('success', function(e) {
+        let $btn = $(e.trigger);
+        $btn.addClass('copied');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-checkbox-circle-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPIED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-checkbox-circle-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+      clipboard.on('error', function(e) {
+        e.clearSelection();
+        let $btn = $(e.trigger);
+        $btn.addClass('copy-failed');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-time-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPY FAILED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-time-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+    }
+    initCopyCode();
+  }(window, document);
+</script>
+ 
+<!-- CanvasBackground -->
+
+<script>
+  if (window.mermaid) {
+    mermaid.initialize({ theme: "forest" });
+  }
+</script>
+
+
+    
+    <div id="music">
+    
+    
+    
+    <iframe frameborder="no" border="1" marginwidth="0" marginheight="0" width="200" height="52"
+        src="//music.163.com/outchain/player?type=2&id=22707008&auto=1&height=32"></iframe>
+</div>
+
+<style>
+    #music {
+        position: fixed;
+        right: 15px;
+        bottom: 0;
+        z-index: 998;
+    }
+</style>
+    
+    
+
+  </div>
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"/live2dw/assets/assets/hijiki.model.json"},"display":{"position":"right","width":150,"height":300,"hOffset":400,"vOffset":-38},"mobile":{"show":true},"react":"opacity:1","dialog":{"enable":true,"script":{"every idle 10s":"text1","tap face":"text2","tap body":"text3"}},"log":false});</script></body>
+
+</html>

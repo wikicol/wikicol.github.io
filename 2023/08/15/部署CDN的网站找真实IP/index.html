@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+
+
+<html lang="zh-CN">
+  
+
+    <head>
+      <meta charset="utf-8" />
+        
+      <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1"
+      />
+      <title>部署CDN的网站找真实IP |  山城冰荔枝</title>
+  <meta name="generator" content="hexo-theme-ayer">
+       
+<link rel="stylesheet" href="/dist/main.css">
+
+      
+<link rel="stylesheet" href="/css/fonts/remixicon.css">
+
+      
+<link rel="stylesheet" href="/css/custom.css">
+ 
+      <script src="https://cdn.staticfile.org/pace/1.2.4/pace.min.js"></script>
+       
+ 
+
+      <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bulma@5.0.1/bulma.min.css"
+      />
+      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.min.js"></script>
+
+      <!-- mermaid -->
+      
+      <script src="https://cdn.staticfile.org/mermaid/8.14.0/mermaid.min.js"></script>
+      
+      <style>
+        .swal2-styled.swal2-confirm {
+          font-size: 1.6rem;
+        }
+      </style>
+    <link rel="alternate" href="/atom.xml" title="山城冰荔枝" type="application/atom+xml">
+</head>
+  </html>
+</html>
+
+
+<body>
+  <div id="app">
+    
+      
+    <main class="content on">
+      <section class="outer">
+  <article
+  id="post-部署CDN的网站找真实IP"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h1 class="article-title sea-center" style="border-left:0" itemprop="name">
+  部署CDN的网站找真实IP
+</h1>
+ 
+
+      
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2023/08/15/%E9%83%A8%E7%BD%B2CDN%E7%9A%84%E7%BD%91%E7%AB%99%E6%89%BE%E7%9C%9F%E5%AE%9EIP/" class="article-date">
+  <time datetime="2023-08-15T14:40:26.000Z" itemprop="datePublished">2023-08-15</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8/">网络安全</a>
+  </div>
+  
+<div class="word_count">
+    <span class="post-time">
+        <span class="post-meta-item-icon">
+            <i class="ri-quill-pen-line"></i>
+            <span class="post-meta-item-text"> 字数统计:</span>
+            <span class="post-count">2.2k</span>
+        </span>
+    </span>
+
+    <span class="post-time">
+        &nbsp; | &nbsp;
+        <span class="post-meta-item-icon">
+            <i class="ri-book-open-line"></i>
+            <span class="post-meta-item-text"> 阅读时长≈</span>
+            <span class="post-count">9 分钟</span>
+        </span>
+    </span>
+</div>
+ 
+    </div>
+      
+    <div class="tocbot"></div>
+
+
+
+
+  
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h1 id="部署CDN的网站找真实IP"><a href="#部署CDN的网站找真实IP" class="headerlink" title="部署CDN的网站找真实IP"></a><strong>部署CDN的网站找真实IP</strong></h1><h2 id="1-概述"><a href="#1-概述" class="headerlink" title="1. 概述"></a>1. <strong>概述</strong></h2><p>目前很多网站使用了cdn服务，用了此服务 可以隐藏服务器的真实IP，加速网站静态文件的访问，而且你请求网站服务时，cdn服务会根据你所在的地区，选择合适的线路给予你访问，由此达网站加速的效果，cdn不仅可以加速网站访问，还可以提供waf服务，如防止cc攻击，SQL注入拦截等多种功能，再说使用cdn的成本不太高，很多云服务器也免费提供此服务。在进行黑盒测试的时候，往往成了拦路石，所以掌握cdn找真实ip成了不得不掌握的一项技术。</p>
+<p><img src="/images/cdn%E6%89%BEip%2026e5bb7ac20b4d7cb70d737d27e2f833/Untitled.png" alt="Untitled"></p>
+<h2 id="2-判断是否CDN"><a href="#2-判断是否CDN" class="headerlink" title="2. 判断是否CDN"></a>2. <strong>判断是否CDN</strong></h2><p>ping 域名</p>
+<p><img src="/images/cdn%E6%89%BEip%2026e5bb7ac20b4d7cb70d737d27e2f833/Untitled%201.png" alt="Untitled"></p>
+<p>使用超级ping</p>
+<p><a target="_blank" rel="noopener" href="http://ping.chinaz.com/">http://ping.chinaz.com/</a></p>
+<p><a target="_blank" rel="noopener" href="http://ping.aizhan.com/">http://ping.aizhan.com/</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.17ce.com/">https://www.17ce.com/</a></p>
+<p><a target="_blank" rel="noopener" href="http://ping.chinaz.com/www.t00ls.net">http://ping.chinaz.com/www.t00ls.net</a></p>
+<p>不同的地区访问有着不同的IP，这样就确定了该域名使用了cdn了。</p>
+<p><img src="/images/cdn%E6%89%BEip%2026e5bb7ac20b4d7cb70d737d27e2f833/Untitled%202.png" alt="Untitled"></p>
+<h2 id="3-找真实IP的方法集合"><a href="#3-找真实IP的方法集合" class="headerlink" title="3. 找真实IP的方法集合"></a>3. <strong>找真实IP的方法集合</strong></h2><p>找到真实IP可以继续旁站检测，找其他站点进行突破，也可以绕过cdn进行访问，从而绕过waf针对攻击语句的拦截 发现有攻击语句就会对攻击的IP封堵。</p>
+<h2 id="3-1-dns历史绑定记录"><a href="#3-1-dns历史绑定记录" class="headerlink" title="3.1. dns历史绑定记录"></a>3.1. <strong>dns历史绑定记录</strong></h2><p>通过以下这些网站可以访问dns的解析，有可能存在未有绑cdn之前的记录。</p>
+<p><a target="_blank" rel="noopener" href="https://dnsdb.io/zh-cn/">https://dnsdb.io/zh-cn/</a> ###DNS查询</p>
+<p><a target="_blank" rel="noopener" href="https://x.threatbook.cn/">https://x.threatbook.cn/</a> ###微步在线</p>
+<p><a target="_blank" rel="noopener" href="http://viewdns.info/">http://viewdns.info/</a> ###DNS、IP等查询</p>
+<p><a target="_blank" rel="noopener" href="https://tools.ipip.net/cdn.php">https://tools.ipip.net/cdn.php</a> ###CDN查询IP</p>
+<p><a target="_blank" rel="noopener" href="https://sitereport.netcraft.com/?url=%E5%9F%9F%E5%90%8D">https://sitereport.netcraft.com/?url=域名</a></p>
+<p>查询WWW.T00Ls.net的历史记录</p>
+<p><a target="_blank" rel="noopener" href="https://site.ip138.com/www.t00ls.net/">https://site.ip138.com/www.t00ls.net/</a></p>
+<p><img src="/images/cdn%E6%89%BEip%2026e5bb7ac20b4d7cb70d737d27e2f833/Untitled%203.png" alt="Untitled"></p>
+<h2 id="3-2-子域名解析"><a href="#3-2-子域名解析" class="headerlink" title="3.2. 子域名解析"></a>3.2. <strong>子域名解析</strong></h2><p>通过子域名的解析指向 也有可能指向目标的同一个IP上。</p>
+<p>使用工具对其子域名进行穷举</p>
+<p>在线子域名查询</p>
+<p><a target="_blank" rel="noopener" href="https://securitytrails.com/list/apex_domain/t00ls.net">https://securitytrails.com/list/apex_domain/t00ls.net</a></p>
+<p><a target="_blank" rel="noopener" href="http://tool.chinaz.com/subdomain/t00ls.net">http://tool.chinaz.com/subdomain/t00ls.net</a></p>
+<p><img src="/images/cdn%E6%89%BEip%2026e5bb7ac20b4d7cb70d737d27e2f833/Untitled%204.png" alt="Untitled"></p>
+<p><a target="_blank" rel="noopener" href="https://phpinfo.me/domain/">https://phpinfo.me/domain/</a></p>
+<p>找到子域名继续确认子域名没有cdn的情况下批量进行域名解析查询，有cdn的情况继续查询历史。</p>
+<p>域名批量解析</p>
+<p><a target="_blank" rel="noopener" href="http://tools.bugscaner.com/domain2ip.html">http://tools.bugscaner.com/domain2ip.html</a></p>
+<p><img src="/images/cdn%E6%89%BEip%2026e5bb7ac20b4d7cb70d737d27e2f833/Untitled%205.png" alt="Untitled"></p>
+<h2 id="3-3-国外dns获取真实IP"><a href="#3-3-国外dns获取真实IP" class="headerlink" title="3.3. 国外dns获取真实IP"></a>3.3. <strong>国外dns获取真实IP</strong></h2><p>部分cdn只针对国内的ip访问，如果国外ip访问域名 即可获取真实IP</p>
+<p>全世界DNS地址：</p>
+<p><a target="_blank" rel="noopener" href="http://www.ab173.com/dns/dns_world.php">http://www.ab173.com/dns/dns_world.php</a></p>
+<p><a target="_blank" rel="noopener" href="https://dnsdumpster.com/">https://dnsdumpster.com/</a></p>
+<p><a target="_blank" rel="noopener" href="https://dnshistory.org/">https://dnshistory.org/</a></p>
+<p><a target="_blank" rel="noopener" href="http://whoisrequest.com/history/">http://whoisrequest.com/history/</a></p>
+<p><a target="_blank" rel="noopener" href="https://completedns.com/dns-history/">https://completedns.com/dns-history/</a></p>
+<p><a target="_blank" rel="noopener" href="http://dnstrails.com/">http://dnstrails.com/</a></p>
+<p><a target="_blank" rel="noopener" href="https://who.is/domain-history/">https://who.is/domain-history/</a></p>
+<p><a target="_blank" rel="noopener" href="http://research.domaintools.com/research/hosting-history/">http://research.domaintools.com/research/hosting-history/</a> <a target="_blank" rel="noopener" href="http://site.ip138.com/">http://site.ip138.com/</a></p>
+<p><a target="_blank" rel="noopener" href="http://viewdns.info/iphistory/">http://viewdns.info/iphistory/</a></p>
+<p><a target="_blank" rel="noopener" href="https://dnsdb.io/zh-cn/">https://dnsdb.io/zh-cn/</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.virustotal.com/">https://www.virustotal.com/</a></p>
+<p><a target="_blank" rel="noopener" href="https://x.threatbook.cn/">https://x.threatbook.cn/</a></p>
+<p><a target="_blank" rel="noopener" href="http://viewdns.info/">http://viewdns.info/</a></p>
+<p><a target="_blank" rel="noopener" href="http://www.17ce.com/">http://www.17ce.com/</a></p>
+<p><a target="_blank" rel="noopener" href="http://toolbar.netcraft.com/site_report?url=">http://toolbar.netcraft.com/site_report?url=</a> <a target="_blank" rel="noopener" href="https://securitytrails.com/">https://securitytrails.com/</a></p>
+<p><a target="_blank" rel="noopener" href="https://tools.ipip.net/cdn.php">https://tools.ipip.net/cdn.php</a></p>
+<h2 id="3-4-ico图标通过空间搜索找真实ip"><a href="#3-4-ico图标通过空间搜索找真实ip" class="headerlink" title="3.4. ico图标通过空间搜索找真实ip"></a>3.4. <strong>ico图标通过空间搜索找真实ip</strong></h2><p><a target="_blank" rel="noopener" href="https://www.t00ls.net/favicon.ico">https://www.t00ls.net/favicon.ico</a> 下载图标 放到fofa识别</p>
+<p><img src="/images/cdn%E6%89%BEip%2026e5bb7ac20b4d7cb70d737d27e2f833/Untitled%206.png" alt="Untitled"></p>
+<p>通过fofa搜图标</p>
+<p><img src="/images/cdn%E6%89%BEip%2026e5bb7ac20b4d7cb70d737d27e2f833/Untitled%207.png" alt="Untitled"></p>
+<p>通过这样查询 快速定位资源 查看端口是否开放 这里没有开放</p>
+<p><img src="/images/cdn%E6%89%BEip%2026e5bb7ac20b4d7cb70d737d27e2f833/Untitled%208.png" alt="Untitled"></p>
+<p>通过zoomeye搜图标</p>
+<p><img src="/images/cdn%E6%89%BEip%2026e5bb7ac20b4d7cb70d737d27e2f833/Untitled%209.png" alt="Untitled"></p>
+<p>查看端口开放情况</p>
+<p><img src="/images/cdn%E6%89%BEip%2026e5bb7ac20b4d7cb70d737d27e2f833/Untitled%2010.png" alt="Untitled"></p>
+<p>绑定hosts进行测试</p>
+<p><img src="/images/cdn%E6%89%BEip%2026e5bb7ac20b4d7cb70d737d27e2f833/Untitled%2011.png" alt="Untitled"></p>
+<p>这应该是真实ip了。</p>
+<h2 id="3-5-fofa搜索真实IP"><a href="#3-5-fofa搜索真实IP" class="headerlink" title="3.5. fofa搜索真实IP"></a>3.5. <strong>fofa搜索真实IP</strong></h2><p>domain&#x3D;”t00ls.net” 302一般是cdn</p>
+<p><img src="/images/cdn%E6%89%BEip%2026e5bb7ac20b4d7cb70d737d27e2f833/Untitled%2012.png" alt="Untitled"></p>
+<h2 id="3-6-通过censys找真实ip"><a href="#3-6-通过censys找真实ip" class="headerlink" title="3.6. 通过censys找真实ip"></a>3.6. <strong>通过censys找真实ip</strong></h2><p>Censys工具就能实现对整个互联网的扫描，Censys是一款用以搜索联网设备信息的新型搜索引擎，能够扫描整个互联网，Censys会将互联网所有的ip进行扫面和连接，以及证书探测。</p>
+<p>若目标站点有https证书，并且默认虚拟主机配了https证书，我们就可以找所有目标站点是该https证书的站点。</p>
+<p>通过协议查询</p>
+<p><a target="_blank" rel="noopener" href="https://censys.io/ipv4?q=((www.t00ls.net)">https://censys.io/ipv4?q=((www.t00ls.net)</a> AND protocols: “443&#x2F;https”) AND tags.raw: “https”&amp;</p>
+<p>443.https.tls.certificate.parsed.extensions.subject_alt_name.dns_names:moonsec.com</p>
+<p><img src="/images/cdn%E6%89%BEip%2026e5bb7ac20b4d7cb70d737d27e2f833/Untitled%2013.png" alt="Untitled"></p>
+<h2 id="3-7-360测绘中心"><a href="#3-7-360测绘中心" class="headerlink" title="3.7. 360测绘中心"></a>3.7. <strong>360测绘中心</strong></h2><p><a target="_blank" rel="noopener" href="https://quake.360.cn/">https://quake.360.cn</a></p>
+<p><img src="/images/cdn%E6%89%BEip%2026e5bb7ac20b4d7cb70d737d27e2f833/Untitled%2014.png" alt="Untitled"></p>
+<h2 id="3-8-利用SSL证书寻找真实IP"><a href="#3-8-利用SSL证书寻找真实IP" class="headerlink" title="3.8. 利用SSL证书寻找真实IP"></a>3.8. <strong>利用SSL证书寻找真实IP</strong></h2><p>证书颁发机构(CA)必须将他们发布的每个SSL&#x2F;TLS证书发布到公共日志中，SSL&#x2F;TLS证书通常包含域名、子域名和电子邮件地址。因此SSL&#x2F;TLS证书成为了攻击者的切入点。</p>
+<p>获取网站SSL证书的HASH再结合Censys</p>
+<p>利用Censys搜索网站的SSL证书及HASH，在<a target="_blank" rel="noopener" href="https://crt.sh上查找目标网站ssl证书的hash/">https://crt.sh上查找目标网站SSL证书的HASH</a></p>
+<p>再用Censys搜索该HASH即可得到真实IP地址</p>
+<p><img src="/images/cdn%E6%89%BEip%2026e5bb7ac20b4d7cb70d737d27e2f833/Untitled%2015.png" alt="Untitled"></p>
+<p><img src="/images/cdn%E6%89%BEip%2026e5bb7ac20b4d7cb70d737d27e2f833/Untitled%2016.png" alt="Untitled"></p>
+<p>SSL证书搜索引擎：</p>
+<p><a target="_blank" rel="noopener" href="https://censys.io/ipv4?q=b6bce7fb8f7723ea63c6d0419e7af1f780d6b6cb1b4c2240e657f029142e2aae">https://censys.io/ipv4?q=b6bce7fb8f7723ea63c6d0419e7af1f780d6b6cb1b4c2240e657f029142e2aae</a></p>
+<p><a target="_blank" rel="noopener" href="https://censys.io/certificates?q=parsed.names:+t00ls.net+and+tags.raw:+trusted">https://censys.io/certificates?q=parsed.names%3A+t00ls.net+and+tags.raw%3A+trusted</a></p>
+<p><img src="/images/cdn%E6%89%BEip%2026e5bb7ac20b4d7cb70d737d27e2f833/Untitled%2017.png" alt="Untitled"></p>
+<p>找到hash</p>
+<p><img src="/images/cdn%E6%89%BEip%2026e5bb7ac20b4d7cb70d737d27e2f833/Untitled%2018.png" alt="Untitled"></p>
+<p>转成ipv4 进行搜索</p>
+<p><img src="/images/cdn%E6%89%BEip%2026e5bb7ac20b4d7cb70d737d27e2f833/Untitled%2019.png" alt="Untitled"></p>
+<p>找到两个IP</p>
+<p>两个ip</p>
+<p>222.186.129.100</p>
+<p>118.184.255.28</p>
+<p>或者把hash放进网络空间搜索</p>
+<p>7489210725011808154949879630532736653</p>
+<p><img src="/images/cdn%E6%89%BEip%2026e5bb7ac20b4d7cb70d737d27e2f833/Untitled%2020.png" alt="Untitled"></p>
+<p>成功找到网络IP 接着就是判断ip是否是这个域名的了。</p>
+<h2 id="3-9-邮箱获取真实IP"><a href="#3-9-邮箱获取真实IP" class="headerlink" title="3.9. 邮箱获取真实IP"></a>3.9. <strong>邮箱获取真实IP</strong></h2><p>网站在发信的时候，会附带真实的IP地址 进入邮箱 查看源文件头部信息 选择from</p>
+<p><img src="/images/cdn%E6%89%BEip%2026e5bb7ac20b4d7cb70d737d27e2f833/Untitled%2021.png" alt="Untitled"></p>
+<p>是否真实 还需要 邮箱发送是否与网站同一个IP地址。</p>
+<p><img src="/images/cdn%E6%89%BEip%2026e5bb7ac20b4d7cb70d737d27e2f833/Untitled%2022.png" alt="Untitled"></p>
+<h2 id="3-10-网站敏感文件获取真实IP"><a href="#3-10-网站敏感文件获取真实IP" class="headerlink" title="3.10. 网站敏感文件获取真实IP"></a>3.10. <strong>网站敏感文件获取真实IP</strong></h2><ul>
+<li>文件探针</li>
+<li>phpinfo</li>
+<li>网站源代码</li>
+<li>信息泄露</li>
+<li>GitHub信息泄露</li>
+<li>js文件</li>
+</ul>
+<p><img src="/images/cdn%E6%89%BEip%2026e5bb7ac20b4d7cb70d737d27e2f833/Untitled%2023.png" alt="Untitled"></p>
+<h2 id="3-11-F5-LTM解码法"><a href="#3-11-F5-LTM解码法" class="headerlink" title="3.11. F5 LTM解码法"></a>3.11. <strong>F5 LTM解码法</strong></h2><p>当服务器使用F5 LTM做负载均衡时，通过对set-cookie关键字的解码真实ip也可被获取，</p>
+<p>例如：Set-Cookie: BIGipServerpool_8.29_8030&#x3D;487098378.24095.0000，先把第一小</p>
+<p>节的十进制数即487098378取出来，然后将其转为十六进制数1d08880a，接着从后至前，</p>
+<p>以此取四位数出来，也就是0a.88.08.1d，最后依次把他们转为十进制数10.136.8.29，也就</p>
+<p>是最后的真实ip。</p>
+<p>rverpool-cas01&#x3D;3255675072.20480.0000; path&#x3D;&#x2F;</p>
+<p>3255675072 转十六进制 c20da8c0 从右向左取 c0a80dc2 转10进制 192 168 13 194</p>
+<h2 id="3-12-APP获取真实IP"><a href="#3-12-APP获取真实IP" class="headerlink" title="3.12. APP获取真实IP"></a>3.12. <strong>APP获取真实IP</strong></h2><p>如果网站有app，使用Fiddler或BurpSuite抓取数据包 可能获取真实IP</p>
+<p>模拟器 mimi模拟器抓包</p>
+<h2 id="3-13-小程序获取真实IP"><a href="#3-13-小程序获取真实IP" class="headerlink" title="3.13. 小程序获取真实IP"></a>3.13. <strong>小程序获取真实IP</strong></h2><h2 id="3-14-配置不当获取真实IP"><a href="#3-14-配置不当获取真实IP" class="headerlink" title="3.14. 配置不当获取真实IP"></a>3.14. <strong>配置不当获取真实IP</strong></h2><p>在配置CDN的时候，需要指定域名、端口等信息，有时候小小的配置细节就容易导致CDN防护被绕过。</p>
+<ul>
+<li>案例1：为了方便用户访问，我们常常将test.com 和 test.com 解析到同一个站点，而CDN只配置了<a target="_blank" rel="noopener" href="http://www.test.com,通过访问test.com,就可以绕过/">www.test.com，通过访问test.com，就可以绕过</a> CDN 了。</li>
+<li>案例2：站点同时支持http和https访问，CDN只配置 https协议，那么这时访问http就可以轻易绕过。</li>
+</ul>
+<h2 id="3-15-banner"><a href="#3-15-banner" class="headerlink" title="3.15. banner"></a>3.15. <strong>banner</strong></h2><p>获取目标站点的banner，在全网搜索引擎搜索，也可以使用AQUATONE，在Shodan上搜索相同指纹站点。</p>
+<p>可以通过互联网络信息中心的IP数据，筛选目标地区IP，遍历Web服务的banner用来对比CDN站的banner，可以确定源IP。</p>
+<p>欧洲：</p>
+<p><a target="_blank" rel="noopener" href="http://ftp.ripe.net/pub/stats/ripencc/delegated-ripencc-latest">http://ftp.ripe.net/pub/stats/ripencc/delegated-ripencc-latest</a></p>
+<p>北美：</p>
+<p><a target="_blank" rel="noopener" href="https://ftp.arin.net/pub/stats/arin/delegated-arin-extended-latest">https://ftp.arin.net/pub/stats/arin/delegated-arin-extended-latest</a></p>
+<p>亚洲：</p>
+<p><a href="ftp://ftp.apnic.net/public/apnic/stats/apnic/delegated-apnic-latest">ftp://ftp.apnic.net/public/apnic/stats/apnic/delegated-apnic-latest</a></p>
+<p>非洲：</p>
+<p><a href="ftp://ftp.afrinic.net/pub/stats/afrinic/delegated-afrinic-latest">ftp://ftp.afrinic.net/pub/stats/afrinic/delegated-afrinic-latest</a></p>
+<p>拉美：</p>
+<p><a href="ftp://ftp.lacnic.net/pub/stats/lacnic/delegated-lacnic-extended-latest">ftp://ftp.lacnic.net/pub/stats/lacnic/delegated-lacnic-extended-latest</a></p>
+<p>获取CN的IP</p>
+<p><a target="_blank" rel="noopener" href="http://www.ipdeny.com/ipblocks/data/countries/cn.zone">http://www.ipdeny.com/ipblocks/data/countries/cn.zone</a></p>
+<p>例如：</p>
+<p>找到目标服务器 IP 段后，可以直接进行暴力匹配 ，使用zmap、masscan 扫描 HTTP banner，然后匹配到目标域名的相同 banner</p>
+<p>zmap -p 80 -w bbs.txt -o 80.txt</p>
+<p>使用zmap的banner-grab对扫描出来80端口开放的主机进行banner抓取。</p>
+<p>cat &#x2F;root&#x2F;bbs.txt |.&#x2F;banner-grab-tcp -p 80 -c 100 -d http-req -f ascii &gt; http-banners.out</p>
+<p>根据网站返回包特征，进行特征过滤</p>
+<p>location: plugin.php?id&#x3D;info:index</p>
+<p><a target="_blank" rel="noopener" href="https://fofa.so/">https://fofa.so/</a></p>
+<p>title&#x3D;”T00LS | 低调求发展 - 潜心习安全 - T00ls.Net”</p>
+<p><a target="_blank" rel="noopener" href="https://www.zoomeye.org/">https://www.zoomeye.org/</a></p>
+<p>title:”T00LS | 低调求发展 -潜心习安全 -T00ls.Net”</p>
+<p><a target="_blank" rel="noopener" href="https://quake.360.cn/">https://quake.360.cn/</a></p>
+<p>response:”T00LS | 低调求发展 - 潜心习安全 - T00ls.Net”</p>
+<p>1、ZMap号称是最快的互联网扫描工具，能够在45分钟扫遍全网。<a target="_blank" rel="noopener" href="https://github.com/zmap/zmap">https://github.com/zmap/zmap</a></p>
+<p>2、Masscan号称是最快的互联网端口扫描器，最快可以在六分钟内扫遍互联网。</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/robertdavidgraham/masscan">https://github.com/robertdavidgraham/masscan</a></p>
+<h2 id="3-16-长期关注"><a href="#3-16-长期关注" class="headerlink" title="3.16. 长期关注"></a>3.16. <strong>长期关注</strong></h2><p>在长期渗透的时候，设置程序每天访问网站，可能有新的发现。每天零点 或者业务需求增大 它会换ip 换服务器的。</p>
+<h2 id="3-17-流量攻击"><a href="#3-17-流量攻击" class="headerlink" title="3.17. 流量攻击"></a>3.17. <strong>流量攻击</strong></h2><p>发包机可以一下子发送很大的流量。</p>
+<p>这个方法是很笨，但是在特定的目标下渗透，建议采用。</p>
+<p>cdn除了能隐藏ip，可能还考虑到分配流量，</p>
+<p>不设防的cdn 量大就会挂，高防cdn 要大流量访问。</p>
+<p>经受不住大流量冲击的时候可能会显示真实ip。</p>
+<p>站长-&gt;业务不正常-&gt;cdn不使用-&gt;更换服务器。</p>
+<h2 id="3-18-被动获取"><a href="#3-18-被动获取" class="headerlink" title="3.18. 被动获取"></a>3.18. <strong>被动获取</strong></h2><p>被动获取就是让服务器或网站主动连接我们的服务器，从而获取服务器的真实IP</p>
+<p>如果网站有编辑器可以填写远程url图片，即可获取真实IP</p>
+<p>如果存在ssrf漏洞 或者xss 让服务器主动连接我们的服务器 均可获取真实IP。</p>
+<h2 id="3-19-扫全网获取真实IP"><a href="#3-19-扫全网获取真实IP" class="headerlink" title="3.19. 扫全网获取真实IP"></a>3.19. <strong>扫全网获取真实IP</strong></h2><p><a target="_blank" rel="noopener" href="https://github.com/superfish9/hackcdn">https://github.com/superfish9/hackcdn</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/boy-hack/w8fuckcdn">https://github.com/boy-hack/w8fuckcdn</a></p>
+ 
+      <!-- reward -->
+      
+      <div id="reword-out">
+        <div id="reward-btn">
+          打赏
+        </div>
+      </div>
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <div class="declare">
+      <ul class="post-copyright">
+        <li>
+          <i class="ri-copyright-line"></i>
+          <strong>版权声明： </strong>
+          
+          本博客所有文章除特别声明外，著作权归作者所有。转载请注明出处！
+          
+        </li>
+      </ul>
+    </div>
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%B8%97%E9%80%8F%E5%BF%85%E7%9F%A5%E5%BF%85%E4%BC%9A/" rel="tag">渗透必知必会</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%BD%91%E5%AE%89/" rel="tag">网安</a></li></ul>
+
+    </footer>
+  </div>
+
+   
+  <nav class="article-nav">
+    
+      <a href="/2023/08/18/kali-Linux%E7%A3%81%E7%9B%98%E6%89%A9%E5%AE%B9/" class="article-nav-link">
+        <strong class="article-nav-caption">上一篇</strong>
+        <div class="article-nav-title">
+          
+            kali Linux磁盘扩容
+          
+        </div>
+      </a>
+    
+    
+      <a href="/2023/08/07/%E5%AE%9D%E5%A1%94%E9%9D%A2%E6%9D%BF%E4%BC%81%E4%B8%9A%E7%89%88/" class="article-nav-link">
+        <strong class="article-nav-caption">下一篇</strong>
+        <div class="article-nav-title">宝塔面板企业版</div>
+      </a>
+    
+  </nav>
+
+  
+   
+     
+</article>
+
+</section>
+      <footer class="footer">
+  <div class="outer">
+    <ul>
+      <li>
+        Copyrights &copy;
+        2015-2023
+        <i class="ri-heart-fill heart_icon"></i> 山城冰荔枝
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+        
+        <span>
+  <span><i class="ri-user-3-fill"></i>访问人数:<span id="busuanzi_value_site_uv"></span></span>
+  <span class="division">|</span>
+  <span><i class="ri-eye-fill"></i>浏览次数:<span id="busuanzi_value_page_pv"></span></span>
+</span>
+        
+      </li>
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      <li>
+        <!-- cnzz统计 -->
+        
+        <script type="text/javascript" src='https://s9.cnzz.com/z_stat.php?id=1278069914&amp;web_id=1278069914'></script>
+        
+      </li>
+    </ul>
+  </div>
+</footer>    
+    </main>
+    <div class="float_btns">
+      <div class="totop" id="totop">
+  <i class="ri-arrow-up-line"></i>
+</div>
+
+<div class="todark" id="todark">
+  <i class="ri-moon-line"></i>
+</div>
+
+    </div>
+    <aside class="sidebar on">
+      <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">主页</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/archives">归档</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/categories">分类</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags">标签</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/photos">图库</a>
+    </li>
+    
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+    </aside>
+    <div id="mask"></div>
+
+<!-- #reward -->
+<div id="reward">
+  <span class="close"><i class="ri-close-line"></i></span>
+  <p class="reward-p"><i class="ri-cup-line"></i>请我喝杯咖啡吧~</p>
+  <div class="reward-box">
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/alipay.jpg">
+      <span class="reward-type">支付宝</span>
+    </div>
+    
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/wechat.jpg">
+      <span class="reward-type">微信</span>
+    </div>
+    
+  </div>
+</div>
+    
+<script src="/js/jquery-3.6.0.min.js"></script>
+ 
+<script src="/js/lazyload.min.js"></script>
+
+<!-- Tocbot -->
+ 
+<script src="/js/tocbot.min.js"></script>
+
+<script>
+  tocbot.init({
+    tocSelector: ".tocbot",
+    contentSelector: ".article-entry",
+    headingSelector: "h1, h2, h3, h4, h5, h6",
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    scrollContainer: "main",
+    positionFixedSelector: ".tocbot",
+    positionFixedClass: "is-position-fixed",
+    fixedSidebarOffset: "auto",
+  });
+</script>
+
+<script src="https://cdn.staticfile.org/jquery-modal/0.9.2/jquery.modal.min.js"></script>
+<link
+  rel="stylesheet"
+  href="https://cdn.staticfile.org/jquery-modal/0.9.2/jquery.modal.min.css"
+/>
+<script src="https://cdn.staticfile.org/justifiedGallery/3.8.1/js/jquery.justifiedGallery.min.js"></script>
+
+<script src="/dist/main.js"></script>
+
+<!-- ImageViewer -->
+ <!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" style="display:none" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<link rel="stylesheet" href="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.css">
+<link rel="stylesheet" href="https://cdn.staticfile.org/photoswipe/4.1.3/default-skin/default-skin.min.css">
+<script src="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.js"></script>
+<script src="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe-ui-default.min.js"></script>
+
+<script>
+    function viewer_init() {
+        let pswpElement = document.querySelectorAll('.pswp')[0];
+        let $imgArr = document.querySelectorAll(('.article-entry img:not(.reward-img)'))
+
+        $imgArr.forEach(($em, i) => {
+            $em.onclick = () => {
+                // slider展开状态
+                // todo: 这样不好，后面改成状态
+                if (document.querySelector('.left-col.show')) return
+                let items = []
+                $imgArr.forEach(($em2, i2) => {
+                    let img = $em2.getAttribute('data-idx', i2)
+                    let src = $em2.getAttribute('data-target') || $em2.getAttribute('src')
+                    let title = $em2.getAttribute('alt')
+                    // 获得原图尺寸
+                    const image = new Image()
+                    image.src = src
+                    items.push({
+                        src: src,
+                        w: image.width || $em2.width,
+                        h: image.height || $em2.height,
+                        title: title
+                    })
+                })
+                var gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, {
+                    index: parseInt(i)
+                });
+                gallery.init()
+            }
+        })
+    }
+    viewer_init()
+</script> 
+<!-- MathJax -->
+
+<!-- Katex -->
+
+<!-- busuanzi  -->
+ 
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+ 
+<!-- ClickLove -->
+
+<!-- ClickBoom1 -->
+
+<!-- ClickBoom2 -->
+
+<!-- CodeCopy -->
+ 
+<link rel="stylesheet" href="/css/clipboard.css">
+ <script src="https://cdn.staticfile.org/clipboard.js/2.0.10/clipboard.min.js"></script>
+<script>
+  function wait(callback, seconds) {
+    var timelag = null;
+    timelag = window.setTimeout(callback, seconds);
+  }
+  !function (e, t, a) {
+    var initCopyCode = function(){
+      var copyHtml = '';
+      copyHtml += '<button class="btn-copy" data-clipboard-snippet="">';
+      copyHtml += '<i class="ri-file-copy-2-line"></i><span>COPY</span>';
+      copyHtml += '</button>';
+      $(".highlight .code pre").before(copyHtml);
+      $(".article pre code").before(copyHtml);
+      var clipboard = new ClipboardJS('.btn-copy', {
+        target: function(trigger) {
+          return trigger.nextElementSibling;
+        }
+      });
+      clipboard.on('success', function(e) {
+        let $btn = $(e.trigger);
+        $btn.addClass('copied');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-checkbox-circle-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPIED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-checkbox-circle-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+      clipboard.on('error', function(e) {
+        e.clearSelection();
+        let $btn = $(e.trigger);
+        $btn.addClass('copy-failed');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-time-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPY FAILED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-time-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+    }
+    initCopyCode();
+  }(window, document);
+</script>
+ 
+<!-- CanvasBackground -->
+
+<script>
+  if (window.mermaid) {
+    mermaid.initialize({ theme: "forest" });
+  }
+</script>
+
+
+    
+    <div id="music">
+    
+    
+    
+    <iframe frameborder="no" border="1" marginwidth="0" marginheight="0" width="200" height="52"
+        src="//music.163.com/outchain/player?type=2&id=22707008&auto=1&height=32"></iframe>
+</div>
+
+<style>
+    #music {
+        position: fixed;
+        right: 15px;
+        bottom: 0;
+        z-index: 998;
+    }
+</style>
+    
+    
+
+  </div>
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"/live2dw/assets/assets/hijiki.model.json"},"display":{"position":"right","width":150,"height":300,"hOffset":400,"vOffset":-38},"mobile":{"show":true},"react":"opacity:1","dialog":{"enable":true,"script":{"every idle 10s":"text1","tap face":"text2","tap body":"text3"}},"log":false});</script></body>
+
+</html>

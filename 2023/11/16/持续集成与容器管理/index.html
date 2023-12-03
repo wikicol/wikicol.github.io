@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+
+
+<html lang="zh-CN">
+  
+
+    <head>
+      <meta charset="utf-8" />
+        
+      <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1"
+      />
+      <title>持续集成与容器管理 |  山城冰荔枝</title>
+  <meta name="generator" content="hexo-theme-ayer">
+       
+<link rel="stylesheet" href="/dist/main.css">
+
+      
+<link rel="stylesheet" href="/css/fonts/remixicon.css">
+
+      
+<link rel="stylesheet" href="/css/custom.css">
+ 
+      <script src="https://cdn.staticfile.org/pace/1.2.4/pace.min.js"></script>
+       
+ 
+
+      <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bulma@5.0.1/bulma.min.css"
+      />
+      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.min.js"></script>
+
+      <!-- mermaid -->
+      
+      <script src="https://cdn.staticfile.org/mermaid/8.14.0/mermaid.min.js"></script>
+      
+      <style>
+        .swal2-styled.swal2-confirm {
+          font-size: 1.6rem;
+        }
+      </style>
+    <link rel="alternate" href="/atom.xml" title="山城冰荔枝" type="application/atom+xml">
+</head>
+  </html>
+</html>
+
+
+<body>
+  <div id="app">
+    
+      
+    <main class="content on">
+      <section class="outer">
+  <article
+  id="post-持续集成与容器管理"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h1 class="article-title sea-center" style="border-left:0" itemprop="name">
+  持续集成与容器管理
+</h1>
+ 
+
+      
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2023/11/16/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/" class="article-date">
+  <time datetime="2023-11-16T08:44:40.000Z" itemprop="datePublished">2023-11-16</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Java%E5%AD%A6%E4%B9%A0/">Java学习</a>
+  </div>
+  
+<div class="word_count">
+    <span class="post-time">
+        <span class="post-meta-item-icon">
+            <i class="ri-quill-pen-line"></i>
+            <span class="post-meta-item-text"> 字数统计:</span>
+            <span class="post-count">4.7k</span>
+        </span>
+    </span>
+
+    <span class="post-time">
+        &nbsp; | &nbsp;
+        <span class="post-meta-item-icon">
+            <i class="ri-book-open-line"></i>
+            <span class="post-meta-item-text"> 阅读时长≈</span>
+            <span class="post-count">19 分钟</span>
+        </span>
+    </span>
+</div>
+ 
+    </div>
+      
+    <div class="tocbot"></div>
+
+
+
+
+  
+    <div class="article-entry" itemprop="articleBody">
+       
+  <!-- Jenkins，Rancher ，influxDB ，cAdvisor，Grafana -->
+<h1 id="持续集成与容器管理"><a href="#持续集成与容器管理" class="headerlink" title="持续集成与容器管理"></a>持续集成与容器管理</h1><p>学习目标：</p>
+<ul>
+<li>掌握DockerMaven插件的使用</li>
+<li>掌握持续集成工具Jenkins的安装与使用</li>
+<li>掌握容器管理工具Rancher的安装与使用</li>
+<li>掌握时间序列数据库influxDB的安装与使用</li>
+<li>掌握容器监控工具cAdvisor的安装与使用</li>
+<li>掌握图表工具Grafana的使用</li>
+</ul>
+<h1 id="1-DockerMaven插件"><a href="#1-DockerMaven插件" class="headerlink" title="1 DockerMaven插件"></a>1 DockerMaven插件</h1><p>微服务部署有两种方法：</p>
+<p>（1）手动部署：首先基于源码打包生成jar包（或war包）,将jar包（或war包）上传至虚拟机并拷贝至JDK容器。</p>
+<p>（2）通过Maven插件自动部署。</p>
+<p>对于数量众多的微服务，手动部署无疑是非常麻烦的做法，并且容易出错。所以我们这里学习如何自动部署，这也是企业实际开发中经常使用的方法。</p>
+<p>Maven插件自动部署步骤：</p>
+<p>（1）修改宿主机的docker配置，让其可以远程访问</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vi /lib/systemd/system/docker.service</span><br></pre></td></tr></table></figure>
+
+<p>其中ExecStart&#x3D;后添加配置<code>-H tcp://0.0.0.0:2375 -H unix:///var/run/docker.sock</code></p>
+<p>修改后如下：</p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/9_17.png"></p>
+<p>（2）刷新配置，重启服务</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">systemctl daemon-reload</span><br><span class="line">systemctl restart docker</span><br><span class="line">docker start registry</span><br></pre></td></tr></table></figure>
+
+<p>（3）在工程pom.xml 增加配置</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"> <span class="tag">&lt;<span class="name">build</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">finalName</span>&gt;</span>app<span class="tag">&lt;/<span class="name">finalName</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">plugins</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">plugin</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-maven-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></span><br><span class="line">        <span class="comment">&lt;!-- docker的maven插件，官网：https://github.com/spotify/docker-maven-plugin --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">plugin</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.spotify<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>docker-maven-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">version</span>&gt;</span>0.4.13<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line">           <span class="tag">&lt;<span class="name">imageName</span>&gt;</span>192.168.73.135:5000/$&#123;project.artifactId&#125;:$&#123;project.version&#125;<span class="tag">&lt;/<span class="name">imageName</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">baseImage</span>&gt;</span>jdk1.8<span class="tag">&lt;/<span class="name">baseImage</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">entryPoint</span>&gt;</span>[&quot;java&quot;, &quot;-jar&quot;, &quot;/$&#123;project.build.finalName&#125;.jar&quot;]<span class="tag">&lt;/<span class="name">entryPoint</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">resources</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">resource</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">targetPath</span>&gt;</span>/<span class="tag">&lt;/<span class="name">targetPath</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">directory</span>&gt;</span>$&#123;project.build.directory&#125;<span class="tag">&lt;/<span class="name">directory</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">include</span>&gt;</span>$&#123;project.build.finalName&#125;.jar<span class="tag">&lt;/<span class="name">include</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;/<span class="name">resource</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;/<span class="name">resources</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">dockerHost</span>&gt;</span>http://192.168.73.135:2375<span class="tag">&lt;/<span class="name">dockerHost</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">plugins</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">build</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>以上配置会自动生成Dockerfile</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">FROM jdk1.8</span><br><span class="line">ADD app.jar /</span><br><span class="line">ENTRYPOINT [&quot;java&quot;,&quot;-jar&quot;,&quot;/app.jar&quot;]</span><br></pre></td></tr></table></figure>
+
+<p>（5）在windows的命令提示符下，进入工程tensquare_parent所在的目录</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mvn install</span><br></pre></td></tr></table></figure>
+
+<p>进入tensquare_base 所在的目录，输入以下命令，进行打包和上传镜像</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mvn docker:build  -DpushImage</span><br></pre></td></tr></table></figure>
+
+<p>执行后，会有如下输出，代码正在上传</p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/9_81.png"></p>
+<p>（6）进入宿主机 , 查看镜像</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker images</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">REPOSITORY                              TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">192.168.184.135:5000/tensquare_base   1.0-SNAPSHOT        83efa6b4478c        10 minutes ago      687.9 MB</span><br><span class="line">192.168.184.135:5000/jdk1.8             latest              507438a0158f        6 hours ago         584 MB</span><br><span class="line">jdk1.8                                  latest              507438a0158f        6 hours ago         584 MB</span><br></pre></td></tr></table></figure>
+
+<p>输出如上内容，表示微服务已经做成镜像</p>
+<p>浏览器访问  <a target="_blank" rel="noopener" href="http://192.168.73.135:5000/v2/_catalog">http://192.168.73.135:5000/v2/_catalog</a>  ，输出</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;&quot;repositories&quot;:[&quot;tensquare_base&quot;]&#125;</span><br></pre></td></tr></table></figure>
+
+<p>浏览器访问  <a target="_blank" rel="noopener" href="http://192.168.73.135:5000/v2/_catalog">http://192.168.73.135:5000/v2/_catalog</a>  ，输出</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;&quot;repositories&quot;:[&quot;tensquare_base&quot;]&#125;</span><br></pre></td></tr></table></figure>
+
+<p>（7） 启动容器：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run -di --name=base -p 9001:9001 192.168.73.135:5000/tensquare_base:1.0-SNAPSHOT </span><br></pre></td></tr></table></figure>
+
+<h1 id="2-持续集成工具-Jenkins"><a href="#2-持续集成工具-Jenkins" class="headerlink" title="2 持续集成工具-Jenkins"></a>2 持续集成工具-Jenkins</h1><h2 id="2-1-什么是持续集成"><a href="#2-1-什么是持续集成" class="headerlink" title="2.1 什么是持续集成"></a>2.1 什么是持续集成</h2><p>​	持续集成   Continuous integration ，简称CI	</p>
+<p>​	随着软件开发复杂度的不断提高，团队开发成员间如何更好地协同工作以确保软件开发的质量已经慢慢成为开发过程中不可回避的问题。尤其是近些年来，敏捷（Agile） 在软件工程领域越来越红火，如何能再不断变化的需求中快速适应和保证软件的质量也显得尤其的重要。</p>
+<p>​	持续集成正是针对这一类问题的一种软件开发实践。它倡导团队开发成员必须经常集成他们的工作，甚至每天都可能发生多次集成。而每次的集成都是通过自动化的构建来验证，包括自动编译、发布和测试，从而尽快地发现集成错误，让团队能够更快的开发内聚的软件。</p>
+<p>持续集成具有的特点：</p>
+<ul>
+<li>它是一个自动化的周期性的集成测试过程，从检出代码、编译构建、运行测试、结果记录、测试统计等都是自动完成的，无需人工干预；</li>
+<li>需要有专门的集成服务器来执行集成构建；</li>
+<li>需要有代码托管工具支持，我们下一小节将介绍Git以及可视化界面Gogs的使用</li>
+</ul>
+<p>持续集成的作用：</p>
+<ul>
+<li>保证团队开发人员提交代码的质量，减轻了软件发布时的压力；</li>
+<li>持续集成中的任何一个环节都是自动完成的，无需太多的人工干预，有利于减少重复过程以节省时间、费用和工作量；</li>
+</ul>
+<h2 id="2-2-Jenkins简介"><a href="#2-2-Jenkins简介" class="headerlink" title="2.2 Jenkins简介"></a>2.2 Jenkins简介</h2><p>​	Jenkins，原名Hudson，2011年改为现在的名字，它 是一个开源的实现持续集成的软件工具。官方网站：<a target="_blank" rel="noopener" href="http://jenkins-ci.org/">http://jenkins-ci.org/</a>。</p>
+<p>​	Jenkins 能实施监控集成中存在的错误，提供详细的日志文件和提醒功能，还能用图表的形式形象地展示项目构建的趋势和稳定性。</p>
+<p>​	特点：</p>
+<ul>
+<li>易安装：仅仅一个 java -jar jenkins.war，从官网下载该文件后，直接运行，无需额外的安装，更无需安装数据库；</li>
+<li>易配置：提供友好的GUI配置界面；</li>
+<li>变更支持：Jenkins能从代码仓库（Subversion&#x2F;CVS）中获取并产生代码更新列表并输出到编译输出信息中；</li>
+<li>支持永久链接：用户是通过web来访问Jenkins的，而这些web页面的链接地址都是永久链接地址，因此，你可以在各种文档中直接使用该链接；</li>
+<li>集成E-Mail&#x2F;RSS&#x2F;IM：当完成一次集成时，可通过这些工具实时告诉你集成结果（据我所知，构建一次集成需要花费一定时间，有了这个功能，你就可以在等待结果过程中，干别的事情）；</li>
+<li>JUnit&#x2F;TestNG测试报告：也就是用以图表等形式提供详细的测试报表功能；</li>
+<li>支持分布式构建：Jenkins可以把集成构建等工作分发到多台计算机中完成；</li>
+<li>文件指纹信息：Jenkins会保存哪次集成构建产生了哪些jars文件，哪一次集成构建使用了哪个版本的jars文件等构建记录；</li>
+<li>支持第三方插件：使得 Jenkins 变得越来越强大</li>
+</ul>
+<h2 id="2-3-Jenkins安装"><a href="#2-3-Jenkins安装" class="headerlink" title="2.3 Jenkins安装"></a>2.3 Jenkins安装</h2><h3 id="2-3-1-JDK安装"><a href="#2-3-1-JDK安装" class="headerlink" title="2.3.1 JDK安装"></a>2.3.1 JDK安装</h3><p>（1）将jdk-8u171-linux-x64.rpm上传至服务器（虚拟机）</p>
+<p>（2）执行安装命令</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rpm -ivh jdk-8u171-linux-x64.rpm</span><br></pre></td></tr></table></figure>
+
+<p>RPM方式安装JDK，其根目录为：&#x2F;usr&#x2F;java&#x2F;jdk1.8.0_171-amd64</p>
+<h3 id="2-3-2-Jenkins安装与启动"><a href="#2-3-2-Jenkins安装与启动" class="headerlink" title="2.3.2 Jenkins安装与启动"></a>2.3.2 Jenkins安装与启动</h3><p>（1）下载jenkins</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://pkg.jenkins.io/redhat/jenkins-2.83-1.1.noarch.rpm</span><br></pre></td></tr></table></figure>
+
+<p>或将jenkins-2.83-1.1.noarch.rpm上传至服务器</p>
+<p>（2）安装jenkins</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rpm -ivh jenkins-2.83-1.1.noarch.rpm</span><br></pre></td></tr></table></figure>
+
+<p>（3）配置jenkins</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vi /etc/sysconfig/jenkins</span><br></pre></td></tr></table></figure>
+
+<p>修改用户和端口</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">JENKINS_USER=&quot;root&quot;</span><br><span class="line">JENKINS_PORT=&quot;8888&quot;</span><br></pre></td></tr></table></figure>
+
+<p>（4）启动服务</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl start jenkins</span><br></pre></td></tr></table></figure>
+
+<p>（5）访问链接 <a target="_blank" rel="noopener" href="http://192.168.184.135:8888/">http://192.168.184.135:8888</a></p>
+<p>从&#x2F;var&#x2F;lib&#x2F;jenkins&#x2F;secrets&#x2F;initialAdminPassword中获取初始密码串 </p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/9_1.png"></p>
+<p>（6）安装插件  </p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/9_86.png"></p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/9_2.png"></p>
+<p>（7）新建用户</p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/9_3.png"></p>
+<p>完成安装进入主界面</p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/9_4.png"></p>
+<h2 id="2-4-Jenkins插件安装"><a href="#2-4-Jenkins插件安装" class="headerlink" title="2.4 Jenkins插件安装"></a>2.4 Jenkins插件安装</h2><p>我们以安装maven插件为例，演示插件的安装</p>
+<p>（1）点击左侧的“系统管理”菜单 ,然后点击</p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/9_5.png"></p>
+<p>（2）选择“可选插件”选项卡，搜索maven，在列表中选择Maven Integration  ，点击“直接安装”按钮</p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/9_6.png"></p>
+<p>看到如下图时，表示已经完成</p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/9_7.png"></p>
+<h2 id="2-5-全局工具配置"><a href="#2-5-全局工具配置" class="headerlink" title="2.5 全局工具配置"></a>2.5 全局工具配置</h2><h3 id="2-5-1-安装Maven与本地仓库"><a href="#2-5-1-安装Maven与本地仓库" class="headerlink" title="2.5.1 安装Maven与本地仓库"></a>2.5.1 安装Maven与本地仓库</h3><p>（1）将Maven压缩包上传至服务器（虚拟机）</p>
+<p>（2）解压</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar zxvf apache-maven-3.5.4-bin.tar.gz</span><br></pre></td></tr></table></figure>
+
+<p>（3）移动目录</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mv apache-maven-3.5.4 /usr/local/maven</span><br></pre></td></tr></table></figure>
+
+<p>（4）编辑setting.xml配置文件<code>vi /usr/local/maven/conf/settings.xml </code>，配置本地仓库目录,内容如下</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;localRepository&gt;/usr/local/repository&lt;/localRepository&gt;</span><br></pre></td></tr></table></figure>
+
+<p>（5）将开发环境的本地仓库上传至服务器（虚拟机）并移动到&#x2F;usr&#x2F;local&#x2F;repository   。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mv reponsitory_boot /usr/local/repository</span><br></pre></td></tr></table></figure>
+
+<p>执行此步是为了以后在打包的时候不必重新下载，缩短打包的时间。</p>
+<h3 id="2-5-2-全局工具配置"><a href="#2-5-2-全局工具配置" class="headerlink" title="2.5.2 全局工具配置"></a>2.5.2 全局工具配置</h3><p>选择系统管理，全局工具配置</p>
+<p>（1）JDK配置</p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/9_10.png"></p>
+<p>设置javahome为 &#x2F;usr&#x2F;java&#x2F;jdk1.8.0_171-amd64</p>
+<p>（2）Git配置   （本地已经安装了Git软件）</p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/9_11.png"></p>
+<p>（3）Maven配置</p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/9_12.png"></p>
+<h2 id="2-6-代码上传至Git服务器"><a href="#2-6-代码上传至Git服务器" class="headerlink" title="2.6 代码上传至Git服务器"></a>2.6 代码上传至Git服务器</h2><h3 id="2-6-1-Gogs搭建与配置"><a href="#2-6-1-Gogs搭建与配置" class="headerlink" title="2.6.1 Gogs搭建与配置"></a>2.6.1 Gogs搭建与配置</h3><p>Gogs 是一款极易搭建的自助 Git 服务。</p>
+<p>Gogs 的目标是打造一个最简单、最快速和最轻松的方式搭建自助 Git 服务。使用 Go 语言开发使得 Gogs 能够通过独立的二进制分发，并且支持 Go 语言支持的 <strong>所有平台</strong>，包括 Linux、Mac OS X、Windows 以及 ARM 平台。</p>
+<p>地址：<a target="_blank" rel="noopener" href="https://gitee.com/Unknown/gogs">https://gitee.com/Unknown/gogs</a></p>
+<p>（1）下载镜像</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker pull gogs/gogs</span><br></pre></td></tr></table></figure>
+
+<p>（2）创建容器</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run -di --name=gogs -p 10022:22 -p 3000:3000 -v /var/gogsdata:/data gogs/gogs</span><br></pre></td></tr></table></figure>
+
+<p>（3）假设我的centos虚拟机IP为192.168.73.135   在地址栏输入<a target="_blank" rel="noopener" href="http://192.168.73.135:3000/">http://192.168.73.135:3000</a>  会进入首次运行安装程序页面，我们可以选择一种数据库作为gogs数据的存储，最简单的是选择SQLite3。如果对于规模较大的公司，可以选择MySQL  </p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/9_82.png"></p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/9_83.png"> </p>
+<p>点击“立即安装”</p>
+<p>这里的域名要设置为centos的IP地址,安装后显示主界面</p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/8_5.png"></p>
+<p>（4）注册</p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/8_6.png"></p>
+<p>（5）登录</p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/8_9.png"></p>
+<p>（6）创建仓库 <img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/8_1.png" alt="创建仓库"></p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/9_84.png"></p>
+<h3 id="2-6-2-提交代码"><a href="#2-6-2-提交代码" class="headerlink" title="2.6.2 提交代码"></a>2.6.2 提交代码</h3><p>步骤：</p>
+<p>（1）在本地安装git(Windows版本)</p>
+<p>（2）在IDEA中选择菜单 :  File – settings ,  在窗口中选择Version Control –  Git</p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/8_2.png"></p>
+<p>（3）选择菜单VCS  –&gt; Enable Version Control Integration… </p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/8_3.png"></p>
+<p>选择Git</p>
+<p>（4）设置远程地址:  右键点击工程选择菜单    Git –&gt; Repository   –&gt;Remotes…</p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/8_4.png"></p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/9_85.png"></p>
+<p>（5）右键点击工程选择菜单    Git –&gt; Add</p>
+<p>（6）右键点击工程选择菜单    Git –&gt; Commit Directory…</p>
+<p>（7）右键点击工程选择菜单    Git –&gt; Repository   –&gt; Push …</p>
+<h2 id="2-7-任务的创建与执行"><a href="#2-7-任务的创建与执行" class="headerlink" title="2.7 任务的创建与执行"></a>2.7 任务的创建与执行</h2><p>（1）回到首页，点击新建按钮 .如下图，输入名称，选择创建一个Maven项目，点击OK</p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/9_21.png"></p>
+<p>（2）源码管理，选择Git</p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/9_22.png"></p>
+<p>（3）Build</p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/9_23.png"></p>
+<p>命令:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">clean package docker:build -DpushImage</span><br></pre></td></tr></table></figure>
+
+<p>用于清除、打包，构建docker镜像</p>
+<p>最后点击“保存”按钮</p>
+<p>（4）执行任务</p>
+<h1 id="3-容器管理工具Rancher"><a href="#3-容器管理工具Rancher" class="headerlink" title="3 容器管理工具Rancher"></a>3 容器管理工具Rancher</h1><h2 id="3-1-什么是Rancher"><a href="#3-1-什么是Rancher" class="headerlink" title="3.1 什么是Rancher"></a>3.1 什么是Rancher</h2><p>​     Rancher是一个开源的企业级全栈化容器部署及管理平台。Rancher为容器提供一揽子基础架构服务：CNI兼容的网络服务、存储服务、主机管理、负载均衡、防护墙……Rancher让上述服务跨越公有云、私有云、虚拟机、物理机环境运行，真正实现一键式应用部署和管理。</p>
+<p>​      <a target="_blank" rel="noopener" href="https://www.cnrancher.com/">https://www.cnrancher.com/</a></p>
+<h2 id="3-2-Rancher安装"><a href="#3-2-Rancher安装" class="headerlink" title="3.2 Rancher安装"></a>3.2 Rancher安装</h2><p>（1）下载Rancher 镜像</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker pull rancher/server</span><br></pre></td></tr></table></figure>
+
+<p>（2）创建Rancher容器</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run -di --name=rancher -p 9090:8080 rancher/server</span><br></pre></td></tr></table></figure>
+
+
+
+<p>（3）在浏览器输入地址： <a target="_blank" rel="noopener" href="http://192.168.73.135:9090/">http://192.168.73.135:9090</a>  即可看到高端大气的欢迎页</p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/9_31.png"></p>
+<p>点击Got It  进入主界面</p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/9_32.png"></p>
+<p>（4）切换至中文界面</p>
+<p>点击右下角的English 在弹出菜单中选择中文</p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/9_33.png"></p>
+<p>切换后我们就可以看到亲切的中文界面啦~  </p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/9_34.png"></p>
+<h2 id="3-3-Rancher初始化"><a href="#3-3-Rancher初始化" class="headerlink" title="3.3 Rancher初始化"></a>3.3 Rancher初始化</h2><h3 id="3-3-1-添加环境"><a href="#3-3-1-添加环境" class="headerlink" title="3.3.1  添加环境"></a>3.3.1  添加环境</h3><p>Rancher 支持将资源分组归属到多个<strong>环境</strong>。 每个环境具有自己独立的基础架构资源及服务，并由一个或多个用户、团队或组织所管理。</p>
+<p>例如，您可以创建独立的“开发”、“测试”及“生产”环境以确保环境之间的安全隔离，将“开发”环境的访问权限赋予全部人员，但限制“生产”环境的访问权限给一个小的团队。</p>
+<p>（1）选择“Default –&gt;环境管理” 菜单</p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/9_41.png"></p>
+<p>（2）填写名称，点击“创建”按钮</p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/9_42.png"></p>
+<p>（3）按照上述步骤，添加十次方测试环境和生产环境</p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/9_43.png"></p>
+<p>（4）你可以通过点击logo右侧的菜单在各种环境下切换</p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/9_44.png"></p>
+<h3 id="3-3-2-添加主机"><a href="#3-3-2-添加主机" class="headerlink" title="3.3.2 添加主机"></a>3.3.2 添加主机</h3><p>（1）选择基础架构–&gt;主机 菜单，点击添加主机</p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/9_46.png"></p>
+<p>（2）拷贝脚本</p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/9_47.png"></p>
+<p>（3）在服务器（虚拟机）上运行脚本</p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/9_48.png"></p>
+<p>（4）点击关闭按钮后，会看到界面中显示此主机。我们可以很方便地管理主机的每个容器的开启和关闭</p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/9_50.png"></p>
+<h3 id="3-3-3-添加应用"><a href="#3-3-3-添加应用" class="headerlink" title="3.3.3 添加应用"></a>3.3.3 添加应用</h3><p>点击应用–&gt;全部(或用户)  ，点击“添加应用”按钮</p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/9_52.png"></p>
+<p>填写名称和描述</p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/9_51.png"></p>
+<p>点击“创建”按钮，列表中增加了新增的应用</p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/9_53.png"></p>
+<h2 id="3-4-应用部署"><a href="#3-4-应用部署" class="headerlink" title="3.4 应用部署"></a>3.4 应用部署</h2><h3 id="3-4-1-MySQL部署"><a href="#3-4-1-MySQL部署" class="headerlink" title="3.4.1 MySQL部署"></a>3.4.1 MySQL部署</h3><p>镜像：centos&#x2F;mysql-57-centos7   增加数据库服务</p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/10_22.png"></p>
+<p>注意：添加环境变量  MYSQL_ROOT_PASSWORD&#x3D;123456 </p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/9_63.png"></p>
+<p>点击创建按钮，完成创建    上述操作相当于以下docker命令</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run -di --name mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=123456 centos/mysql-57-centos7</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/10_23.png"></p>
+<p>完成后服务列表中存在并且状态为激活    使用SQLyog测试链接，执行建表语句</p>
+<h3 id="3-4-2-RabbitMQ部署"><a href="#3-4-2-RabbitMQ部署" class="headerlink" title="3.4.2 RabbitMQ部署"></a>3.4.2 RabbitMQ部署</h3><p>镜像：rabbitmq:management     端口映射5671   5672  4369    15671  15672  25672</p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/10_24.png"></p>
+<p>浏览器访问   <a target="_blank" rel="noopener" href="http://192.168.184.136:15672/">http://192.168.184.136:15672/</a></p>
+<h3 id="3-4-3-Redis部署"><a href="#3-4-3-Redis部署" class="headerlink" title="3.4.3 Redis部署"></a>3.4.3 Redis部署</h3><p>进入应用，点击添加服务，名称redis ，镜像redis ，端口映射6379 </p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/10_21.png"></p>
+<p>创建后使用客户端测试链接</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">redis-cli -h 192.168.184.144</span><br></pre></td></tr></table></figure>
+
+<p>测试成功</p>
+<h3 id="3-4-4-微服务部署"><a href="#3-4-4-微服务部署" class="headerlink" title="3.4.4 微服务部署"></a>3.4.4 微服务部署</h3><p>（1）搭建私有仓库</p>
+<p>启动私有仓库容器</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run -di --name=registry -p 5000:5000 registry</span><br></pre></td></tr></table></figure>
+
+<p>打开浏览器 输入地址<a target="_blank" rel="noopener" href="http://192.168.184.144:5000/v2/_catalog%E7%9C%8B%E5%88%B0%60%7B%22repositories%22:[]%7D%60">http://192.168.184.144:5000/v2/_catalog看到`{&quot;repositories&quot;:[]}`</a> 表示私有仓库搭建成功并且内容为空</p>
+<p>修改daemon.json</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vi /etc/docker/daemon.json</span><br></pre></td></tr></table></figure>
+
+<p>添加以下内容，保存退出。</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span><span class="attr">&quot;insecure-registries&quot;</span><span class="punctuation">:</span><span class="punctuation">[</span><span class="string">&quot;192.168.184.144:5000&quot;</span><span class="punctuation">]</span><span class="punctuation">&#125;</span> </span><br></pre></td></tr></table></figure>
+
+<p>（2）修改docker配置，允许远程访问</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vi /lib/systemd/system/docker.service</span><br></pre></td></tr></table></figure>
+
+<p>其中ExecStart&#x3D;后添加配置<code>-H tcp://0.0.0.0:2375 -H unix:///var/run/docker.sock</code></p>
+<p> 修改后刷新配置，冲洗服务</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">systemctl daemon-reload</span><br><span class="line">systemctl restart docker</span><br><span class="line">docker start registry</span><br></pre></td></tr></table></figure>
+
+<p>（3）修改微服务工程，添加DockerMaven插件</p>
+<p>（4）连接mysql数据库，执行建库脚本</p>
+<p>（5）添加服务base-service   镜像192.168.184.144:5000&#x2F;tensquare_base:1.0-SNAPSHOT    端口映射9001</p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/9_67.png"></p>
+<p>（6）测试微服务  浏览器打开网址  <a target="_blank" rel="noopener" href="http://192.168.184.144:9001/label">http://192.168.184.144:9001/label</a>   看是否可以看到标签列表</p>
+<h2 id="3-6-扩容与缩容"><a href="#3-6-扩容与缩容" class="headerlink" title="3.6 扩容与缩容"></a>3.6 扩容与缩容</h2><h3 id="3-6-1-扩容"><a href="#3-6-1-扩容" class="headerlink" title="3.6.1 扩容"></a>3.6.1 扩容</h3><p>（1）在Rancher将创建的base-service（基础信息微服务）删除</p>
+<p>（2）重新创建base-service ，不设置端口映射</p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/10_01.png"></p>
+<p>（3）在选择菜单API  –&gt;WebHooks  ，点击“添加接收器”按钮</p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/9_68.png"></p>
+<p>（4）填写名称等信息，选择要扩容的服务，点击创建按钮</p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/10_05.png"></p>
+<p>（5）接收器列表中新增了一条记录  ，点击触发地址将地址复制到剪切板</p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/10_06.png"></p>
+<p>（6）使用postman测试：</p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/10_07.png"></p>
+<p>测试后，发现容器由原来的1个变为了3个</p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/10_08.png"></p>
+<h3 id="3-6-2-缩容"><a href="#3-6-2-缩容" class="headerlink" title="3.6.2 缩容"></a>3.6.2 缩容</h3><p>刚才我们实现了扩容，那么如何减少容器数量呢？我们来试试如何缩容</p>
+<p>（1）添加接收器  ,选择缩容，步长为1表示每次递减1个 ，点击创建按钮</p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/10_10.png"></p>
+<p>（2）创建成功后，复制触发地址</p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/10_11.png"></p>
+<p>（3）使用postman测试</p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/10_12.png"></p>
+<h1 id="4-influxDB"><a href="#4-influxDB" class="headerlink" title="4 influxDB"></a>4 influxDB</h1><h2 id="4-1-什么是influxDB"><a href="#4-1-什么是influxDB" class="headerlink" title="4.1 什么是influxDB"></a>4.1 什么是influxDB</h2><p>​	influxDB是一个分布式时间序列数据库。cAdvisor仅仅显示实时信息，但是不存储监视数据。因此，我们需要提供时序数据库用于存储cAdvisor组件所提供的监控信息，以便显示除实时信息之外的时序数据。</p>
+<h2 id="4-2-influxDB安装"><a href="#4-2-influxDB安装" class="headerlink" title="4.2 influxDB安装"></a>4.2 influxDB安装</h2><p>（1）下载镜像</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker pull tutum/influxdb</span><br></pre></td></tr></table></figure>
+
+<p>（2）创建容器</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">docker run -di \</span><br><span class="line">   -p 8083:8083 \</span><br><span class="line">   -p 8086:8086 \</span><br><span class="line">   --expose 8090 \</span><br><span class="line">   --expose 8099 \</span><br><span class="line">   --name influxsrv \</span><br><span class="line">   tutum/influxdb</span><br></pre></td></tr></table></figure>
+
+<p>端口概述：  8083端口:web访问端口     8086:数据写入端口</p>
+<p>打开浏览器   <a target="_blank" rel="noopener" href="http://192.168.184.144:8083/">http://192.168.184.144:8083/</a></p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/10_71.png"></p>
+<h2 id="4-3-influxDB常用操作"><a href="#4-3-influxDB常用操作" class="headerlink" title="4.3 influxDB常用操作"></a>4.3 influxDB常用操作</h2><h3 id="4-3-1-创建数据库"><a href="#4-3-1-创建数据库" class="headerlink" title="4.3.1 创建数据库"></a>4.3.1 创建数据库</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CREATE DATABASE &quot;cadvisor&quot;</span><br></pre></td></tr></table></figure>
+
+<p>回车创建数据库</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SHOW DATABASES</span><br></pre></td></tr></table></figure>
+
+<p>查看数据库</p>
+<h3 id="4-3-2-创建用户并授权"><a href="#4-3-2-创建用户并授权" class="headerlink" title="4.3.2 创建用户并授权"></a>4.3.2 创建用户并授权</h3><p>创建用户</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CREATE USER &quot;cadvisor&quot; WITH PASSWORD &#x27;cadvisor&#x27; WITH ALL PRIVILEGES</span><br></pre></td></tr></table></figure>
+
+<p>查看用户</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SHOW USRES</span><br></pre></td></tr></table></figure>
+
+<p>用户授权</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">grant all privileges on cadvisor to cadvisor</span><br><span class="line">grant WRITE on cadvisor to cadvisor</span><br><span class="line">grant READ on cadvisor to cadvisor</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-3-3-查看采集的数据"><a href="#4-3-3-查看采集的数据" class="headerlink" title="4.3.3 查看采集的数据"></a>4.3.3 查看采集的数据</h3><p>切换到cadvisor数据库，使用以下命令查看采集的数据</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SHOW MEASUREMENTS</span><br></pre></td></tr></table></figure>
+
+<p>现在我们还没有数据，如果想采集系统的数据，我们需要使用<strong>Cadvisor</strong>软件来实现</p>
+<h1 id="5-cAdvisor"><a href="#5-cAdvisor" class="headerlink" title="5 cAdvisor"></a>5 cAdvisor</h1><h2 id="5-1-什么是cAdvisor"><a href="#5-1-什么是cAdvisor" class="headerlink" title="5.1 什么是cAdvisor"></a>5.1 什么是cAdvisor</h2><p>​	Google开源的用于监控基础设施应用的工具，它是一个强大的监控工具，不需要任何配置就可以通过运行在Docker主机上的容器来监控Docker容器，而且可以监控Docker主机。更多详细操作和配置选项可以查看Github上的cAdvisor项目文档。</p>
+<h2 id="5-2-cAdvisor安装"><a href="#5-2-cAdvisor安装" class="headerlink" title="5.2 cAdvisor安装"></a>5.2 cAdvisor安装</h2><p>（1）下载镜像</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker pull google/cadvisor</span><br></pre></td></tr></table></figure>
+
+<p>（2）创建容器</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run --volume=/:/rootfs:ro --volume=/var/run:/var/run:rw --volume=/sys:/sys:ro --volume=/var/lib/docker/:/var/lib/docker:ro --publish=8080:8080 --detach=true --link influxsrv:influxsrv --name=cadvisor google/cadvisor -storage_driver=influxdb -storage_driver_db=cadvisor -storage_driver_host=influxsrv:8086</span><br></pre></td></tr></table></figure>
+
+<p>WEB前端访问地址</p>
+<p><a target="_blank" rel="noopener" href="http://192.168.184.144:8080/containers/">http://192.168.184.144:8080/containers/</a></p>
+<p>性能指标含义参照如下地址</p>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/ZHANG_H_A/article/details/53097084">https://blog.csdn.net/ZHANG_H_A&#x2F;article&#x2F;details&#x2F;53097084</a></p>
+<p>再次查看influxDB，发现已经有很多数据被采集进去了。</p>
+<h1 id="6-Grafana"><a href="#6-Grafana" class="headerlink" title="6 Grafana"></a>6 Grafana</h1><h2 id="6-1-什么是Grafana"><a href="#6-1-什么是Grafana" class="headerlink" title="6.1 什么是Grafana"></a>6.1 什么是Grafana</h2><p>​	Grafana是一个可视化面板（Dashboard），有着非常漂亮的图表和布局展示，功能齐全的度量仪表盘和图形编辑器。支持Graphite、zabbix、InfluxDB、Prometheus和OpenTSDB作为数据源。<br>Grafana主要特性：灵活丰富的图形化选项；可以混合多种风格；支持白天和夜间模式；多个数据源。</p>
+<h2 id="6-2-Grafana安装"><a href="#6-2-Grafana安装" class="headerlink" title="6.2 Grafana安装"></a>6.2 Grafana安装</h2><p>（1）下载镜像</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker pull grafana/grafana</span><br></pre></td></tr></table></figure>
+
+<p>（2）创建容器</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run -d -p 3001:3000  -e INFLUXDB_HOST=influxsrv -e INFLUXDB_PORT=8086 -e INFLUXDB_NAME=cadvisor -e INFLUXDB_USER=cadvisor -e INFLUXDB_PASS=cadvisor --link influxsrv:influxsrv --name grafana grafana/grafana</span><br></pre></td></tr></table></figure>
+
+<p>（3）访问</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://192.168.184.144:3001</span><br></pre></td></tr></table></figure>
+
+<p>用户名密码均为admin</p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/10_41.png"></p>
+<p>（4）登录后提示你修改密码</p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/10_42.png"></p>
+<p>（5）之后进入主页面</p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/10_43.png"></p>
+<h2 id="6-3-Grafana的使用"><a href="#6-3-Grafana的使用" class="headerlink" title="6.3 Grafana的使用"></a>6.3 Grafana的使用</h2><h3 id="6-3-1-添加数据源"><a href="#6-3-1-添加数据源" class="headerlink" title="6.3.1 添加数据源"></a>6.3.1 添加数据源</h3><p>（1）点击设置，DataSource </p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/10_44.png"></p>
+<p>（2）点击添加data source</p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/10_45.png"></p>
+<p>（3）为数据源起个名称，指定类型、地址、以及连接的数据库名、用户名和密码</p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/10_46.png"></p>
+<p>点击保存。数据源建立成功</p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/10_47.png"></p>
+<h3 id="6-3-2-添加仪表盘"><a href="#6-3-2-添加仪表盘" class="headerlink" title="6.3.2 添加仪表盘"></a>6.3.2 添加仪表盘</h3><p>（1）选择Dashboards –Manager  </p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/10_48.png"></p>
+<p>（2）点击“添加”按钮</p>
+<p>（3）点击Graph  图标</p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/10_49.png"></p>
+<p>（4）出现下面图表的界面 ，点击Panel Title  选择Edit (编辑)</p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/10_51.png"></p>
+<p>（5）定义标题等基础信息</p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/10_52.png"></p>
+<p>（6）设置查询的信息为内存，指定容器名称</p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/10_53.png"></p>
+<p>（7）指定y轴的单位 为M</p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/10_54.png"></p>
+<p>（8）保存</p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/10_55.png"></p>
+<p>填写名称</p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/10_56.png"></p>
+<h3 id="6-4-3-预警通知设置"><a href="#6-4-3-预警通知设置" class="headerlink" title="6.4.3 预警通知设置"></a>6.4.3 预警通知设置</h3><p>（1）选择菜单  alerting–&gt; Notification channels</p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/10_57.png"></p>
+<p>（2）点击Add channel 按钮</p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/10_58.png"></p>
+<p>（3）填写名称，选择类型为webhook  ,填写钩子地址</p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/10_59.png"></p>
+<p>这个钩子地址是之前对base微服务扩容的地址</p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/10_60.png"></p>
+<p>（4）点击SendTest  测试  观察基础微服务是否增加容器</p>
+<p>（5）点击save保存</p>
+<p>（6）按照同样的方法添加缩容地址</p>
+<h3 id="6-4-4-仪表盘预警设置"><a href="#6-4-4-仪表盘预警设置" class="headerlink" title="6.4.4 仪表盘预警设置"></a>6.4.4 仪表盘预警设置</h3><p>（1）再次打开刚刚编辑的仪表盘</p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/10_61.png"></p>
+<p>（2）点击 Create Alert </p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/10_62.png"></p>
+<p>设置预警线</p>
+<p>（3）选择通知</p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/10_63.png"></p>
+<p><img src="/images/%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%AE%A1%E7%90%86/image/10_64.png"></p>
+<p>保存更改</p>
+ 
+      <!-- reward -->
+      
+      <div id="reword-out">
+        <div id="reward-btn">
+          打赏
+        </div>
+      </div>
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <div class="declare">
+      <ul class="post-copyright">
+        <li>
+          <i class="ri-copyright-line"></i>
+          <strong>版权声明： </strong>
+          
+          本博客所有文章除特别声明外，著作权归作者所有。转载请注明出处！
+          
+        </li>
+      </ul>
+    </div>
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Grafana/" rel="tag">Grafana</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Jenkins/" rel="tag">Jenkins</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Rancher/" rel="tag">Rancher</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/cAdvisor/" rel="tag">cAdvisor</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/influxDB/" rel="tag">influxDB</a></li></ul>
+
+    </footer>
+  </div>
+
+   
+  <nav class="article-nav">
+    
+      <a href="/2023/11/17/%E7%A7%81%E5%9F%9F%E6%96%87%E7%AB%A0%E6%95%B4%E7%90%86%E3%80%90%E4%B8%80%E3%80%91/" class="article-nav-link">
+        <strong class="article-nav-caption">上一篇</strong>
+        <div class="article-nav-title">
+          
+            私域文章整理【一】
+          
+        </div>
+      </a>
+    
+    
+      <a href="/2023/11/16/ES6%E6%A8%A1%E5%9D%97%E5%8C%96/" class="article-nav-link">
+        <strong class="article-nav-caption">下一篇</strong>
+        <div class="article-nav-title">ES6模块化</div>
+      </a>
+    
+  </nav>
+
+  
+   
+     
+</article>
+
+</section>
+      <footer class="footer">
+  <div class="outer">
+    <ul>
+      <li>
+        Copyrights &copy;
+        2015-2023
+        <i class="ri-heart-fill heart_icon"></i> 山城冰荔枝
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+        
+        <span>
+  <span><i class="ri-user-3-fill"></i>访问人数:<span id="busuanzi_value_site_uv"></span></span>
+  <span class="division">|</span>
+  <span><i class="ri-eye-fill"></i>浏览次数:<span id="busuanzi_value_page_pv"></span></span>
+</span>
+        
+      </li>
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      <li>
+        <!-- cnzz统计 -->
+        
+        <script type="text/javascript" src='https://s9.cnzz.com/z_stat.php?id=1278069914&amp;web_id=1278069914'></script>
+        
+      </li>
+    </ul>
+  </div>
+</footer>    
+    </main>
+    <div class="float_btns">
+      <div class="totop" id="totop">
+  <i class="ri-arrow-up-line"></i>
+</div>
+
+<div class="todark" id="todark">
+  <i class="ri-moon-line"></i>
+</div>
+
+    </div>
+    <aside class="sidebar on">
+      <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">主页</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/archives">归档</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/categories">分类</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags">标签</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/photos">图库</a>
+    </li>
+    
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+    </aside>
+    <div id="mask"></div>
+
+<!-- #reward -->
+<div id="reward">
+  <span class="close"><i class="ri-close-line"></i></span>
+  <p class="reward-p"><i class="ri-cup-line"></i>请我喝杯咖啡吧~</p>
+  <div class="reward-box">
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/alipay.jpg">
+      <span class="reward-type">支付宝</span>
+    </div>
+    
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/wechat.jpg">
+      <span class="reward-type">微信</span>
+    </div>
+    
+  </div>
+</div>
+    
+<script src="/js/jquery-3.6.0.min.js"></script>
+ 
+<script src="/js/lazyload.min.js"></script>
+
+<!-- Tocbot -->
+ 
+<script src="/js/tocbot.min.js"></script>
+
+<script>
+  tocbot.init({
+    tocSelector: ".tocbot",
+    contentSelector: ".article-entry",
+    headingSelector: "h1, h2, h3, h4, h5, h6",
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    scrollContainer: "main",
+    positionFixedSelector: ".tocbot",
+    positionFixedClass: "is-position-fixed",
+    fixedSidebarOffset: "auto",
+  });
+</script>
+
+<script src="https://cdn.staticfile.org/jquery-modal/0.9.2/jquery.modal.min.js"></script>
+<link
+  rel="stylesheet"
+  href="https://cdn.staticfile.org/jquery-modal/0.9.2/jquery.modal.min.css"
+/>
+<script src="https://cdn.staticfile.org/justifiedGallery/3.8.1/js/jquery.justifiedGallery.min.js"></script>
+
+<script src="/dist/main.js"></script>
+
+<!-- ImageViewer -->
+ <!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" style="display:none" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<link rel="stylesheet" href="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.css">
+<link rel="stylesheet" href="https://cdn.staticfile.org/photoswipe/4.1.3/default-skin/default-skin.min.css">
+<script src="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.js"></script>
+<script src="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe-ui-default.min.js"></script>
+
+<script>
+    function viewer_init() {
+        let pswpElement = document.querySelectorAll('.pswp')[0];
+        let $imgArr = document.querySelectorAll(('.article-entry img:not(.reward-img)'))
+
+        $imgArr.forEach(($em, i) => {
+            $em.onclick = () => {
+                // slider展开状态
+                // todo: 这样不好，后面改成状态
+                if (document.querySelector('.left-col.show')) return
+                let items = []
+                $imgArr.forEach(($em2, i2) => {
+                    let img = $em2.getAttribute('data-idx', i2)
+                    let src = $em2.getAttribute('data-target') || $em2.getAttribute('src')
+                    let title = $em2.getAttribute('alt')
+                    // 获得原图尺寸
+                    const image = new Image()
+                    image.src = src
+                    items.push({
+                        src: src,
+                        w: image.width || $em2.width,
+                        h: image.height || $em2.height,
+                        title: title
+                    })
+                })
+                var gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, {
+                    index: parseInt(i)
+                });
+                gallery.init()
+            }
+        })
+    }
+    viewer_init()
+</script> 
+<!-- MathJax -->
+
+<!-- Katex -->
+
+<!-- busuanzi  -->
+ 
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+ 
+<!-- ClickLove -->
+
+<!-- ClickBoom1 -->
+
+<!-- ClickBoom2 -->
+
+<!-- CodeCopy -->
+ 
+<link rel="stylesheet" href="/css/clipboard.css">
+ <script src="https://cdn.staticfile.org/clipboard.js/2.0.10/clipboard.min.js"></script>
+<script>
+  function wait(callback, seconds) {
+    var timelag = null;
+    timelag = window.setTimeout(callback, seconds);
+  }
+  !function (e, t, a) {
+    var initCopyCode = function(){
+      var copyHtml = '';
+      copyHtml += '<button class="btn-copy" data-clipboard-snippet="">';
+      copyHtml += '<i class="ri-file-copy-2-line"></i><span>COPY</span>';
+      copyHtml += '</button>';
+      $(".highlight .code pre").before(copyHtml);
+      $(".article pre code").before(copyHtml);
+      var clipboard = new ClipboardJS('.btn-copy', {
+        target: function(trigger) {
+          return trigger.nextElementSibling;
+        }
+      });
+      clipboard.on('success', function(e) {
+        let $btn = $(e.trigger);
+        $btn.addClass('copied');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-checkbox-circle-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPIED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-checkbox-circle-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+      clipboard.on('error', function(e) {
+        e.clearSelection();
+        let $btn = $(e.trigger);
+        $btn.addClass('copy-failed');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-time-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPY FAILED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-time-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+    }
+    initCopyCode();
+  }(window, document);
+</script>
+ 
+<!-- CanvasBackground -->
+
+<script>
+  if (window.mermaid) {
+    mermaid.initialize({ theme: "forest" });
+  }
+</script>
+
+
+    
+    <div id="music">
+    
+    
+    
+    <iframe frameborder="no" border="1" marginwidth="0" marginheight="0" width="200" height="52"
+        src="//music.163.com/outchain/player?type=2&id=22707008&auto=1&height=32"></iframe>
+</div>
+
+<style>
+    #music {
+        position: fixed;
+        right: 15px;
+        bottom: 0;
+        z-index: 998;
+    }
+</style>
+    
+    
+
+  </div>
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"/live2dw/assets/assets/hijiki.model.json"},"display":{"position":"right","width":150,"height":300,"hOffset":400,"vOffset":-38},"mobile":{"show":true},"react":"opacity:1","dialog":{"enable":true,"script":{"every idle 10s":"text1","tap face":"text2","tap body":"text3"}},"log":false});</script></body>
+
+</html>

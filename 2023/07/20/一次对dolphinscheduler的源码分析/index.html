@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+
+
+<html lang="zh-CN">
+  
+
+    <head>
+      <meta charset="utf-8" />
+        
+      <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1"
+      />
+      <title>一次对dolphinscheduler的源码分析 |  山城冰荔枝</title>
+  <meta name="generator" content="hexo-theme-ayer">
+       
+<link rel="stylesheet" href="/dist/main.css">
+
+      
+<link rel="stylesheet" href="/css/fonts/remixicon.css">
+
+      
+<link rel="stylesheet" href="/css/custom.css">
+ 
+      <script src="https://cdn.staticfile.org/pace/1.2.4/pace.min.js"></script>
+       
+ 
+
+      <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bulma@5.0.1/bulma.min.css"
+      />
+      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.min.js"></script>
+
+      <!-- mermaid -->
+      
+      <script src="https://cdn.staticfile.org/mermaid/8.14.0/mermaid.min.js"></script>
+      
+      <style>
+        .swal2-styled.swal2-confirm {
+          font-size: 1.6rem;
+        }
+      </style>
+    <link rel="alternate" href="/atom.xml" title="山城冰荔枝" type="application/atom+xml">
+</head>
+  </html>
+</html>
+
+
+<body>
+  <div id="app">
+    
+      
+    <main class="content on">
+      <section class="outer">
+  <article
+  id="post-一次对dolphinscheduler的源码分析"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h1 class="article-title sea-center" style="border-left:0" itemprop="name">
+  一次对dolphinscheduler的源码分析
+</h1>
+ 
+
+      
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2023/07/20/%E4%B8%80%E6%AC%A1%E5%AF%B9dolphinscheduler%E7%9A%84%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="article-date">
+  <time datetime="2023-07-20T01:05:10.000Z" itemprop="datePublished">2023-07-20</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E6%8A%80%E6%9C%AF/">技术</a>
+  </div>
+  
+<div class="word_count">
+    <span class="post-time">
+        <span class="post-meta-item-icon">
+            <i class="ri-quill-pen-line"></i>
+            <span class="post-meta-item-text"> 字数统计:</span>
+            <span class="post-count">4.2k</span>
+        </span>
+    </span>
+
+    <span class="post-time">
+        &nbsp; | &nbsp;
+        <span class="post-meta-item-icon">
+            <i class="ri-book-open-line"></i>
+            <span class="post-meta-item-text"> 阅读时长≈</span>
+            <span class="post-count">20 分钟</span>
+        </span>
+    </span>
+</div>
+ 
+    </div>
+      
+    <div class="tocbot"></div>
+
+
+
+
+  
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h1 id="dolphinscheduler学习"><a href="#dolphinscheduler学习" class="headerlink" title="dolphinscheduler学习"></a>dolphinscheduler学习</h1><h2 id="DolphinScheduler-项目结构"><a href="#DolphinScheduler-项目结构" class="headerlink" title="DolphinScheduler 项目结构"></a><strong>DolphinScheduler 项目结构</strong></h2><p><strong>2.1 结构分析</strong></p>
+<p><img src="/images/Untitled.png" alt="Untitled"></p>
+<p>导入项目后，可以看到<strong>其主要核心模块如下：</strong></p>
+<table>
+<thead>
+<tr>
+<th>模块</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>dolphinscheduler-alert</td>
+<td>告警模块，提供 AlertServer 服务。</td>
+</tr>
+<tr>
+<td>dolphinscheduler-api</td>
+<td>web应用模块，提供 ApiServer 服务。</td>
+</tr>
+<tr>
+<td>dolphinscheduler-common</td>
+<td>通用的常量枚举、工具类、数据结构或者基类</td>
+</tr>
+<tr>
+<td>dolphinscheduler-dao</td>
+<td>提供数据库访问等操作。</td>
+</tr>
+<tr>
+<td>dolphinscheduler-remote</td>
+<td>基于 netty 的客户端、服务端</td>
+</tr>
+<tr>
+<td>dolphinscheduler-server</td>
+<td>MasterServer 和 WorkerServer 服务</td>
+</tr>
+<tr>
+<td>dolphinscheduler-service</td>
+<td>service模块，包含Quartz、Zookeeper、日志客户端访问服务，便于server模块和api模块调用</td>
+</tr>
+<tr>
+<td>dolphinscheduler-ui</td>
+<td>前端模块</td>
+</tr>
+</tbody></table>
+<p><strong>2.2 表分析</strong></p>
+<p>dolphinscheduler_ddl.sql及dolphinscheduler_dml.sql</p>
+<p><img src="/images/Untitled%201.png" alt="Untitled"></p>
+<p><strong>执行完后，可以在数据库里看到有如下表：</strong></p>
+<table>
+<thead>
+<tr>
+<th>表名</th>
+<th>表信息</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>t_ds_access_token</td>
+<td>访问ds后端的token</td>
+</tr>
+<tr>
+<td>t_ds_alert</td>
+<td>告警信息</td>
+</tr>
+<tr>
+<td>t_ds_alertgroup</td>
+<td>告警组</td>
+</tr>
+<tr>
+<td>t_ds_command</td>
+<td>执行命令</td>
+</tr>
+<tr>
+<td>t_ds_datasource</td>
+<td>数据源</td>
+</tr>
+<tr>
+<td>t_ds_error_command（核心表）</td>
+<td>错误命令</td>
+</tr>
+<tr>
+<td>t_ds_process_definition（核心表）</td>
+<td>流程定义</td>
+</tr>
+<tr>
+<td>t_ds_process_instance（核心表）</td>
+<td>流程实例</td>
+</tr>
+<tr>
+<td>t_ds_project</td>
+<td>项目</td>
+</tr>
+<tr>
+<td>t_ds_queue</td>
+<td>队列</td>
+</tr>
+<tr>
+<td>t_ds_relation_datasource_user</td>
+<td>用户关联数据源</td>
+</tr>
+<tr>
+<td>t_ds_relation_process_instance</td>
+<td>子流程</td>
+</tr>
+<tr>
+<td>t_ds_relation_project_user</td>
+<td>用户关联项目</td>
+</tr>
+<tr>
+<td>t_ds_relation_resources_user</td>
+<td>用户关联资源</td>
+</tr>
+<tr>
+<td>t_ds_relation_udfs_user</td>
+<td>用户关联UDF函数</td>
+</tr>
+<tr>
+<td>t_ds_relation_user_alertgroup</td>
+<td>用户关联告警组</td>
+</tr>
+<tr>
+<td>t_ds_resources</td>
+<td>资源文件</td>
+</tr>
+<tr>
+<td>t_ds_schedules（核心表）</td>
+<td>流程定时调度</td>
+</tr>
+<tr>
+<td>t_ds_session</td>
+<td>用户登录的session</td>
+</tr>
+<tr>
+<td>t_ds_task_instance（核心表）</td>
+<td>任务实例</td>
+</tr>
+<tr>
+<td>t_ds_tenant</td>
+<td>租户</td>
+</tr>
+<tr>
+<td>t_ds_udfs</td>
+<td>UDF资源</td>
+</tr>
+<tr>
+<td>t_ds_user</td>
+<td>用户</td>
+</tr>
+<tr>
+<td>t_ds_version</td>
+<td>ds版本信息</td>
+</tr>
+</tbody></table>
+<p><strong>2.2.1 类关系图 （用户&#x2F;队列&#x2F;数据源）</strong></p>
+<p><strong>DS</strong></p>
+<p><img src="/images/image%201.png" alt="1"></p>
+<p><strong>描述如下：</strong></p>
+<ul>
+<li>一个租户下可以有多个用户；</li>
+<li><code>t_ds_user</code>中的<code>queue</code>字段存储的是队列表中的<code>queue_name</code>信息;</li>
+<li><code>t_ds_tenant</code>下存的是<code>queue_id</code>，在流程定义执行过程中，用户队列优先级最高，用户队列为空则采用租户队列；</li>
+<li><code>t_ds_datasource</code>表中的<code>user_id</code>字段表示创建该数据源的用户;</li>
+<li><code>t_ds_relation_datasource_user</code>中的<code>user_id</code>表示，对数据源有权限的用户。</li>
+</ul>
+<p><strong>2.2.2 类关系图 （项目&#x2F;资源&#x2F;告警）</strong></p>
+<p><strong>DS</strong></p>
+<p><img src="/images/image%201.png" alt="2"></p>
+<p><strong>描述如下：</strong></p>
+<ul>
+<li><strong>一个用户可以有多个项目，用户项目授权通过t_ds_relation_project_user表完成project_id和user_id的关系绑定</strong>；</li>
+<li>t_ds_projcet表中的user_id表示创建该项目的用户；</li>
+<li>t_ds_relation_project_user表中的user_id表示对项目有权限的用户；</li>
+<li>t_ds_resources表中的user_id表示创建该资源的用户；</li>
+<li>t_ds_relation_resources_user中的user_id表示对资源有权限的用户；</li>
+<li>t_ds_udfs表中的user_id表示创建该UDF的用户；</li>
+<li>t_ds_relation_udfs_user表中的user_id表示对UDF有权限的用户。</li>
+</ul>
+<p><strong>2.2.3 类关系图 （ 命令&#x2F;流程&#x2F;任务）</strong></p>
+<p><strong>DS</strong><br><img src="/images/image3.png" alt="3"></p>
+<p><img src="/images/image4.png" alt="4"></p>
+<p><strong>描述如下：</strong></p>
+<ul>
+<li><strong>一个项目有多个流程定义，一个流程定义可以生成多个流程实例，一个流程实例可以生成多个任务实例</strong>；</li>
+<li>t_ds_schedulers表存放流程定义的定时调度信息；</li>
+<li>t_ds_relation_process_instance表存放的数据用于处理流程定义中含有子流程的情况，parent_process_instance_id表示含有子流程的主流程实例id，process_instance_id表示子流程实例的id，parent_task_instance_id表示子流程节点的任务实例id，流程实例表和任务实例表分别对应t_ds_process_instance表和t_ds_task_instance表</li>
+</ul>
+<p><strong>03</strong></p>
+<p><strong>DolphinScheduler 源码分析</strong></p>
+<p>讲解源码前，先贴一份官网的启动流程图：</p>
+<p><img src="/images/image5.png" alt="5"></p>
+<p><strong>3.1 ExecutorController</strong></p>
+<p><strong>DS</strong></p>
+<p>org.apache.dolphinscheduler.api.controller.ExecutorController</p>
+<p><img src="/images/image6.png" alt="6 text"></p>
+<p>以下是对各接口的描述：</p>
+<table>
+<thead>
+<tr>
+<th>接口</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>&#x2F;start-process-instance</td>
+<td>执行流程实例</td>
+</tr>
+<tr>
+<td>&#x2F;batch-start-process-instance</td>
+<td>批量执行流程实例</td>
+</tr>
+<tr>
+<td>&#x2F;execute</td>
+<td>操作流程实例，如：暂停, 停止, 重跑, 从暂停恢复,从停止恢复</td>
+</tr>
+<tr>
+<td>&#x2F;batch-execute</td>
+<td>批量操作流程实例</td>
+</tr>
+<tr>
+<td>&#x2F;start-check</td>
+<td>检查流程定义或检查所有的子流程定义是否在线</td>
+</tr>
+</tbody></table>
+<p>接下我们看看最核心的方法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">     * do action to process instance: pause, stop, repeat, recover from pause, recover from stop</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> loginUser login user</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> projectCode project code</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> processInstanceId process instance id</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> executeType execute type</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> execute result code</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@ApiOperation(value = &quot;execute&quot;, notes = &quot;EXECUTE_ACTION_TO_PROCESS_INSTANCE_NOTES&quot;)</span></span><br><span class="line">    <span class="meta">@ApiImplicitParams(&#123;</span></span><br><span class="line"><span class="meta">            @ApiImplicitParam(name = &quot;processInstanceId&quot;, value = &quot;PROCESS_INSTANCE_ID&quot;, required = true, dataType = &quot;Int&quot;, example = &quot;100&quot;),</span></span><br><span class="line"><span class="meta">            @ApiImplicitParam(name = &quot;executeType&quot;, value = &quot;EXECUTE_TYPE&quot;, required = true, dataType = &quot;ExecuteType&quot;)</span></span><br><span class="line"><span class="meta">    &#125;)</span></span><br><span class="line">    <span class="meta">@PostMapping(value = &quot;/execute&quot;)</span></span><br><span class="line">    <span class="meta">@ResponseStatus(HttpStatus.OK)</span></span><br><span class="line">    <span class="meta">@ApiException(EXECUTE_PROCESS_INSTANCE_ERROR)</span></span><br><span class="line">    <span class="meta">@AccessLogAnnotation(ignoreRequestArgs = &quot;loginUser&quot;)</span></span><br><span class="line">    <span class="keyword">public</span> Result <span class="title function_">execute</span><span class="params">(<span class="meta">@ApiIgnore</span> <span class="meta">@RequestAttribute(value = Constants.SESSION_USER)</span> User loginUser,</span></span><br><span class="line"><span class="params">                          <span class="meta">@ApiParam(name = &quot;projectCode&quot;, value = &quot;PROJECT_CODE&quot;, required = true)</span> <span class="meta">@PathVariable</span> <span class="type">long</span> projectCode,</span></span><br><span class="line"><span class="params">                          <span class="meta">@RequestParam(&quot;processInstanceId&quot;)</span> Integer processInstanceId,</span></span><br><span class="line"><span class="params">                          <span class="meta">@RequestParam(&quot;executeType&quot;)</span> ExecuteType executeType</span></span><br><span class="line"><span class="params">    )</span> &#123;</span><br><span class="line">        <span class="type">Map</span> <span class="variable">result</span> <span class="operator">=</span> execService.execute(loginUser, projectCode, processInstanceId, executeType);</span><br><span class="line">        <span class="keyword">return</span> returnDataList(result);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>可以看到execute接口，是直接使用ExecService去执行了，下面分析下。</p>
+<p><strong>3.2 ExecService</strong></p>
+<p><strong>DS</strong></p>
+<p><strong>下面看看里面的execute方法，已经加好了注释：</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 操作工作流实例</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> loginUser         登录用户</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> projectCode       项目编码</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> processInstanceId 流程实例ID</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> executeType       执行类型（repeat running、resume pause、resume failure、stop、pause）</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@return</span> 执行结果</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="keyword">public</span> Map&lt;String, Object&gt; <span class="title function_">execute</span><span class="params">(User loginUser, <span class="type">long</span> projectCode, Integer processInstanceId, ExecuteType executeType)</span> &#123;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*** 查询项目信息 **/</span></span><br><span class="line">    <span class="type">Project</span> <span class="variable">project</span> <span class="operator">=</span> projectMapper.queryByCode(projectCode);</span><br><span class="line"><span class="comment">//check user access for project</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*** 判断当前用户是否有操作权限 **/</span></span><br><span class="line">    Map&lt;String, Object&gt; result = projectService.checkProjectAndAuth(loginUser, project, projectCode, ApiFuncIdentificationConstant.map.get(executeType));</span><br><span class="line">    <span class="keyword">if</span> (result.get(Constants.STATUS) != Status.SUCCESS) &#123;</span><br><span class="line">        <span class="keyword">return</span> result;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*** 检查Master节点是否存在 **/</span></span><br><span class="line">    <span class="keyword">if</span> (!checkMasterExists(result)) &#123;</span><br><span class="line">        <span class="keyword">return</span> result;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*** 查询工作流实例详情 **/</span></span><br><span class="line">    <span class="type">ProcessInstance</span> <span class="variable">processInstance</span> <span class="operator">=</span> processService.findProcessInstanceDetailById(processInstanceId);</span><br><span class="line">    <span class="keyword">if</span> (processInstance == <span class="literal">null</span>) &#123;</span><br><span class="line">        putMsg(result, Status.PROCESS_INSTANCE_NOT_EXIST, processInstanceId);</span><br><span class="line">        <span class="keyword">return</span> result;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*** 根据工作流实例绑定的流程定义ID查询流程定义 **/</span></span><br><span class="line">    <span class="type">ProcessDefinition</span> <span class="variable">processDefinition</span> <span class="operator">=</span> processService.findProcessDefinition(processInstance.getProcessDefinitionCode(),</span><br><span class="line">            processInstance.getProcessDefinitionVersion());</span><br><span class="line">    <span class="keyword">if</span> (executeType != ExecuteType.STOP &amp;&amp; executeType != ExecuteType.PAUSE) &#123;</span><br><span class="line"><span class="comment">/*** 校验工作流定义能否执行（工作流是否存在？是否上线状态？存在子工作流定义不是上线状态？） **/</span></span><br><span class="line">        result = checkProcessDefinitionValid(projectCode, processDefinition, processInstance.getProcessDefinitionCode(), processInstance.getProcessDefinitionVersion());</span><br><span class="line">        <span class="keyword">if</span> (result.get(Constants.STATUS) != Status.SUCCESS) &#123;</span><br><span class="line">            <span class="keyword">return</span> result;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*** 根据当前工作流实例的状态判断能否执行对应executeType类型的操作 **/</span></span><br><span class="line">    result = checkExecuteType(processInstance, executeType);</span><br><span class="line">    <span class="keyword">if</span> (result.get(Constants.STATUS) != Status.SUCCESS) &#123;</span><br><span class="line">        <span class="keyword">return</span> result;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*** 判断是否已经选择了合适的租户 **/</span></span><br><span class="line">    <span class="keyword">if</span> (!checkTenantSuitable(processDefinition)) &#123;</span><br><span class="line">        logger.error(<span class="string">&quot;there is not any valid tenant for the process definition: id:&#123;&#125;,name:&#123;&#125;, &quot;</span>,</span><br><span class="line">                processDefinition.getId(), processDefinition.getName());</span><br><span class="line">        putMsg(result, Status.TENANT_NOT_SUITABLE);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*** 在executeType为重跑的状态下，获取用户指定的启动参数 **/</span></span><br><span class="line">    Map&lt;String, Object&gt; commandMap = JSONUtils.parseObject(processInstance.getCommandParam(), <span class="keyword">new</span> <span class="title class_">TypeReference</span>&lt;Map&lt;String, Object&gt;&gt;() &#123;</span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="type">String</span> <span class="variable">startParams</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line">    <span class="keyword">if</span> (MapUtils.isNotEmpty(commandMap) &amp;&amp; executeType == ExecuteType.REPEAT_RUNNING) &#123;</span><br><span class="line">        <span class="type">Object</span> <span class="variable">startParamsJson</span> <span class="operator">=</span> commandMap.get(Constants.CMD_PARAM_START_PARAMS);</span><br><span class="line">        <span class="keyword">if</span> (startParamsJson != <span class="literal">null</span>) &#123;</span><br><span class="line">            startParams = startParamsJson.toString();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*** 根据不同的ExecuteType去执行相应的操作 **/</span></span><br><span class="line">    <span class="keyword">switch</span> (executeType) &#123;</span><br><span class="line">        <span class="keyword">case</span> REPEAT_RUNNING:<span class="comment">// 重跑</span></span><br><span class="line">            result = insertCommand(loginUser, processInstanceId, processDefinition.getCode(), processDefinition.getVersion(), CommandType.REPEAT_RUNNING, startParams);</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">case</span> RECOVER_SUSPENDED_PROCESS:<span class="comment">// 恢复挂载的工作流</span></span><br><span class="line">            result = insertCommand(loginUser, processInstanceId, processDefinition.getCode(), processDefinition.getVersion(), CommandType.RECOVER_SUSPENDED_PROCESS, startParams);</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">case</span> START_FAILURE_TASK_PROCESS:<span class="comment">// 启动失败的工作流</span></span><br><span class="line">            result = insertCommand(loginUser, processInstanceId, processDefinition.getCode(), processDefinition.getVersion(), CommandType.START_FAILURE_TASK_PROCESS, startParams);</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">case</span> STOP:<span class="comment">// 停止</span></span><br><span class="line">            <span class="keyword">if</span> (processInstance.getState() == ExecutionStatus.READY_STOP) &#123;</span><br><span class="line">                putMsg(result, Status.PROCESS_INSTANCE_ALREADY_CHANGED, processInstance.getName(), processInstance.getState());</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                result = updateProcessInstancePrepare(processInstance, CommandType.STOP, ExecutionStatus.READY_STOP);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">case</span> PAUSE:<span class="comment">// 暂停</span></span><br><span class="line">            <span class="keyword">if</span> (processInstance.getState() == ExecutionStatus.READY_PAUSE) &#123;</span><br><span class="line">                putMsg(result, Status.PROCESS_INSTANCE_ALREADY_CHANGED, processInstance.getName(), processInstance.getState());</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                result = updateProcessInstancePrepare(processInstance, CommandType.PAUSE, ExecutionStatus.READY_PAUSE);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">default</span>:</span><br><span class="line">            logger.error(<span class="string">&quot;unknown execute type : &#123;&#125;&quot;</span>, executeType);</span><br><span class="line">            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, <span class="string">&quot;unknown execute type&quot;</span>);</span><br><span class="line"></span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>可以看到，以上代码前半部分主要是做了校验的操作，后半部分是根据执行类型来做不同的操作，<strong>操作主要分为两部分：insertCommand以及updateProcessInstancePrepare</strong>。</p>
+<p><a target="_blank" rel="noopener" href="https://www.notion.so/execute-58f6ea28eb7f4d4cb8f6ee64c614f670?pvs=21">execute执行接口分析</a></p>
+<p><strong>3.2.1 insertCommand</strong></p>
+<p><strong>DS</strong></p>
+<p>方法代码如下，<strong>其实主要就是把生成命令并插入t_ds_command（执行命令表）</strong>，插入已经添加好注释：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 插入命令（re run, recovery (pause / failure) execution)</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> loginUser             登录用户</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> instanceId            工作流实例id</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> processDefinitionCode 工作流定义id</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> processVersion        工作流版本</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> commandType           命令类型</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@return</span> 操作结果</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">private</span> Map&lt;String, Object&gt; <span class="title function_">insertCommand</span><span class="params">(User loginUser, Integer instanceId, <span class="type">long</span> processDefinitionCode, <span class="type">int</span> processVersion, CommandType commandType, String startParams)</span> &#123;</span><br><span class="line">    Map&lt;String, Object&gt; result = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;&gt;();</span><br><span class="line"></span><br><span class="line"><span class="comment">/*** 封装启动参数 **/</span></span><br><span class="line">    Map&lt;String, Object&gt; cmdParam = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;&gt;();</span><br><span class="line">    cmdParam.put(CMD_PARAM_RECOVER_PROCESS_ID_STRING, instanceId);</span><br><span class="line">    <span class="keyword">if</span> (!StringUtils.isEmpty(startParams)) &#123;</span><br><span class="line">        cmdParam.put(CMD_PARAM_START_PARAMS, startParams);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="type">Command</span> <span class="variable">command</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Command</span>();</span><br><span class="line">    command.setCommandType(commandType);</span><br><span class="line">    command.setProcessDefinitionCode(processDefinitionCode);</span><br><span class="line">    command.setCommandParam(JSONUtils.toJsonString(cmdParam));</span><br><span class="line">    command.setExecutorId(loginUser.getId());</span><br><span class="line">    command.setProcessDefinitionVersion(processVersion);</span><br><span class="line">    command.setProcessInstanceId(instanceId);</span><br><span class="line"></span><br><span class="line"><span class="comment">/*** 判断工作流实例是否正在执行 **/</span></span><br><span class="line">    <span class="keyword">if</span> (!processService.verifyIsNeedCreateCommand(command)) &#123;</span><br><span class="line">        putMsg(result, Status.PROCESS_INSTANCE_EXECUTING_COMMAND, String.valueOf(processDefinitionCode));</span><br><span class="line">        <span class="keyword">return</span> result;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*** 保存命令 **/</span></span><br><span class="line">    <span class="type">int</span> <span class="variable">create</span> <span class="operator">=</span> processService.createCommand(command);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (create &gt; <span class="number">0</span>) &#123;</span><br><span class="line">        putMsg(result, Status.SUCCESS);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        putMsg(result, Status.EXECUTE_PROCESS_INSTANCE_ERROR);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><strong>3.2.2 updateProcessInstancePrepare</strong></p>
+<p><strong>DS</strong></p>
+<p>方法代码如下，已经添加注释</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 准备更新工作流实例的命令类型和状态</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> processInstance 工作流实例</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> commandType     命令类型</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> executionStatus 执行状态</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@return</span> 更新结果</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">private</span> Map&lt;String, Object&gt; <span class="title function_">updateProcessInstancePrepare</span><span class="params">(ProcessInstance processInstance, CommandType commandType, ExecutionStatus executionStatus)</span> &#123;</span><br><span class="line">    Map&lt;String, Object&gt; result = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    processInstance.setCommandType(commandType);</span><br><span class="line">    processInstance.addHistoryCmd(commandType);</span><br><span class="line">    processInstance.setState(executionStatus);</span><br><span class="line">    <span class="type">int</span> <span class="variable">update</span> <span class="operator">=</span> processService.updateProcessInstance(processInstance);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 判断流程是否正常</span></span><br><span class="line">    <span class="keyword">if</span> (update &gt; <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="type">StateEventChangeCommand</span> <span class="variable">stateEventChangeCommand</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">StateEventChangeCommand</span>(</span><br><span class="line">                processInstance.getId(), <span class="number">0</span>, processInstance.getState(), processInstance.getId(), <span class="number">0</span></span><br><span class="line">        );</span><br><span class="line">        <span class="type">Host</span> <span class="variable">host</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Host</span>(processInstance.getHost());</span><br><span class="line">        stateEventCallbackService.sendResult(host, stateEventChangeCommand.convert2Command());</span><br><span class="line">        putMsg(result, Status.SUCCESS);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        putMsg(result, Status.EXECUTE_PROCESS_INSTANCE_ERROR);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>根据流程图，我们可以看到了已经执行了如下红框的代码，也就是把我们的<strong>command已经缓存到了DB。</strong></p>
+<p>接下来需要看看Master的代码。</p>
+<p><img src="/images/image7.png" alt="Alt 7"></p>
+<p><strong>3.3 MasterServer</strong></p>
+<p><strong>DS</strong></p>
+<p><img src="/images/image8.png" alt="Alt 8"></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@SpringBootApplication</span></span><br><span class="line"><span class="meta">@ComponentScan(&quot;org.apache.dolphinscheduler&quot;)</span></span><br><span class="line"><span class="meta">@EnableTransactionManagement</span></span><br><span class="line"><span class="meta">@EnableCaching</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">MasterServer</span> <span class="keyword">implements</span> <span class="title class_">IStoppable</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">Logger</span> <span class="variable">logger</span> <span class="operator">=</span> LoggerFactory.getLogger(MasterServer.class);</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> SpringApplicationContext springApplicationContext;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> MasterRegistryClient masterRegistryClient;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> TaskPluginManager taskPluginManager;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> MasterSchedulerService masterSchedulerService;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> SchedulerApi schedulerApi;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> EventExecuteService eventExecuteService;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> FailoverExecuteThread failoverExecuteThread;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> MasterRPCServer masterRPCServer;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        Thread.currentThread().setName(Constants.THREAD_NAME_MASTER_SERVER);</span><br><span class="line">        SpringApplication.run(MasterServer.class);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 启动 master server</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@PostConstruct</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">run</span><span class="params">()</span> <span class="keyword">throws</span> SchedulerException &#123;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 初始化 RPC服务</span></span><br><span class="line">        <span class="built_in">this</span>.masterRPCServer.start();</span><br><span class="line"></span><br><span class="line"><span class="comment">//安装任务插件</span></span><br><span class="line">        <span class="built_in">this</span>.taskPluginManager.installPlugin();</span><br><span class="line"></span><br><span class="line"><span class="comment">/*** MasterServer 注册客户端，用于连接到注册表并传递注册表事件。</span></span><br><span class="line"><span class="comment">         * 当主节点启动时，它将在注册中心注册,并调度一个&#123;<span class="doctag">@link</span> HeartBeatTask&#125;来更新注册表中的元数据**/</span></span><br><span class="line">        <span class="built_in">this</span>.masterRegistryClient.init();</span><br><span class="line">        <span class="built_in">this</span>.masterRegistryClient.start();</span><br><span class="line">        <span class="built_in">this</span>.masterRegistryClient.setRegistryStoppable(<span class="built_in">this</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 主调度程序线程，该线程将使用来自数据库的命令并触发执行的processInstance。</span></span><br><span class="line">        <span class="built_in">this</span>.masterSchedulerService.init();</span><br><span class="line">        <span class="built_in">this</span>.masterSchedulerService.start();</span><br><span class="line"></span><br><span class="line">        <span class="built_in">this</span>.eventExecuteService.start();</span><br><span class="line">        <span class="built_in">this</span>.failoverExecuteThread.start();</span><br><span class="line"></span><br><span class="line"><span class="comment">//这是调度器的接口，包含操作调度任务的方法。</span></span><br><span class="line">        <span class="built_in">this</span>.schedulerApi.start();</span><br><span class="line"></span><br><span class="line">        Runtime.getRuntime().addShutdownHook(<span class="keyword">new</span> <span class="title class_">Thread</span>(() -&gt; &#123;</span><br><span class="line">            <span class="keyword">if</span> (Stopper.isRunning()) &#123;</span><br><span class="line">                close(<span class="string">&quot;MasterServer shutdownHook&quot;</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 优雅的关闭方法</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> cause 关闭的原因</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">close</span><span class="params">(String cause)</span> &#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line"><span class="comment">// set stop signal is true</span></span><br><span class="line"><span class="comment">// execute only once</span></span><br><span class="line">            <span class="keyword">if</span> (!Stopper.stop()) &#123;</span><br><span class="line">                logger.warn(<span class="string">&quot;MasterServer is already stopped, current cause: &#123;&#125;&quot;</span>, cause);</span><br><span class="line">                <span class="keyword">return</span>;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            logger.info(<span class="string">&quot;Master server is stopping, current cause : &#123;&#125;&quot;</span>, cause);</span><br><span class="line"></span><br><span class="line"><span class="comment">// thread sleep 3 seconds for thread quietly stop</span></span><br><span class="line">            ThreadUtils.sleep(Constants.SERVER_CLOSE_WAIT_TIME.toMillis());</span><br><span class="line"><span class="comment">// close</span></span><br><span class="line">            <span class="built_in">this</span>.schedulerApi.close();</span><br><span class="line">            <span class="built_in">this</span>.masterSchedulerService.close();</span><br><span class="line">            <span class="built_in">this</span>.masterRPCServer.close();</span><br><span class="line">            <span class="built_in">this</span>.masterRegistryClient.closeRegistry();</span><br><span class="line"><span class="comment">// close spring Context and will invoke method with @PreDestroy annotation to destroy beans.</span></span><br><span class="line"><span class="comment">// like ServerNodeManager,HostManager,TaskResponseService,CuratorZookeeperClient,etc</span></span><br><span class="line">            springApplicationContext.close();</span><br><span class="line"></span><br><span class="line">            logger.info(<span class="string">&quot;MasterServer stopped, current cause: &#123;&#125;&quot;</span>, cause);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            logger.error(<span class="string">&quot;MasterServer stop failed, current cause: &#123;&#125;&quot;</span>, cause, e);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">stop</span><span class="params">(String cause)</span> &#123;</span><br><span class="line">        close(cause);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>在run方法里面，可以看到，主要依次执行了：</p>
+<ul>
+<li>**① MasterRPCServer.start()**：启动master的rpc服务；</li>
+<li>**② TaskPluginManager.installPlugin()**：安装任务插件；</li>
+<li>**③ MasterRegistryClient.start()**：向Zookeeper注册MasterServer；</li>
+<li>**④ MasterSchedulerService.start()**：主调度程序线程，该线程将使用来自数据库的命令并触发执行的processInstance。</li>
+<li>**⑤ EventExecuteService.start()**：工作流实例执行情况</li>
+<li>**⑥ FailoverExecuteThread()**：故障转移检测</li>
+<li>**⑦ SchedulerApi.start()**：scheduler接口去操作任务实例</li>
+</ul>
+<p><strong>3.1.1 MasterRPCServer</strong></p>
+<p><strong>DS</strong></p>
+<p><strong>Master RPC Server主要用来发送或接收请求给其它系统</strong>。</p>
+<p>初始化方法如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@PostConstruct</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">init</span><span class="params">()</span> &#123;</span><br><span class="line"><span class="comment">// 初始化远程服务</span></span><br><span class="line">    <span class="type">NettyServerConfig</span> <span class="variable">serverConfig</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">NettyServerConfig</span>();</span><br><span class="line">    serverConfig.setListenPort(masterConfig.getListenPort());</span><br><span class="line">    <span class="built_in">this</span>.nettyRemotingServer = <span class="keyword">new</span> <span class="title class_">NettyRemotingServer</span>(serverConfig);</span><br><span class="line">    <span class="built_in">this</span>.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_RESPONSE, taskExecuteResponseProcessor);</span><br><span class="line">    <span class="built_in">this</span>.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_RUNNING, taskExecuteRunningProcessor);</span><br><span class="line">    <span class="built_in">this</span>.nettyRemotingServer.registerProcessor(CommandType.TASK_KILL_RESPONSE, taskKillResponseProcessor);</span><br><span class="line">    <span class="built_in">this</span>.nettyRemotingServer.registerProcessor(CommandType.STATE_EVENT_REQUEST, stateEventProcessor);</span><br><span class="line">    <span class="built_in">this</span>.nettyRemotingServer.registerProcessor(CommandType.TASK_FORCE_STATE_EVENT_REQUEST, taskEventProcessor);</span><br><span class="line">    <span class="built_in">this</span>.nettyRemotingServer.registerProcessor(CommandType.TASK_WAKEUP_EVENT_REQUEST, taskEventProcessor);</span><br><span class="line">    <span class="built_in">this</span>.nettyRemotingServer.registerProcessor(CommandType.CACHE_EXPIRE, cacheProcessor);</span><br><span class="line">    <span class="built_in">this</span>.nettyRemotingServer.registerProcessor(CommandType.TASK_RECALL, taskRecallProcessor);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 日志服务</span></span><br><span class="line">    <span class="built_in">this</span>.nettyRemotingServer.registerProcessor(CommandType.GET_LOG_BYTES_REQUEST, loggerRequestProcessor);</span><br><span class="line">    <span class="built_in">this</span>.nettyRemotingServer.registerProcessor(CommandType.ROLL_VIEW_LOG_REQUEST, loggerRequestProcessor);</span><br><span class="line">    <span class="built_in">this</span>.nettyRemotingServer.registerProcessor(CommandType.VIEW_WHOLE_LOG_REQUEST, loggerRequestProcessor);</span><br><span class="line">    <span class="built_in">this</span>.nettyRemotingServer.registerProcessor(CommandType.REMOVE_TAK_LOG_REQUEST, loggerRequestProcessor);</span><br><span class="line">    <span class="built_in">this</span>.nettyRemotingServer.start();</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><strong>3.2.2 TaskPluginManager</strong></p>
+<p><strong>DS</strong></p>
+<p><img src="/images/image9.png" alt="Alt 9"><br><img src="/images/image10.png" alt="Alt 10"></p>
+<p><img src="/images/image11.png" alt="Alt 11"></p>
+<h2 id="到此部分源码解析完成"><a href="#到此部分源码解析完成" class="headerlink" title="到此部分源码解析完成"></a>到此部分源码解析完成</h2><p>整体流程运行</p>
+<p><img src="/images/Untitled%202.png" alt="Untitled"></p>
+<p>用户点击WEB界面的启动工作流按钮。</p>
+<p>apiserver 封装 commnd 到 db（往 t_ds_command 表中插入一条数据）。</p>
+<p>master 扫描到 commad，进行 dga 构建，初始化，将源头 task 提交到 priority 队列中。</p>
+<p>taskConsumer 消费队列数据得到 task，选择一台 worker 分配任务。</p>
+<p>worker 接收到分配任务的消息启动任务。</p>
+<p>worker 返回结果给 master，master 更新任务信息到 db 。</p>
+<p>03</p>
+<p>DolphinScheduler源码剖析</p>
+<p>3.1 apiserver任务执行入口</p>
+<p>当用户在前端点击执行任务，则会向海豚调度的接口发送请求，最终由 ExecutorController 的 startProcessInstance 方法来处理请求。</p>
+<p><img src="/images/Untitled%203.png" alt="Untitled"></p>
+<p>ExecutorController.startProcessInstance() 方法。</p>
+<p>最终会往 mysql 表 t_ds_command 插入一条数据，将要运行的工作流信息写入该表。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@PostMapping(value = &quot;start-process-instance&quot;)</span></span><br><span class="line"><span class="meta">@ResponseStatus(HttpStatus.OK)</span></span><br><span class="line"><span class="meta">@ApiException(START_PROCESS_INSTANCE_ERROR)</span></span><br><span class="line"><span class="meta">@AccessLogAnnotation(ignoreRequestArgs = &quot;loginUser&quot;)</span></span><br><span class="line"><span class="keyword">public</span> Result <span class="title function_">startProcessInstance</span><span class="params">(<span class="meta">@ApiIgnore</span> <span class="meta">@RequestAttribute(value = Constants.SESSION_USER)</span> User loginUser,</span></span><br><span class="line"><span class="params">                                   <span class="meta">@ApiParam(name = &quot;projectCode&quot;, value = &quot;PROJECT_CODE&quot;, required = true)</span> <span class="meta">@PathVariable</span> <span class="type">long</span> projectCode,</span></span><br><span class="line"><span class="params">                                   <span class="meta">@RequestParam(value = &quot;processDefinitionCode&quot;)</span> <span class="type">long</span> processDefinitionCode,</span></span><br><span class="line"><span class="params">                                   <span class="meta">@RequestParam(value = &quot;scheduleTime&quot;)</span> String scheduleTime,</span></span><br><span class="line"><span class="params">                                   <span class="meta">@RequestParam(value = &quot;failureStrategy&quot;)</span> FailureStrategy failureStrategy,</span></span><br><span class="line"><span class="params">                                   <span class="meta">@RequestParam(value = &quot;startNodeList&quot;, required = false)</span> String startNodeList,</span></span><br><span class="line"><span class="params">                                   <span class="meta">@RequestParam(value = &quot;taskDependType&quot;, required = false)</span> TaskDependType taskDependType,</span></span><br><span class="line"><span class="params">                                   <span class="meta">@RequestParam(value = &quot;execType&quot;, required = false)</span> CommandType execType,</span></span><br><span class="line"><span class="params">                                   <span class="meta">@RequestParam(value = &quot;warningType&quot;)</span> WarningType warningType,</span></span><br><span class="line"><span class="params">                                   <span class="meta">@RequestParam(value = &quot;warningGroupId&quot;, required = false, defaultValue = &quot;0&quot;)</span> Integer warningGroupId,</span></span><br><span class="line"><span class="params">                                   <span class="meta">@RequestParam(value = &quot;runMode&quot;, required = false)</span> RunMode runMode,</span></span><br><span class="line"><span class="params">                                   <span class="meta">@RequestParam(value = &quot;processInstancePriority&quot;, required = false)</span> Priority processInstancePriority,</span></span><br><span class="line"><span class="params">                                   <span class="meta">@RequestParam(value = &quot;workerGroup&quot;, required = false, defaultValue = &quot;default&quot;)</span> String workerGroup,</span></span><br><span class="line"><span class="params">                                   <span class="meta">@RequestParam(value = &quot;environmentCode&quot;, required = false, defaultValue = &quot;-1&quot;)</span> Long environmentCode,</span></span><br><span class="line"><span class="params">                                   <span class="meta">@RequestParam(value = &quot;timeout&quot;, required = false)</span> Integer timeout,</span></span><br><span class="line"><span class="params">                                   <span class="meta">@RequestParam(value = &quot;startParams&quot;, required = false)</span> String startParams,</span></span><br><span class="line"><span class="params">                                   <span class="meta">@RequestParam(value = &quot;expectedParallelismNumber&quot;, required = false)</span> Integer expectedParallelismNumber,</span></span><br><span class="line"><span class="params">                                   <span class="meta">@RequestParam(value = &quot;dryRun&quot;, defaultValue = &quot;0&quot;, required = false)</span> <span class="type">int</span> dryRun,</span></span><br><span class="line"><span class="params">                                   <span class="meta">@RequestParam(value = &quot;complementDependentMode&quot;, required = false)</span> ComplementDependentMode complementDependentMode)</span> &#123;</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line">    <span class="keyword">if</span> (timeout == <span class="literal">null</span>) &#123;</span><br><span class="line">        timeout = Constants.MAX_TASK_TIMEOUT;</span><br><span class="line">    &#125;</span><br><span class="line">    Map&lt;String, String&gt; startParamMap = <span class="literal">null</span>;</span><br><span class="line">    <span class="keyword">if</span> (startParams != <span class="literal">null</span>) &#123;</span><br><span class="line">        startParamMap = JSONUtils.toMap(startParams);</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line">    <span class="keyword">if</span> (complementDependentMode == <span class="literal">null</span>) &#123;</span><br><span class="line">        complementDependentMode = ComplementDependentMode.OFF_MODE;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//生成commnd信息入库</span></span><br><span class="line">    Map&lt;String, Object&gt; result = execService.execProcessInstance(loginUser, projectCode, processDefinitionCode,</span><br><span class="line">            scheduleTime, execType, failureStrategy,</span><br><span class="line">            startNodeList, taskDependType, warningType, warningGroupId, runMode, processInstancePriority,</span><br><span class="line">            workerGroup, environmentCode, timeout, startParamMap, expectedParallelismNumber, dryRun, complementDependentMode);</span><br><span class="line">    <span class="keyword">return</span> returnDataList(result);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>3.2 master 调度任务</p>
+<p>3.2.1  master启动</p>
+<p>DS</p>
+<p>MasterServer.run() 方法</p>
+<p>启动 master 的工作线程</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">run</span><span class="params">()</span> <span class="keyword">throws</span> SchedulerException &#123;</span><br><span class="line"><span class="comment">// init rpc server</span></span><br><span class="line"><span class="built_in">this</span>.masterRPCServer.start();<span class="comment">//启动netty rpc服务，与worker通信使用</span></span><br><span class="line"><span class="comment">// install task plugin</span></span><br><span class="line"><span class="built_in">this</span>.taskPluginManager.loadPlugin();<span class="comment">//加载taskplugin</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// self tolerant</span></span><br><span class="line"><span class="built_in">this</span>.masterRegistryClient.init();<span class="comment">//加载高可用的一些注册信息</span></span><br><span class="line"><span class="built_in">this</span>.masterRegistryClient.start();</span><br><span class="line"><span class="built_in">this</span>.masterRegistryClient.setRegistryStoppable(<span class="built_in">this</span>);</span><br><span class="line"><span class="comment">//command扫描线程</span></span><br><span class="line"><span class="built_in">this</span>.masterSchedulerBootstrap.init();</span><br><span class="line"><span class="built_in">this</span>.masterSchedulerBootstrap.start();</span><br><span class="line"><span class="comment">//事件处理线程</span></span><br><span class="line"><span class="built_in">this</span>.eventExecuteService.start();</span><br><span class="line"><span class="built_in">this</span>.failoverExecuteThread.start();</span><br><span class="line"><span class="comment">//定时调度</span></span><br><span class="line"><span class="built_in">this</span>.schedulerApi.start();</span><br><span class="line"></span><br><span class="line">Runtime.getRuntime().addShutdownHook(<span class="keyword">new</span> <span class="title class_">Thread</span>(() -&gt; &#123;</span><br><span class="line">    <span class="keyword">if</span> (Stopper.isRunning()) &#123;</span><br><span class="line">        close(<span class="string">&quot;MasterServer shutdownHook&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>3.2.2 command扫描</p>
+<p>DS</p>
+<p>MasterSchedulerBootstrap.run()方法</p>
+<p>该线程在3.2.1启动，启动之后，进入循环，一直扫描 command 表，查询出 command，然后封装成 processInstants 入库，创建 WorkflowExecuteRunnable (此对象后续很多地方用到) 写入到 workflowEventQueue 中。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">run</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="keyword">while</span> (Stopper.isRunning()) &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="comment">// todo: if the workflow event queue is much, we need to handle the back pressure</span></span><br><span class="line">            <span class="type">boolean</span> <span class="variable">isOverload</span> <span class="operator">=</span></span><br><span class="line">                    OSUtils.isOverload(masterConfig.getMaxCpuLoadAvg(), masterConfig.getReservedMemory());</span><br><span class="line">            <span class="keyword">if</span> (isOverload) &#123;</span><br><span class="line">                MasterServerMetrics.incMasterOverload();</span><br><span class="line">                Thread.sleep(Constants.SLEEP_TIME_MILLIS);</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            List&lt;Command&gt; commands = findCommands();</span><br><span class="line">            <span class="keyword">if</span> (CollectionUtils.isEmpty(commands)) &#123;</span><br><span class="line">                <span class="comment">// indicate that no command ,sleep for 1s</span></span><br><span class="line">                Thread.sleep(Constants.SLEEP_TIME_MILLIS);</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">//将command转换成processInstance,并入库</span></span><br><span class="line">            List&lt;ProcessInstance&gt; processInstances = command2ProcessInstance(commands);</span><br><span class="line">            <span class="keyword">if</span> (CollectionUtils.isEmpty(processInstances)) &#123;</span><br><span class="line">                <span class="comment">// indicate that the command transform to processInstance error, sleep for 1s</span></span><br><span class="line">                Thread.sleep(Constants.SLEEP_TIME_MILLIS);</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            MasterServerMetrics.incMasterConsumeCommand(commands.size());</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line">            processInstances.forEach(processInstance -&gt; &#123;</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    LoggerUtils.setWorkflowInstanceIdMDC(processInstance.getId());</span><br><span class="line">                    <span class="keyword">if</span> (processInstanceExecCacheManager.contains(processInstance.getId())) &#123;</span><br><span class="line">                        logger.error(<span class="string">&quot;The workflow instance is already been cached, this case shouldn&#x27;t be happened&quot;</span>);</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="type">WorkflowExecuteRunnable</span> <span class="variable">workflowRunnable</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">WorkflowExecuteRunnable</span>(processInstance,</span><br><span class="line">                            processService,</span><br><span class="line">                            nettyExecutorManager,</span><br><span class="line">                            processAlertManager,</span><br><span class="line">                            masterConfig,</span><br><span class="line">                            stateWheelExecuteThread,</span><br><span class="line">                            curingGlobalParamsService);</span><br><span class="line">                    processInstanceExecCacheManager.cache(processInstance.getId(), workflowRunnable);<span class="comment">//processInstanceExecCacheManager设置进cache 被  workflowEventLoop获取</span></span><br><span class="line">                    workflowEventQueue.addEvent(<span class="keyword">new</span> <span class="title class_">WorkflowEvent</span>(WorkflowEventType.START_WORKFLOW,</span><br><span class="line">                            processInstance.getId()));</span><br><span class="line">                &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">                    LoggerUtils.removeWorkflowInstanceIdMDC();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (InterruptedException interruptedException) &#123;</span><br><span class="line">            logger.warn(<span class="string">&quot;Master schedule bootstrap interrupted, close the loop&quot;</span>, interruptedException);</span><br><span class="line">            Thread.currentThread().interrupt();</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            logger.error(<span class="string">&quot;Master schedule workflow error&quot;</span>, e);</span><br><span class="line">            <span class="comment">// sleep for 1s here to avoid the database down cause the exception boom</span></span><br><span class="line">            ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>}<br>3.2.3 workerFlowEvent消费</p>
+<p>DS</p>
+<p>在 command 扫描线程中启动了 workflowEventLooper 线程用于消费 workerFlowEvent 。</p>
+<p>MasterSchedulerBootstrap.start() 方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title function_">start</span><span class="params">()</span> &#123;</span><br><span class="line">    logger.info(<span class="string">&quot;Master schedule bootstrap starting..&quot;</span>);</span><br><span class="line">    <span class="built_in">super</span>.start();</span><br><span class="line">    workflowEventLooper.start();<span class="comment">//工作流调度线程启动</span></span><br><span class="line">    logger.info(<span class="string">&quot;Master schedule bootstrap started...&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>从workflowEventQueue 拉取 workflowevent 事件，调用 workflowEventHandler 处理该事件。</p>
+<p><strong>WorkflowEventLooper.run()方法</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">run</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="type">WorkflowEvent</span> <span class="variable">workflowEvent</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line">    <span class="keyword">while</span> (Stopper.isRunning()) &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            workflowEvent = workflowEventQueue.poolEvent();<span class="comment">//拉取workflowevent</span></span><br><span class="line">            LoggerUtils.setWorkflowInstanceIdMDC(workflowEvent.getWorkflowInstanceId());</span><br><span class="line">            logger.info(<span class="string">&quot;Workflow event looper receive a workflow event: &#123;&#125;, will handle this&quot;</span>, workflowEvent);</span><br><span class="line">            <span class="type">WorkflowEventHandler</span> <span class="variable">workflowEventHandler</span> <span class="operator">=</span></span><br><span class="line">                workflowEventHandlerMap.get(workflowEvent.getWorkflowEventType());<span class="comment">//获取workflowevent，处理workflowevent事件</span></span><br><span class="line">            workflowEventHandler.handleWorkflowEvent(workflowEvent);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">            logger.warn(<span class="string">&quot;WorkflowEventLooper thread is interrupted, will close this loop&quot;</span>, e);</span><br><span class="line">            Thread.currentThread().interrupt();</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (WorkflowEventHandleException workflowEventHandleException) &#123;</span><br><span class="line">            logger.error(<span class="string">&quot;Handle workflow event failed, will add this event to event queue again, event: &#123;&#125;&quot;</span>,</span><br><span class="line">                workflowEvent, workflowEventHandleException);</span><br><span class="line">            workflowEventQueue.addEvent(workflowEvent);</span><br><span class="line">            ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (WorkflowEventHandleError workflowEventHandleError) &#123;</span><br><span class="line">            logger.error(<span class="string">&quot;Handle workflow event error, will drop this event, event: &#123;&#125;&quot;</span>,</span><br><span class="line">                         workflowEvent,</span><br><span class="line">                         workflowEventHandleError);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception unknownException) &#123;</span><br><span class="line">            logger.error(</span><br><span class="line">                <span class="string">&quot;Handle workflow event failed, get a unknown exception, will add this event to event queue again, event: &#123;&#125;&quot;</span>,</span><br><span class="line">                workflowEvent, unknownException);</span><br><span class="line">            workflowEventQueue.addEvent(workflowEvent);</span><br><span class="line">            ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            LoggerUtils.removeWorkflowInstanceIdMDC();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>3.2.4 workerflow事件处理逻辑</strong></p>
+<p><strong>DS</strong></p>
+<p>因为是START_WORKFLOW类型的所以获取到 WorkflowStartEventHandler.handleWorkflowEvent() 来处理该事件。</p>
+<p>该方法中，获取 WorkflowExecuteRunnable ，运行异步任务调用 call 方法。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">handleWorkflowEvent</span><span class="params">(WorkflowEvent workflowEvent)</span> <span class="keyword">throws</span> WorkflowEventHandleError &#123;</span><br><span class="line">    logger.info(<span class="string">&quot;Handle workflow start event, begin to start a workflow, event: &#123;&#125;&quot;</span>, workflowEvent);</span><br><span class="line"><span class="comment">//获取WorkflowExecuteRunnable </span></span><br><span class="line">    <span class="type">WorkflowExecuteRunnable</span> <span class="variable">workflowExecuteRunnable</span> <span class="operator">=</span></span><br><span class="line">       processInstanceExecCacheManager.getByProcessInstanceId(workflowEvent.getWorkflowInstanceId());</span><br><span class="line">    <span class="keyword">if</span> (workflowExecuteRunnable == <span class="literal">null</span>) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">WorkflowEventHandleError</span>(</span><br><span class="line">            <span class="string">&quot;The workflow start event is invalid, cannot find the workflow instance from cache&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="type">ProcessInstance</span> <span class="variable">processInstance</span> <span class="operator">=</span> workflowExecuteRunnable.getProcessInstance();</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line">    ProcessInstanceMetrics.incProcessInstanceSubmit();</span><br><span class="line">   <span class="comment">//异步调用call方法执行workflowExecute运行逻辑。</span></span><br><span class="line"> CompletableFuture&lt;WorkflowSubmitStatue&gt; workflowSubmitFuture =</span><br><span class="line">        CompletableFuture.supplyAsync(workflowExecuteRunnable::call, workflowExecuteThreadPool);</span><br><span class="line">    workflowSubmitFuture.thenAccept(workflowSubmitStatue -&gt; &#123;</span><br><span class="line">        <span class="keyword">if</span> (WorkflowSubmitStatue.SUCCESS == workflowSubmitStatue) &#123;</span><br><span class="line">            <span class="comment">// submit failed will resend the event to workflow event queue</span></span><br><span class="line">            logger.info(<span class="string">&quot;Success submit the workflow instance&quot;</span>);<span class="comment">//监听返回状态是否成功</span></span><br><span class="line">            <span class="keyword">if</span> (processInstance.getTimeout() &gt; <span class="number">0</span>) &#123;<span class="comment">//是否超时</span></span><br><span class="line">                stateWheelExecuteThread.addProcess4TimeoutCheck(processInstance);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;<span class="comment">//出现异常，重试，重新进入队列，调用call方法</span></span><br><span class="line">            logger.error(<span class="string">&quot;Failed to submit the workflow instance, will resend the workflow start event: &#123;&#125;&quot;</span>,</span><br><span class="line">                         workflowEvent);</span><br><span class="line">            workflowEventQueue.addEvent(<span class="keyword">new</span> <span class="title class_">WorkflowEvent</span>(WorkflowEventType.START_WORKFLOW,</span><br><span class="line">                                                          processInstance.getId()));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>3.2.5 workerflowRunnable运行逻辑</strong></p>
+<p><strong>DS</strong></p>
+<p><strong>WorkflowExecuteRunnable.call()</strong></p>
+<ul>
+<li>初始化workerflow的有向无环图。</li>
+<li>初始化任务调度配置</li>
+<li>提交源头任务到任务优先级队列中。</li>
+</ul>
+ 
+      <!-- reward -->
+      
+      <div id="reword-out">
+        <div id="reward-btn">
+          打赏
+        </div>
+      </div>
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <div class="declare">
+      <ul class="post-copyright">
+        <li>
+          <i class="ri-copyright-line"></i>
+          <strong>版权声明： </strong>
+          
+          本博客所有文章除特别声明外，著作权归作者所有。转载请注明出处！
+          
+        </li>
+      </ul>
+    </div>
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/GitHub/" rel="tag">GitHub</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/dolphinscheduler/" rel="tag">dolphinscheduler</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%A4%A7%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90%E5%B9%B3%E5%8F%B0/" rel="tag">大数据分析平台</a></li></ul>
+
+    </footer>
+  </div>
+
+   
+  <nav class="article-nav">
+    
+      <a href="/2023/08/03/my-first-blog/" class="article-nav-link">
+        <strong class="article-nav-caption">上一篇</strong>
+        <div class="article-nav-title">
+          
+            记一次对小区wifi渗透
+          
+        </div>
+      </a>
+    
+    
+      <a href="/2023/07/18/dolphinscheduler%E7%9B%91%E6%8E%A7%E5%8A%9F%E8%83%BD%E5%88%A8%E6%9E%90/" class="article-nav-link">
+        <strong class="article-nav-caption">下一篇</strong>
+        <div class="article-nav-title">dolphinscheduler监控功能刨析</div>
+      </a>
+    
+  </nav>
+
+  
+   
+     
+</article>
+
+</section>
+      <footer class="footer">
+  <div class="outer">
+    <ul>
+      <li>
+        Copyrights &copy;
+        2015-2023
+        <i class="ri-heart-fill heart_icon"></i> 山城冰荔枝
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+        
+        <span>
+  <span><i class="ri-user-3-fill"></i>访问人数:<span id="busuanzi_value_site_uv"></span></span>
+  <span class="division">|</span>
+  <span><i class="ri-eye-fill"></i>浏览次数:<span id="busuanzi_value_page_pv"></span></span>
+</span>
+        
+      </li>
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      <li>
+        <!-- cnzz统计 -->
+        
+        <script type="text/javascript" src='https://s9.cnzz.com/z_stat.php?id=1278069914&amp;web_id=1278069914'></script>
+        
+      </li>
+    </ul>
+  </div>
+</footer>    
+    </main>
+    <div class="float_btns">
+      <div class="totop" id="totop">
+  <i class="ri-arrow-up-line"></i>
+</div>
+
+<div class="todark" id="todark">
+  <i class="ri-moon-line"></i>
+</div>
+
+    </div>
+    <aside class="sidebar on">
+      <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">主页</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/archives">归档</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/categories">分类</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags">标签</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/photos">图库</a>
+    </li>
+    
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+    </aside>
+    <div id="mask"></div>
+
+<!-- #reward -->
+<div id="reward">
+  <span class="close"><i class="ri-close-line"></i></span>
+  <p class="reward-p"><i class="ri-cup-line"></i>请我喝杯咖啡吧~</p>
+  <div class="reward-box">
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/alipay.jpg">
+      <span class="reward-type">支付宝</span>
+    </div>
+    
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/wechat.jpg">
+      <span class="reward-type">微信</span>
+    </div>
+    
+  </div>
+</div>
+    
+<script src="/js/jquery-3.6.0.min.js"></script>
+ 
+<script src="/js/lazyload.min.js"></script>
+
+<!-- Tocbot -->
+ 
+<script src="/js/tocbot.min.js"></script>
+
+<script>
+  tocbot.init({
+    tocSelector: ".tocbot",
+    contentSelector: ".article-entry",
+    headingSelector: "h1, h2, h3, h4, h5, h6",
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    scrollContainer: "main",
+    positionFixedSelector: ".tocbot",
+    positionFixedClass: "is-position-fixed",
+    fixedSidebarOffset: "auto",
+  });
+</script>
+
+<script src="https://cdn.staticfile.org/jquery-modal/0.9.2/jquery.modal.min.js"></script>
+<link
+  rel="stylesheet"
+  href="https://cdn.staticfile.org/jquery-modal/0.9.2/jquery.modal.min.css"
+/>
+<script src="https://cdn.staticfile.org/justifiedGallery/3.8.1/js/jquery.justifiedGallery.min.js"></script>
+
+<script src="/dist/main.js"></script>
+
+<!-- ImageViewer -->
+ <!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" style="display:none" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<link rel="stylesheet" href="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.css">
+<link rel="stylesheet" href="https://cdn.staticfile.org/photoswipe/4.1.3/default-skin/default-skin.min.css">
+<script src="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.js"></script>
+<script src="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe-ui-default.min.js"></script>
+
+<script>
+    function viewer_init() {
+        let pswpElement = document.querySelectorAll('.pswp')[0];
+        let $imgArr = document.querySelectorAll(('.article-entry img:not(.reward-img)'))
+
+        $imgArr.forEach(($em, i) => {
+            $em.onclick = () => {
+                // slider展开状态
+                // todo: 这样不好，后面改成状态
+                if (document.querySelector('.left-col.show')) return
+                let items = []
+                $imgArr.forEach(($em2, i2) => {
+                    let img = $em2.getAttribute('data-idx', i2)
+                    let src = $em2.getAttribute('data-target') || $em2.getAttribute('src')
+                    let title = $em2.getAttribute('alt')
+                    // 获得原图尺寸
+                    const image = new Image()
+                    image.src = src
+                    items.push({
+                        src: src,
+                        w: image.width || $em2.width,
+                        h: image.height || $em2.height,
+                        title: title
+                    })
+                })
+                var gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, {
+                    index: parseInt(i)
+                });
+                gallery.init()
+            }
+        })
+    }
+    viewer_init()
+</script> 
+<!-- MathJax -->
+
+<!-- Katex -->
+
+<!-- busuanzi  -->
+ 
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+ 
+<!-- ClickLove -->
+
+<!-- ClickBoom1 -->
+
+<!-- ClickBoom2 -->
+
+<!-- CodeCopy -->
+ 
+<link rel="stylesheet" href="/css/clipboard.css">
+ <script src="https://cdn.staticfile.org/clipboard.js/2.0.10/clipboard.min.js"></script>
+<script>
+  function wait(callback, seconds) {
+    var timelag = null;
+    timelag = window.setTimeout(callback, seconds);
+  }
+  !function (e, t, a) {
+    var initCopyCode = function(){
+      var copyHtml = '';
+      copyHtml += '<button class="btn-copy" data-clipboard-snippet="">';
+      copyHtml += '<i class="ri-file-copy-2-line"></i><span>COPY</span>';
+      copyHtml += '</button>';
+      $(".highlight .code pre").before(copyHtml);
+      $(".article pre code").before(copyHtml);
+      var clipboard = new ClipboardJS('.btn-copy', {
+        target: function(trigger) {
+          return trigger.nextElementSibling;
+        }
+      });
+      clipboard.on('success', function(e) {
+        let $btn = $(e.trigger);
+        $btn.addClass('copied');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-checkbox-circle-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPIED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-checkbox-circle-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+      clipboard.on('error', function(e) {
+        e.clearSelection();
+        let $btn = $(e.trigger);
+        $btn.addClass('copy-failed');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-time-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPY FAILED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-time-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+    }
+    initCopyCode();
+  }(window, document);
+</script>
+ 
+<!-- CanvasBackground -->
+
+<script>
+  if (window.mermaid) {
+    mermaid.initialize({ theme: "forest" });
+  }
+</script>
+
+
+    
+    <div id="music">
+    
+    
+    
+    <iframe frameborder="no" border="1" marginwidth="0" marginheight="0" width="200" height="52"
+        src="//music.163.com/outchain/player?type=2&id=22707008&auto=1&height=32"></iframe>
+</div>
+
+<style>
+    #music {
+        position: fixed;
+        right: 15px;
+        bottom: 0;
+        z-index: 998;
+    }
+</style>
+    
+    
+
+  </div>
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"/live2dw/assets/assets/hijiki.model.json"},"display":{"position":"right","width":150,"height":300,"hOffset":400,"vOffset":-38},"mobile":{"show":true},"react":"opacity:1","dialog":{"enable":true,"script":{"every idle 10s":"text1","tap face":"text2","tap body":"text3"}},"log":false});</script></body>
+
+</html>

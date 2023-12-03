@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+
+
+<html lang="zh-CN">
+  
+
+    <head>
+      <meta charset="utf-8" />
+        
+      <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1"
+      />
+      <title>kubernetes核心概念 |  山城冰荔枝</title>
+  <meta name="generator" content="hexo-theme-ayer">
+       
+<link rel="stylesheet" href="/dist/main.css">
+
+      
+<link rel="stylesheet" href="/css/fonts/remixicon.css">
+
+      
+<link rel="stylesheet" href="/css/custom.css">
+ 
+      <script src="https://cdn.staticfile.org/pace/1.2.4/pace.min.js"></script>
+       
+ 
+
+      <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bulma@5.0.1/bulma.min.css"
+      />
+      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.min.js"></script>
+
+      <!-- mermaid -->
+      
+      <script src="https://cdn.staticfile.org/mermaid/8.14.0/mermaid.min.js"></script>
+      
+      <style>
+        .swal2-styled.swal2-confirm {
+          font-size: 1.6rem;
+        }
+      </style>
+    <link rel="alternate" href="/atom.xml" title="山城冰荔枝" type="application/atom+xml">
+</head>
+  </html>
+</html>
+
+
+<body>
+  <div id="app">
+    
+      
+    <main class="content on">
+      <section class="outer">
+  <article
+  id="post-kubernetes核心概念"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h1 class="article-title sea-center" style="border-left:0" itemprop="name">
+  kubernetes核心概念
+</h1>
+ 
+
+      
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2023/11/24/kubernetes%E6%A0%B8%E5%BF%83%E6%A6%82%E5%BF%B5/" class="article-date">
+  <time datetime="2023-11-24T00:29:53.000Z" itemprop="datePublished">2023-11-24</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/K8s/">K8s</a>
+  </div>
+  
+<div class="word_count">
+    <span class="post-time">
+        <span class="post-meta-item-icon">
+            <i class="ri-quill-pen-line"></i>
+            <span class="post-meta-item-text"> 字数统计:</span>
+            <span class="post-count">6.8k</span>
+        </span>
+    </span>
+
+    <span class="post-time">
+        &nbsp; | &nbsp;
+        <span class="post-meta-item-icon">
+            <i class="ri-book-open-line"></i>
+            <span class="post-meta-item-text"> 阅读时长≈</span>
+            <span class="post-count">33 分钟</span>
+        </span>
+    </span>
+</div>
+ 
+    </div>
+      
+    <div class="tocbot"></div>
+
+
+
+
+  
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h2 id="01-kubernetes核心概念"><a href="#01-kubernetes核心概念" class="headerlink" title="01-kubernetes核心概念"></a>01-kubernetes核心概念</h2><p>1 有了docker 什么要用kubernetes</p>
+<p>2 多容器跨主机提供服务</p>
+<p>3 多容器分布节点部署</p>
+<p>4 多容器的升级</p>
+<p>5 高效管理容器</p>
+<p>docker管理工具</p>
+<p>Docker compose, docker machine, docker swarm</p>
+<p>常见的容器编排工具：</p>
+<p>kubernetes  google伯格系统</p>
+<p>swarm  2018已经被docker废弃</p>
+<p>mesos marathon  容器编排组件</p>
+<!-- ![img](01-kubernetes核心概念.assets\kuadm01-17006173052243.png) -->
+
+
+
+
+
+
+
+
+
+<h2 id="02-kubernetes是什么"><a href="#02-kubernetes是什么" class="headerlink" title="02-kubernetes是什么"></a>02-kubernetes是什么</h2><p>Kubernetes 是一个开源的容器编排引擎，用来对容器化应用进行自动化部署、 扩缩和管理。该项目托管在 <a target="_blank" rel="noopener" href="https://www.cncf.io/about">CNCF</a>。</p>
+<p>kubernetes是google 2014年开源的一个容器集群管理系统。简称k8s</p>
+<p>Kubernetes 用于容器化应用程序的部署</p>
+<p>官网</p>
+<p><a target="_blank" rel="noopener" href="https://kubernetes.io/zh/">https://kubernetes.io/zh/</a></p>
+<h2 id="03-kubernetes架构与组件"><a href="#03-kubernetes架构与组件" class="headerlink" title="03-kubernetes架构与组件"></a>03-kubernetes架构与组件</h2><p>master 管理节点（管理集群）</p>
+<p>Kubectl 管理工具</p>
+<p>Api server,scheduler, conttroller manager，etcd分布式键值存储数据库</p>
+<p>API Server：所有服务访问的唯一入口，提供认证、授权、访问控制、API 注册和发现等机制</p>
+<p>Scheduler：负责资源的调度，按照预定的调度策略将 Pod 调度到相应的机器上</p>
+<p>Controller Manager：负责维护集群的状态，比如副本期望数量、故障检测、自动扩展、滚动更新等</p>
+<p>etcd：键值对数据库，保存了整个集群的状态</p>
+<p>Node 工作节点（运行应用）</p>
+<p>Kubelet 代理</p>
+<p>负责维护容器的生命周期，同时也负责 Volume 和网络的管理</p>
+<p>kubelet的主要功能就是定时从node上获取 pod&#x2F;container 的期望状态。并负责管理pod和它们上面的容器，如images镜像、volumes、etc并确保这些Pod正常运行，能实时返回Pod的运行状态。</p>
+<p>注意</p>
+<p>在kubernetes 的设计中，最基本的管理单位是 pod，而不是 container。pod 是 kubernetes 在容器上的一层封装，由一组运行在同一主机的一个或者多个容器组成。</p>
+<p>Kube-proxy </p>
+<p>负责为 Service 提供 cluster 内部的服务发现和负载均衡</p>
+<p>kube-proxy的作用主要是负责service的实现，具体来说，就是实现了内部从pod到service和外部的从node port向service的访问，其实就是pod的网络代理</p>
+<p>Container runtime：</p>
+<p>负责镜像管理以及 Pod 和容器的真正运行</p>
+<p>除了核心组件，还有一些推荐的插件：<br>CoreDNS：可以为集群中的 SVC 创建一个域名 IP 的对应关系解析的 DNS 服务<br>Dashboard：为Kubernetes 集群提供了一个 B&#x2F;S 架构的访问入口<br>Ingress Controller：官方只能够实现四层的网络代理，而 Ingress 可以实现七层的代理<br>Prometheus：给 Kubernetes 集群提供资源监控的能力<br>Federation： 提供一个可以跨集群中心多 Kubernetes 的统一管理功能，提供跨可用区的集群</p>
+<h2 id="05-kubernetes各个组件调用关系"><a href="#05-kubernetes各个组件调用关系" class="headerlink" title="05-kubernetes各个组件调用关系"></a>05-kubernetes各个组件调用关系</h2><p>master：集群的控制平面，负责集群的决策 ( 管理 )<br>ApiServer : 资源操作的唯一入口，接收用户输入的命令，提供认证、授权、API注册和发现等机制<br>Scheduler : 负责集群资源调度，按照预定的调度策略将Pod调度到相应的node节点上<br>ControllerManager : 负责维护集群的状态，比如程序部署安排、故障检测、自动扩展、滚动更新等<br>Etcd ：负责存储集群中各种资源对象的信息</p>
+<p>node：集群的数据平面，负责为容器提供运行环境 ( 干活 )<br>Kubelet : 负责维护容器的生命周期，即通过控制docker，来创建、更新、销毁容器<br>KubeProxy : 负责提供集群内部的服务发现和负载均衡<br>Docker : 负责节点上容器的各种操作</p>
+<!-- ![img](图片素材/组件调用流程.png) -->
+
+
+
+<p>下面，以部署一个nginx服务来说明kubernetes系统各个组件调用关系：<br>kubernetes环境启动之后，master和node都会将自身的信息存储到etcd数据库中，一个nginx服务的安装请求会首先被发送到master节点的apiServer组件,apiServer组件会调用scheduler组件来决定到底应该把这个服务安装到哪个node节点上,此时它会从etcd中读取各个node节点的信息，然后按照特定的算法进行选择，并将结果告知apiServer，apiServer调用controller-manager去调度Node节点安装nginx服务，kubelet接收到指令后，会通知docker，然后由docker来启动一个nginx的pod，pod是kubernetes的最小操作单元，容器必须跑在pod中至此，一个nginx服务就运行了，如果需要访问nginx，就需要通过kube-proxy来对pod产生访问的代理。这样外界用户就可以访问集群中的nginx服务了</p>
+<h2 id="05-kubernetes概念"><a href="#05-kubernetes概念" class="headerlink" title="05-kubernetes概念"></a>05-kubernetes概念</h2><p>Master：集群控制节点，每个集群需要至少一个master节点负责集群的管控<br>Node：工作负载节点，由master分配容器到这些node工作节点上，然后node节点上的docker负责容器的运行<br>Pod：kubernetes的最小控制单元，容器都是运行在pod中的，一个pod中可以有1个或者多个容器<br>Controller：控制器，通过它来实现对pod的管理，比如启动pod、停止pod、伸缩pod的数量等等<br>Service：pod对外服务的统一入口，下面可以维护者同一类的多个pod<br>Label：标签，用于对pod进行分类，同一类pod会拥有相同的标签<br>NameSpace：命名空间，用来隔离pod的运行环境</p>
+<h2 id="06-kubernetes集群架构"><a href="#06-kubernetes集群架构" class="headerlink" title="06-kubernetes集群架构"></a>06-kubernetes集群架构</h2><p>官方文档 概念 和任务。</p>
+<p>官网</p>
+<p><a target="_blank" rel="noopener" href="https://kubernetes.io/zh/">https://kubernetes.io/zh/</a></p>
+<p>k8s的部署方式：</p>
+<p>minikube：一个用于快速搭建单节点kubernetes的工具，minikube顾名思义即迷你型Kubernetes，非常适合快速学习k8s的各个组件的作用及yml的编写。</p>
+<p>Kubeadm 部署  ：官方提供的一个用于快速搭建kubernetes集群的工具</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://kubernetes.io/docs/reference/setup-tools/kubeadm/kubeadm/">https://kubernetes.io/docs/reference/setup-tools/kubeadm/kubeadm/</a></li>
+</ul>
+<p>二进制部署  ： 从官网下载每个组件的二进制包，依次去安装，此方式对于理解kubernetes组件更加有效</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/kubernetes/kubernetes">https://github.com/kubernetes/kubernetes</a></li>
+</ul>
+<p>第三方工具部署： rancher  webui</p>
+<p>k8s服务器硬件配置：</p>
+<!-- <img src="图片素材/image-20220607193947482.png" alt="image-20220607193947482" style="zoom:50%;" /> -->
+
+
+
+<p>kubernetes集群大体上分为两类：一主多从和多住多从</p>
+<ul>
+<li><p>一主多从：一台master节点和多台node节点，搭建简单，但是有单机故障风险，适用于测试环境</p>
+</li>
+<li><p>多主多从：多台master节点和多台node节点，搭建相对负载，安全性高，适用于生产环境</p>
+<!-- ![image-20220607194851548](图片素材/image-20220607194851548.png) --></li>
+</ul>
+<h2 id="07-kubeadm快速部署k8s"><a href="#07-kubeadm快速部署k8s" class="headerlink" title="07-kubeadm快速部署k8s"></a>07-kubeadm快速部署k8s</h2><p>第一步首先安装 Linux ubuntu18.04</p>
+<p>ubuntu下载地址：<a target="_blank" rel="noopener" href="http://cdimage.ubuntu.com/releases/18.04.2/release/">http://cdimage.ubuntu.com/releases/</a></p>
+<p>Ubuntu18.04设置国内源</p>
+<p>阿里源</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">deb http://mirrors.aliyun.com/ubuntu/ bionic main restricted universe multiverse</span><br><span class="line">deb http://mirrors.aliyun.com/ubuntu/ bionic-security main restricted universe multiverse</span><br><span class="line">deb http://mirrors.aliyun.com/ubuntu/ bionic-updates main restricted universe multiverse</span><br><span class="line">deb http://mirrors.aliyun.com/ubuntu/ bionic-proposed main restricted universe multiverse</span><br><span class="line">deb http://mirrors.aliyun.com/ubuntu/ bionic-backports main restricted universe multiverse</span><br><span class="line">deb-src http://mirrors.aliyun.com/ubuntu/ bionic main restricted universe multiverse</span><br><span class="line">deb-src http://mirrors.aliyun.com/ubuntu/ bionic-security main restricted universe multiverse</span><br><span class="line">deb-src http://mirrors.aliyun.com/ubuntu/ bionic-updates main restricted universe multiverse</span><br><span class="line">deb-src http://mirrors.aliyun.com/ubuntu/ bionic-proposed main restricted universe multiverse</span><br><span class="line">deb-src http://mirrors.aliyun.com/ubuntu/ bionic-backports main restricted universe multiverse</span><br></pre></td></tr></table></figure>
+
+<p>中科大源</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">deb https://mirrors.ustc.edu.cn/ubuntu/ bionic main restricted universe multiverse</span><br><span class="line">deb-src https://mirrors.ustc.edu.cn/ubuntu/ bionic main restricted universe multiverse</span><br><span class="line">deb https://mirrors.ustc.edu.cn/ubuntu/ bionic-updates main restricted universe multiverse</span><br><span class="line">deb-src https://mirrors.ustc.edu.cn/ubuntu/ bionic-updates main restricted universe multiverse</span><br><span class="line">deb https://mirrors.ustc.edu.cn/ubuntu/ bionic-backports main restricted universe multiverse</span><br><span class="line">deb-src https://mirrors.ustc.edu.cn/ubuntu/ bionic-backports main restricted universe multiverse</span><br><span class="line">deb https://mirrors.ustc.edu.cn/ubuntu/ bionic-security main restricted universe multiverse</span><br><span class="line">deb-src https://mirrors.ustc.edu.cn/ubuntu/ bionic-security main restricted universe multiverse</span><br><span class="line">deb https://mirrors.ustc.edu.cn/ubuntu/ bionic-proposed main restricted universe multiverse</span><br><span class="line">deb-src https://mirrors.ustc.edu.cn/ubuntu/ bionic-proposed main restricted universe multiverse</span><br></pre></td></tr></table></figure>
+
+<p>网易源</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">deb http://mirrors.163.com/ubuntu/ bionic main restricted universe multiverse</span><br><span class="line">deb http://mirrors.163.com/ubuntu/ bionic-security main restricted universe multiverse</span><br><span class="line">deb http://mirrors.163.com/ubuntu/ bionic-updates main restricted universe multiverse</span><br><span class="line">deb http://mirrors.163.com/ubuntu/ bionic-proposed main restricted universe multiverse</span><br><span class="line">deb http://mirrors.163.com/ubuntu/ bionic-backports main restricted universe multiverse</span><br><span class="line">deb-src http://mirrors.163.com/ubuntu/ bionic main restricted universe multiverse</span><br><span class="line">deb-src http://mirrors.163.com/ubuntu/ bionic-security main restricted universe multiverse</span><br><span class="line">deb-src http://mirrors.163.com/ubuntu/ bionic-updates main restricted universe multiverse</span><br><span class="line">deb-src http://mirrors.163.com/ubuntu/ bionic-proposed main restricted universe multiverse</span><br><span class="line">deb-src http://mirrors.163.com/ubuntu/ bionic-backports main restricted universe multiverse</span><br></pre></td></tr></table></figure>
+
+<p>清华源</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic main restricted universe multiverse</span><br><span class="line">deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic main restricted universe multiverse</span><br><span class="line">deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic-updates main restricted universe multiverse</span><br><span class="line">deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic-updates main restricted universe multiverse</span><br><span class="line">deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic-backports main restricted universe multiverse</span><br><span class="line">deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic-backports main restricted universe multiverse</span><br><span class="line">deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic-security main restricted universe multiverse</span><br><span class="line">deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic-security main restricted universe multiverse</span><br><span class="line">deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic-proposed main restricted universe multiverse</span><br><span class="line">deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic-proposed main restricted universe multiverse</span><br></pre></td></tr></table></figure>
+
+
+
+<p>第二步： 安装docker</p>
+<p>第三步:    安装对应版本的kubeadm工具</p>
+<p>第四步： 初始k8s集群</p>
+<p>第五步： 安装k8s网络插件</p>
+<h2 id="08-部署k8s-v1-26版本"><a href="#08-部署k8s-v1-26版本" class="headerlink" title="08-部署k8s v1.26版本"></a>08-部署k8s v1.26版本</h2><h3 id="8-1-系统环境准备"><a href="#8-1-系统环境准备" class="headerlink" title="8.1 系统环境准备"></a>8.1 系统环境准备</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br></pre></td><td class="code"><pre><span class="line">1.1 安装所需工具</span><br><span class="line">yum -y install vim</span><br><span class="line">yum -y install wget</span><br><span class="line"># 设置yum源</span><br><span class="line">mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.backup</span><br><span class="line">wget -O /etc/yum.repos.d/CentOS-Base.repo https://mirrors.aliyun.com/repo/Centos-7.repo</span><br><span class="line">1.2 修改主机名</span><br><span class="line">#master</span><br><span class="line">hostnamectl set-hostname master-01</span><br><span class="line">#node1</span><br><span class="line">hostnamectl set-hostname node-01</span><br><span class="line">#node2</span><br><span class="line">hostnamectl set-hostname node-02</span><br><span class="line">1.3 编辑hosts</span><br><span class="line">[root@localhost ~]# vim /etc/hosts</span><br><span class="line"></span><br><span class="line"># 增加以下内容</span><br><span class="line">192.168.31.249 master-01</span><br><span class="line">192.168.31.250 node-01</span><br><span class="line">192.168.31.251 node-02</span><br><span class="line"></span><br><span class="line">1.4 安装ntpdate并同步时间</span><br><span class="line">yum -y install ntpdate</span><br><span class="line">ntpdate ntp1.aliyun.com</span><br><span class="line"></span><br><span class="line">1.5 安装并配置 bash-completion，添加命令自动补充</span><br><span class="line">yum -y install bash-completion</span><br><span class="line">source /etc/profile</span><br><span class="line">1.6 关闭防火墙</span><br><span class="line">systemctl stop firewalld.service </span><br><span class="line">systemctl disable firewalld.service</span><br><span class="line">1.7 关闭selinux</span><br><span class="line">sed -i &#x27;s/enforcing/disabled/&#x27; /etc/selinux/config  # 永久关闭</span><br><span class="line">1.8 关闭 swap</span><br><span class="line">free -h</span><br><span class="line">sudo swapoff -a</span><br><span class="line">sudo sed -i &#x27;s/.*swap.*/#&amp;/&#x27; /etc/fstab</span><br><span class="line">free -h</span><br><span class="line">二：安装k8s 1.26.x</span><br><span class="line">2.1 安装 Containerd</span><br><span class="line">yum install -y yum-utils device-mapper-persistent-data lvm2</span><br><span class="line">yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo </span><br><span class="line">sudo yum install -y containerd.io</span><br><span class="line"></span><br><span class="line">systemctl stop containerd.service</span><br><span class="line"></span><br><span class="line">cp /etc/containerd/config.toml /etc/containerd/config.toml.bak</span><br><span class="line">sudo containerd config default &gt; $HOME/config.toml</span><br><span class="line">sudo cp $HOME/config.toml /etc/containerd/config.toml</span><br><span class="line"># 修改 /etc/containerd/config.toml 文件后，要将 docker、containerd 停止后，再启动</span><br><span class="line">sudo sed -i &quot;s#registry.k8s.io/pause#registry.cn-hangzhou.aliyuncs.com/google_containers/pause#g&quot; /etc/containerd/config.toml</span><br><span class="line"># https://kubernetes.io/zh-cn/docs/setup/production-environment/container-runtimes/#containerd-systemd</span><br><span class="line"># 确保 /etc/containerd/config.toml 中的 disabled_plugins 内不存在 cri</span><br><span class="line">sudo sed -i &quot;s#SystemdCgroup = false#SystemdCgroup = true#g&quot; /etc/containerd/config.toml</span><br><span class="line"></span><br><span class="line">#启动containerd</span><br><span class="line">systemctl start containerd.service</span><br><span class="line">systemctl status containerd.service</span><br><span class="line">2.2 添加阿里云 k8s 镜像仓库</span><br><span class="line">cat &lt;&lt;EOF &gt; /etc/yum.repos.d/kubernetes.repo</span><br><span class="line">[kubernetes]</span><br><span class="line">name=Kubernetes</span><br><span class="line">baseurl=https://mirrors.aliyun.com/kubernetes/yum/repos/kubernetes-el7-x86_64/</span><br><span class="line"># 是否开启本仓库</span><br><span class="line">enabled=1</span><br><span class="line"># 是否检查 gpg 签名文件</span><br><span class="line">gpgcheck=0</span><br><span class="line"># 是否检查 gpg 签名文件</span><br><span class="line">repo_gpgcheck=0</span><br><span class="line">gpgkey=https://mirrors.aliyun.com/kubernetes/yum/doc/yum-key.gpg https://mirrors.aliyun.com/kubernetes/yum/doc/rpm-package-key.gpg</span><br><span class="line">EOF</span><br><span class="line">2.3 将桥接的 IPv4 流量传递到 iptables 的链</span><br><span class="line"># 设置所需的 sysctl 参数，参数在重新启动后保持不变</span><br><span class="line">cat &lt;&lt;EOF | sudo tee /etc/sysctl.d/k8s.conf</span><br><span class="line">net.bridge.bridge-nf-call-iptables  = 1</span><br><span class="line">net.bridge.bridge-nf-call-ip6tables = 1</span><br><span class="line">net.ipv4.ip_forward                 = 1</span><br><span class="line">EOF</span><br><span class="line"></span><br><span class="line"># 应用 sysctl 参数而不重新启动</span><br><span class="line">sudo sysctl --system</span><br><span class="line"></span><br><span class="line"># 启动br_netfilter</span><br><span class="line">modprobe br_netfilter</span><br><span class="line">echo 1 &gt; /proc/sys/net/ipv4/ip_forward</span><br><span class="line">2.4 安装k8s</span><br><span class="line"># 2023-03-02，经过测试，版本号：1.26.2，</span><br><span class="line">yum install -y kubelet-1.26.3-0 kubeadm-1.26.3-0 kubectl-1.26.3-0 --disableexcludes=kubernetes --nogpgcheck</span><br><span class="line"></span><br><span class="line">systemctl daemon-reload</span><br><span class="line">systemctl restart kubelet</span><br><span class="line">systemctl enable kubelet</span><br></pre></td></tr></table></figure>
+
+<h3 id="8-2-初始化master集群"><a href="#8-2-初始化master集群" class="headerlink" title="8.2 初始化master集群"></a>8.2 初始化master集群</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">如需订制版本安装：</span><br><span class="line">需获取镜像文件,查看需要的镜像</span><br><span class="line">kubeadm config images list</span><br><span class="line"></span><br><span class="line">系统输出:</span><br><span class="line">[root@master-01 ~]# kubeadm config images list</span><br><span class="line">I1122 10:13:55.024056   66494 version.go:256] remote version is much newer: v1.28.4; falling back to: stable-1.26</span><br><span class="line">registry.k8s.io/kube-apiserver:v1.26.11</span><br><span class="line">registry.k8s.io/kube-controller-manager:v1.26.11</span><br><span class="line">registry.k8s.io/kube-scheduler:v1.26.11</span><br><span class="line">registry.k8s.io/kube-proxy:v1.26.11</span><br><span class="line">registry.k8s.io/pause:3.9</span><br><span class="line">registry.k8s.io/etcd:3.5.6-0</span><br><span class="line">registry.k8s.io/coredns/coredns:v1.9.3</span><br><span class="line">[root@master-01 ~]# </span><br><span class="line"></span><br><span class="line"></span><br><span class="line">编辑一个文件, 命名为： install_k8s_images.sh</span><br><span class="line"></span><br><span class="line">vim install_k8s_images.sh</span><br><span class="line"></span><br><span class="line">#! /bin/bash</span><br><span class="line">images=(</span><br><span class="line">    kube-apiserver:v1.26.11</span><br><span class="line">    kube-controller-manager:v1.26.11</span><br><span class="line">    kube-scheduler:v1.26.11</span><br><span class="line">    kube-proxy:v1.26.11</span><br><span class="line">    pause:3.9</span><br><span class="line">    etcd:3.5.6-0</span><br><span class="line">    coredns:1.9.3</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">for imageName in $&#123;images[@]&#125; ; do</span><br><span class="line">    docker pull registry.cn-hangzhou.aliyuncs.com/google_containers/$imageName</span><br><span class="line">    docker tag registry.cn-hangzhou.aliyuncs.com/google_containers/$imageName k8s.gcr.io/$imageName</span><br><span class="line">done</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">将文件设置为可运行：</span><br><span class="line">chmod a+x install_k8s_images.sh</span><br><span class="line"></span><br><span class="line">运行 install_k8s_images.sh 安装所需要的镜像</span><br><span class="line">./install_k8s_images.sh</span><br><span class="line"></span><br><span class="line">注意：以上步骤需要在Master和work机器完成</span><br></pre></td></tr></table></figure>
+
+<p>通过kubeadm命令初始化master集群</p>
+<p>–kubernetes-version: 用于指定k8s版本；<br>–apiserver-advertise-address：用于指定kube-apiserver监听的ip地址,就是 master本机IP地址。<br>–pod-network-cidr：用于指定Pod的网络范围； 10.244.0.0&#x2F;16<br>–service-cidr：用于指定SVC的网络范围；<br>–image-repository: 指定阿里云镜像仓库地址</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubeadm init --kubernetes-version=v1.26.11 --apiserver-advertise-address=0.0.0.0 --image-repository registry.aliyuncs.com/google_containers --kubernetes-version v1.26.11 --pod-network-cidr=10.244.0.0/16</span><br></pre></td></tr></table></figure>
+
+<!-- ![](01-kubernetes核心概念.assets/kuadm01-17006173052243.png) -->
+
+<p>8.2.1配置集群配置文件</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">mkdir -p $HOME/.kube</span><br><span class="line">cp -i /etc/kubernetes/admin.conf $HOME/.kube/config</span><br><span class="line">chown $(id -u):$(id -g) $HOME/.kube/config</span><br><span class="line"></span><br><span class="line">设置配置文件变量</span><br><span class="line">export KUBECONFIG=/etc/kubernetes/admin.conf</span><br><span class="line"></span><br><span class="line">echo export KUBECONFIG=/etc/kubernetes/admin.conf &gt;&gt; /etc/profile</span><br><span class="line">source /etc/profile</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>8.2.2 各个工作节点，执行如下命令将工作节点加入集群</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubeadm join 192.168.31.249:6443 --token f1226v.yjwsbpyrjs9oojmc --discovery-token-ca-cert-hash sha256:34220ce3bb6d29429afa0b1c6505ff14cc1aee7373a9b973904abd592aec3b3c</span><br></pre></td></tr></table></figure>
+
+<p>查看加入集群的工作节点与token</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[root@master-01 ~]# kubeadm token create --print-join-command</span><br><span class="line">kubeadm join 192.168.31.249:6443 --token ojjtbl.lkchb9823sltuhwn --discovery-token-ca-cert-hash sha256:34220ce3bb6d29429afa0b1c6505ff14cc1aee7373a9b973904abd592aec3b3c </span><br><span class="line">[root@master-01 ~]# kubectl get node</span><br><span class="line">NAME        STATUS     ROLES           AGE     VERSION</span><br><span class="line">master-01   NotReady   control-plane   20m     v1.26.3</span><br><span class="line">node-01     NotReady   &lt;none&gt;          15m     v1.26.3</span><br><span class="line">node-02     NotReady   &lt;none&gt;          9m37s   v1.26.3</span><br><span class="line">[root@master-01 ~]# </span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>8.2.3 配置k8s网络</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"> maste节点配置网络,使用Calico</span><br><span class="line"># 下载</span><br><span class="line">wget --no-check-certificate https://projectcalico.docs.tigera.io/archive/v3.25/manifests/calico.yaml</span><br><span class="line"></span><br><span class="line"># 修改 calico.yaml 文件</span><br><span class="line">vim calico.yaml</span><br><span class="line"># 在 - name: CLUSTER_TYPE 下方添加如下内容</span><br><span class="line">- name: CLUSTER_TYPE</span><br><span class="line">  value: &quot;k8s,bgp&quot;</span><br><span class="line">  # 下方为新增内容</span><br><span class="line">- name: IP_AUTODETECTION_METHOD</span><br><span class="line">  value: &quot;interface=网卡名称&quot;</span><br><span class="line">  # INTERFACE_NAME=ens33</span><br><span class="line">  </span><br><span class="line">设置pod网络为10.244.0.0/16 与前面初始步骤一致</span><br><span class="line">- name: CALICO_IPV4POOL_CIDR</span><br><span class="line">  value: &quot;10.244.0.0/16&quot;</span><br><span class="line"></span><br><span class="line">kubeadm 支持多种网络插件，我们选择 Calico 网络插件（kubeadm 仅支持基于容器网络接口（CNI）的网络（不支持kubenet）。），默认情况下，它给出的pod的IP段地址是 192.168.0.0/16 ,如果你的机器已经使用了此IP段，就需要修改这个配置项，将其值改为在初始化 Master 节点时使用 kubeadm init –pod-network-cidr=x.x.x.x/x 的IP地址段</span><br><span class="line"></span><br><span class="line">然后在部署 Pod 网络组件，当然对于现在的网络环境来说这些都不是必须的</span><br><span class="line">kubectl apply -f calico.yaml</span><br><span class="line"> 稍等片刻查询 pod 详情，你也可以使用 watch 命令来实时查看 pod 的状态，等待 Pod 网络组件部署成功后，就可以看到一些信息了，包括 Pod 的 IP 地址信息，这个过程时间可能会有点长。</span><br><span class="line"> </span><br><span class="line">kubectl get pods -n &lt;namespace&gt; --watch</span><br><span class="line">可以通过Ctrl+C终止这个Watch模式</span><br><span class="line"></span><br><span class="line">查看日志命令用于拍错</span><br><span class="line">journalctl -xefu kubelet</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="8-3-kubelet启用lvs负载"><a href="#8-3-kubelet启用lvs负载" class="headerlink" title="8.3 kubelet启用lvs负载"></a>8.3 kubelet启用lvs负载</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br></pre></td><td class="code"><pre><span class="line">安装ipvsadm</span><br><span class="line">yum install -y ipvsadm</span><br><span class="line"></span><br><span class="line">手动载入如下模块</span><br><span class="line">modprobe ip_vs</span><br><span class="line">modprobe ip_vs_rr</span><br><span class="line">modprobe ip_vs_wrr</span><br><span class="line">modprobe ip_vs_sh</span><br><span class="line"></span><br><span class="line">确认ipvs模块以及载入</span><br><span class="line">root@manager:~# lsmod|grep ip_vs</span><br><span class="line">ip_vs_sh               16384  0</span><br><span class="line">ip_vs_wrr              16384  0</span><br><span class="line">ip_vs_rr               16384  12</span><br><span class="line">ip_vs                 172032  18 ip_vs_rr,ip_vs_sh,ip_vs_wrr</span><br><span class="line">nf_conntrack          172032  7 xt_conntrack,nf_nat,nf_nat_ipv6,ipt_MASQUERADE,nf_nat_ipv4,nf_conntrack_netlink,ip_vs</span><br><span class="line">nf_defrag_ipv6         20480  2 nf_conntrack,ip_vs</span><br><span class="line">libcrc32c              16384  4 nf_conntrack,nf_nat,xfs,ip_vs</span><br><span class="line"></span><br><span class="line">否则要自己构建模块载入配置文件 并设置权限,以下是debian10的配置实例</span><br><span class="line">echo &gt; /etc/systemd/system/kubelet.service.d/10-proxy-ipvs.conf &lt;&lt;-&#x27;EOF&#x27;</span><br><span class="line">#!/bin/bash</span><br><span class="line">modprobe -- ip_vs</span><br><span class="line">modprobe -- ip_vs_rr</span><br><span class="line">modprobe -- ip_vs_wrr</span><br><span class="line">modprobe -- ip_vs_sh</span><br><span class="line">modprobe -- nf_conntrack</span><br><span class="line">modprobe -- br_netfilter</span><br><span class="line">EOF</span><br><span class="line"></span><br><span class="line">chmod +x /etc/systemd/system/kubelet.service.d/10-proxy-ipvs.conf </span><br><span class="line"></span><br><span class="line"></span><br><span class="line">本例是cenntos配置实例</span><br><span class="line">cat &gt; /usr/lib/systemd/system/kubelet.service.d/10-proxy-ipvs.conf &lt;&lt; &#x27;EOF&#x27;</span><br><span class="line">[Service]</span><br><span class="line">ExecStartPre=-modprobe ip_vs</span><br><span class="line">ExecStartPre=-modprobe ip_vs_rr</span><br><span class="line">ExecStartPre=-modprobe ip_vs_wrr</span><br><span class="line">ExecStartPre=-modprobe ip_vs_sh</span><br><span class="line">EOF</span><br><span class="line"></span><br><span class="line">chmod +x /usr/lib/systemd/system/kubelet.service.d/10-proxy-ipvs.conf</span><br><span class="line">scp /usr/lib/systemd/system/kubelet.service.d/10-proxy-ipvs.conf root@192.168.3.166:/usr/lib/systemd/system/kubelet.service.d/10-proxy-ipvs.conf</span><br><span class="line">scp /usr/lib/systemd/system/kubelet.service.d/10-proxy-ipvs.conf root@192.168.3.167:/usr/lib/systemd/system/kubelet.service.d/10-proxy-ipvs.conf</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">更改kube-proxy配置</span><br><span class="line">kubectl edit configmap kube-proxy -n kube-system</span><br><span class="line"></span><br><span class="line">找到如下部分的内容41行左右。</span><br><span class="line"></span><br><span class="line">   minSyncPeriod: 0s</span><br><span class="line">      scheduler: &quot;&quot;</span><br><span class="line">      syncPeriod: 30s</span><br><span class="line">    kind: KubeProxyConfiguration</span><br><span class="line">    metricsBindAddress: 127.0.0.1:10249</span><br><span class="line">    mode: &quot;ipvs&quot;                          # 加上这个</span><br><span class="line">    nodePortAddresses: null</span><br><span class="line">其中mode原来是空，默认为iptables模式，改为ipvs保存退出</span><br><span class="line">scheduler默认是空，默认负载均衡算法为轮训</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">重启验证：   </span><br><span class="line">kubectl logs -n kube-system -f kube-proxy-8kzr2     #(8kzr2为ID)</span><br><span class="line">I1122 06:58:15.474822       1 node.go:136] Successfully retrieved node IP: 192.168.3.167</span><br><span class="line">I1122 06:58:15.474933       1 server_others.go:111] kube-proxy node IP is an IPv4 address (192.168.3.167), assume IPv4 operation</span><br><span class="line">I1122 06:58:15.847846       1 server_others.go:259] Using ipvs Proxier.</span><br><span class="line">W1122 06:58:15.848556       1 proxier.go:434] IPVS scheduler not specified, use rr by default</span><br><span class="line">I1122 06:58:15.848926       1 server.go:650] Version: v1.19.2</span><br><span class="line">I1122 06:58:15.849742       1 conntrack.go:100] Set sysctl &#x27;net/netfilter/nf_conntrack_max</span><br><span class="line"> </span><br><span class="line">ipvsadm -ln  #查看ipvsadm规则</span><br><span class="line">[root@master-01 ~]# ipvsadm -Ln</span><br><span class="line">IP Virtual Server version 1.2.1 (size=4096)</span><br><span class="line">Prot LocalAddress:Port Scheduler Flags</span><br><span class="line">  -&gt; RemoteAddress:Port           Forward Weight ActiveConn InActConn</span><br><span class="line">TCP  10.96.0.1:443 rr</span><br><span class="line">  -&gt; 192.168.31.249:6443          Masq    1      4          0         </span><br><span class="line">TCP  10.96.0.10:53 rr</span><br><span class="line">  -&gt; 10.244.184.4:53              Masq    1      0          0         </span><br><span class="line">  -&gt; 10.244.184.5:53              Masq    1      0          0         </span><br><span class="line">TCP  10.96.0.10:9153 rr</span><br><span class="line">  -&gt; 10.244.184.4:9153            Masq    1      0          0         </span><br><span class="line">  -&gt; 10.244.184.5:9153            Masq    1      0          0         </span><br><span class="line">UDP  10.96.0.10:53 rr</span><br><span class="line">  -&gt; 10.244.184.4:53              Masq    1      0          0         </span><br><span class="line">  -&gt; 10.244.184.5:53              Masq    1      0          0         </span><br><span class="line">[root@master-01 ~]# </span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="8-4-kubectl-命令补全"><a href="#8-4-kubectl-命令补全" class="headerlink" title="8.4 kubectl 命令补全"></a>8.4 kubectl 命令补全</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">yum install -y bash-completion</span><br><span class="line">source &lt;(kubectl completion bash)</span><br><span class="line">echo &quot;source &lt;(kubectl completion bash)&quot; &gt;&gt; ~/.bashrc</span><br><span class="line">source  ~/.bashrc</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="8-5kubectl工具常用命令"><a href="#8-5kubectl工具常用命令" class="headerlink" title="8.5kubectl工具常用命令"></a>8.5kubectl工具常用命令</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line">查看帮助：kubectl -h</span><br><span class="line">查看可配置的资源对象：kubectl api-resources</span><br><span class="line">查看所有node信息：kubectl get node</span><br><span class="line">查看特定ns中的pod : kubectl get pod -n kube-system</span><br><span class="line">查看RC和service列表：kubectl get rc,svc</span><br><span class="line">显示Pod的详细信息：kubectl describe pod pod-name</span><br><span class="line">查看节点my-node的详细信息:   kubectl describe nodes my-node </span><br><span class="line">根据yaml创建资源：kubectl create -f pod.yaml  或 kubectl apply -f pod.yaml</span><br><span class="line">#apply 可以重复执行，create 不行</span><br><span class="line">基于pod.yaml定义的名称删除pod：kubectl delete -f pod.yaml </span><br><span class="line">删除所有包含某个label的pod和service：kubectl delete pod,svc -l name=label-name</span><br><span class="line">删除所有Pod：kubectl delete pod --all</span><br><span class="line">查看endpoint列表：kubectl get endpoints</span><br><span class="line">执行pod的date命令：</span><br><span class="line">kubectl exec pod-name -- date</span><br><span class="line">kubectl exec pod-name -- bash</span><br><span class="line">kubectl exec pod-name -- ping 10.24.51.9</span><br><span class="line"></span><br><span class="line">获得pod中某个容器的TTY（相当于登录容器）：</span><br><span class="line">kubectl exec -it pod-name -c container-name -- bash</span><br><span class="line">#查看容器的日志</span><br><span class="line">kubectl logs pod-name</span><br><span class="line">#实时查看日志</span><br><span class="line">kubectl logs -f pod-name</span><br><span class="line">#若pod只有一个容器，可以不加-c</span><br><span class="line">kubectl log pod-name -c container_name</span><br><span class="line">查看注释：</span><br><span class="line">kubectl explain pod</span><br><span class="line">kubectl explain pod.apiVersion</span><br><span class="line">查看节点labels：kubectl get node --show-label</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">kubectl创建pod实例：</span><br><span class="line">kubectl create deployment nginx --image=nginx</span><br><span class="line">kubectl get pod nginx-748c667d99-b542k --watch  #查看容器启动状态</span><br><span class="line">kubectl get pod -n default -o wide</span><br><span class="line">kubectl get deployments.apps</span><br><span class="line">kubectl expose deployment nginx --port=80 --type=NodePort</span><br><span class="line">kubectl get pod,svc</span><br><span class="line"></span><br><span class="line">扩容多个副本 拉伸实例</span><br><span class="line">kubectl scale deployment nginx --replicas=2</span><br><span class="line">查看pods会看到两个nginx容器</span><br><span class="line">kubectl get pods</span><br><span class="line"></span><br><span class="line">如需修改端口为31000 可以使用edit选项直接指定。端口固定范围 --service-node-port-range=30000-50000。</span><br><span class="line"></span><br><span class="line">kubectl edit service nginx</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="8-6-registry私用仓库"><a href="#8-6-registry私用仓库" class="headerlink" title="8.6 registry私用仓库"></a>8.6 registry私用仓库</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br></pre></td><td class="code"><pre><span class="line">docker创建本地局域网私有仓库:</span><br><span class="line"></span><br><span class="line">但有时候使用公共仓库可能不方便，这种情况下用户可以使用registry创建一个本地仓库供私人使用，使用私有仓库有许多优点：节省网络带宽，针对于每个镜像不用每个人都去中央仓库上面去下载，只需要从私有仓库中下载即可；</span><br><span class="line">提供镜像资源利用，针对于公司内部使用的镜像，推送到本地的私有仓库中，以供公司内部相关人员使用。</span><br><span class="line">目前Docker Registry已经升级到了v2，Registryv2使用Go语言编写，在性能和安全性上做了很多优化，重新设计了镜像的存储格式。如果需要安装registry v2，就需要下载registry:2.2的版本。Docker官方提供的工具docker-registry可以用于构建私有的镜像仓库</span><br><span class="line">docker pull registry   #下载私有仓库镜像</span><br><span class="line">docker run -d -p 5000:5000 registry:latest 		#运行私有仓库容器映射端口号5000</span><br><span class="line">docker run -d --name=my_registry -p 5000:5000 -v /opt/data/registry:/tmp/registry docker.io/registry     #指定本地仓库路径 这样有利于路径的归纳如下</span><br><span class="line"></span><br><span class="line">这将使用官方的   镜像来启动私有仓库。默认情况下，仓库会被创建在 容器的   目录下。你可以通过 -v 参数来将镜像文件存放在 本地的指定路径。例如下面的例子将上传的镜像放到本地的/opt/data/registry 目录</span><br><span class="line"></span><br><span class="line">docker run -d --name=my_registry -p 5000:5000 -v /opt/data/registry:/var/lib/registry docker.io/registry</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">然后回到要上传的客户端主机给要上传的本地镜像&quot;test_nginx&quot;打标签为仓库ip地址/后面是上传仓库后的镜像名称(centos7-nginx)。如下所示：</span><br><span class="line">docker tag test_nginx 192.168.3.138:5000/centos7-nginx</span><br><span class="line"></span><br><span class="line">docker push 192.168.3.138:5000/centos7-nginx  #上载镜像</span><br><span class="line">docker pull 192.168.3.138:5000/centos7-nginx  #下载镜像</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">设置本地docker主机使用本地局域网http私有仓库,默认为https</span><br><span class="line">vi /etc/docker/daemon.json</span><br><span class="line">&#123;&quot;insecure-registries&quot;:[&quot;192.168.3.138:5000&quot;]&#125;	</span><br><span class="line"></span><br><span class="line">如下例所示：</span><br><span class="line">cat &gt; /etc/docker/daemon.json &lt;&lt; &#x27;EOF&#x27;</span><br><span class="line">&#123;</span><br><span class="line">        &quot;graph&quot;:&quot;/docker&quot;,</span><br><span class="line">        &quot;storage-driver&quot;: &quot;overlay2&quot;,</span><br><span class="line">	&quot;insecure-registries&quot;:[&quot;192.168.3.25:5000&quot;],</span><br><span class="line">        &quot;registry-mirrors&quot;: [</span><br><span class="line">               &quot;https://q2gr04ke.mirror.aliyuncs.com&quot;,</span><br><span class="line">               &quot;http://hub-mirror.c.163.com&quot;,</span><br><span class="line">               &quot;https://docker.mirrors.ustc.edu.cn&quot;</span><br><span class="line">          ],</span><br><span class="line">         &quot;bip&quot;: &quot;172.17.0.1/16&quot;,</span><br><span class="line">         &quot;exec-opts&quot;: [&quot;native.cgroupdriver=systemd&quot;],</span><br><span class="line">         &quot;live-restore&quot;: false,</span><br><span class="line">         &quot;dns&quot; : [ &quot;114.114.114.114&quot;,&quot;8.8.8.8&quot; ]</span><br><span class="line">&#125;</span><br><span class="line">EOF</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">cat &gt; /etc/docker/daemon.json &lt;&lt; &#x27;EOF&#x27;</span><br><span class="line">&#123;</span><br><span class="line">        &quot;storage-driver&quot;: &quot;overlay2&quot;,</span><br><span class="line">	&quot;insecure-registries&quot;:[&quot;192.168.3.153:5000&quot;],</span><br><span class="line">        &quot;registry-mirrors&quot;: [</span><br><span class="line">               &quot;https://q2gr04ke.mirror.aliyuncs.com&quot;,</span><br><span class="line">               &quot;http://hub-mirror.c.163.com&quot;,</span><br><span class="line">               &quot;https://docker.mirrors.ustc.edu.cn&quot;</span><br><span class="line">          ],</span><br><span class="line">         &quot;bip&quot;: &quot;172.17.0.1/16&quot;,</span><br><span class="line">         &quot;exec-opts&quot;: [&quot;native.cgroupdriver=systemd&quot;],</span><br><span class="line">         &quot;live-restore&quot;: false,</span><br><span class="line">         &quot;dns&quot; : [ &quot;114.114.114.114&quot;,&quot;8.8.8.8&quot; ]</span><br><span class="line">&#125;</span><br><span class="line">EOF</span><br><span class="line"></span><br><span class="line">systemctl restart docker  #重启docker服务使设置生效</span><br><span class="line"></span><br><span class="line">查看私有仓库镜像</span><br><span class="line">curl http://192.168.3.138:5000/v2/_catalog</span><br><span class="line">curl -XGET http://192.168.3.138:5000/v2/centos7-nginx/tags/list</span><br><span class="line">docker pull 192.168.3.153:5000/centos7-nginx</span><br><span class="line">2.11 安装registry-web</span><br><span class="line"></span><br><span class="line">docker pull hyper/docker-registry-web</span><br><span class="line"></span><br><span class="line">docker run -d -p 5001:8080 --name registry-web --link my_registry -e REGISTRY_URL=http://192.168.3.25:5000/v2 -e REGISTRY_NAME=192.168.3.25:5000 hyper/docker-registry-web</span><br><span class="line"></span><br><span class="line">命令注释</span><br><span class="line">docker run                                      #运行</span><br><span class="line">-d                                                     #后台运行</span><br><span class="line">-p 5001:8080                               #端口映射</span><br><span class="line">--name registry-web                    #容器命名</span><br><span class="line">--link registry                                 #连接其他容器  加入registry到host</span><br><span class="line">-e REGISTRY_URL=http://registry:5000/v2    #指定仓库地址</span><br><span class="line">-e REGISTRY_NAME=localhost:5000               #仓库命名</span><br><span class="line">hyper/docker-registry-web                                 #被启动的镜像</span><br><span class="line"></span><br><span class="line">curl http://127.0.0.1:5001</span><br><span class="line"></span><br><span class="line">镜像仓库的IP为192.168.3.153实例：</span><br><span class="line">docker run -d -p 5001:8080 --name registry-web --link my_registry -e REGISTRY_URL=http://192.168.3.153:5000/v2 -e REGISTRY_NAME=192.168.3.153:5000 hyper/docker-registry-web</span><br><span class="line"></span><br><span class="line">设置本地docker主机使用本地局域网http私有仓库,默认为https</span><br><span class="line">vim /etc/docker/daemon.json </span><br><span class="line">&#123;</span><br><span class="line">  &quot;registry-mirrors&quot;: [&quot;https://4pefdwvq.mirror.aliyuncs.com&quot;],</span><br><span class="line">  &quot;insecure-registries&quot;: [ &quot;192.168.3.25:5000&quot; ],</span><br><span class="line">  &quot;storage-driver&quot;: &quot;overlay2&quot;,</span><br><span class="line">  &quot;storage-opts&quot;: [</span><br><span class="line">    &quot;overlay2.override_kernel_check=true&quot;</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">systemctl restart docker</span><br><span class="line"></span><br><span class="line">2.12 设置容器开机自启：</span><br><span class="line">docker run --restart=always --net=host --privileged=true -v /web:/usr/local/nginx/html/ -d b8ad90037e3a /bin/bash -c &#x27;/usr/local/nginx/sbin/nginx&#x27;</span><br><span class="line"></span><br><span class="line">注： --restart=always 实用容器开机自启</span><br><span class="line">restart的取值可以是以下3种情况：</span><br><span class="line">no -  容器退出时，不重启容器；</span><br><span class="line">on-failure - 只有在非0状态退出时才从新启动容器；</span><br><span class="line">always - 无论退出状态是如何，都重启容器；</span><br></pre></td></tr></table></figure>
+
+<p>8.7 containerd指向本地私有仓库</p>
+<p>修改config.toml配置文件</p>
+<p>第61行 指定国内镜像仓库</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">61     sandbox_image = &quot;registry.aliyuncs.com/google_containers/pause:3.6&quot;</span><br></pre></td></tr></table></figure>
+
+<p>114行区域可以指定http私库地址 如下所示</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">144     [plugins.&quot;io.containerd.grpc.v1.cri&quot;.registry]</span><br><span class="line">145       config_path = &quot;&quot;</span><br><span class="line">146 </span><br><span class="line">147       [plugins.&quot;io.containerd.grpc.v1.cri&quot;.registry.mirrors]</span><br><span class="line">148         [plugins.&quot;io.containerd.grpc.v1.cri&quot;.registry.mirrors.&quot;docker.io&quot;]</span><br><span class="line">149           endpoint = [&quot;https://registry.cn-hangzhou.aliyuncs.com&quot;]</span><br><span class="line">150         [plugins.&quot;io.containerd.grpc.v1.cri&quot;.registry.mirrors.&quot;192.168.31.252:5000&quot;]</span><br><span class="line">151           endpoint = [&quot;http://192.168.31.252:5000&quot;]</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>如下为完整config.toml实例</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br></pre></td><td class="code"><pre><span class="line">[root@master-01 ~]# cat config.toml </span><br><span class="line">disabled_plugins = []</span><br><span class="line">imports = []</span><br><span class="line">oom_score = 0</span><br><span class="line">plugin_dir = &quot;&quot;</span><br><span class="line">required_plugins = []</span><br><span class="line">root = &quot;/var/lib/containerd&quot;</span><br><span class="line">state = &quot;/run/containerd&quot;</span><br><span class="line">temp = &quot;&quot;</span><br><span class="line">version = 2</span><br><span class="line"></span><br><span class="line">[cgroup]</span><br><span class="line">  path = &quot;&quot;</span><br><span class="line"></span><br><span class="line">[debug]</span><br><span class="line">  address = &quot;&quot;</span><br><span class="line">  format = &quot;&quot;</span><br><span class="line">  gid = 0</span><br><span class="line">  level = &quot;&quot;</span><br><span class="line">  uid = 0</span><br><span class="line"></span><br><span class="line">[grpc]</span><br><span class="line">  address = &quot;/run/containerd/containerd.sock&quot;</span><br><span class="line">  gid = 0</span><br><span class="line">  max_recv_message_size = 16777216</span><br><span class="line">  max_send_message_size = 16777216</span><br><span class="line">  tcp_address = &quot;&quot;</span><br><span class="line">  tcp_tls_ca = &quot;&quot;</span><br><span class="line">  tcp_tls_cert = &quot;&quot;</span><br><span class="line">  tcp_tls_key = &quot;&quot;</span><br><span class="line">  uid = 0</span><br><span class="line"></span><br><span class="line">[metrics]</span><br><span class="line">  address = &quot;&quot;</span><br><span class="line">  grpc_histogram = false</span><br><span class="line"></span><br><span class="line">[plugins]</span><br><span class="line"></span><br><span class="line">  [plugins.&quot;io.containerd.gc.v1.scheduler&quot;]</span><br><span class="line">    deletion_threshold = 0</span><br><span class="line">    mutation_threshold = 100</span><br><span class="line">    pause_threshold = 0.02</span><br><span class="line">    schedule_delay = &quot;0s&quot;</span><br><span class="line">    startup_delay = &quot;100ms&quot;</span><br><span class="line"></span><br><span class="line">  [plugins.&quot;io.containerd.grpc.v1.cri&quot;]</span><br><span class="line">    device_ownership_from_security_context = false</span><br><span class="line">    disable_apparmor = false</span><br><span class="line">    disable_cgroup = false</span><br><span class="line">    disable_hugetlb_controller = true</span><br><span class="line">    disable_proc_mount = false</span><br><span class="line">    disable_tcp_service = true</span><br><span class="line">    enable_selinux = false</span><br><span class="line">    enable_tls_streaming = false</span><br><span class="line">    enable_unprivileged_icmp = false</span><br><span class="line">    enable_unprivileged_ports = false</span><br><span class="line">    ignore_image_defined_volumes = false</span><br><span class="line">    max_concurrent_downloads = 3</span><br><span class="line">    max_container_log_line_size = 16384</span><br><span class="line">    netns_mounts_under_state_dir = false</span><br><span class="line">    restrict_oom_score_adj = false</span><br><span class="line">    sandbox_image = &quot;registry.aliyuncs.com/google_containers/pause:3.6&quot;</span><br><span class="line">    selinux_category_range = 1024</span><br><span class="line">    stats_collect_period = 10</span><br><span class="line">    stream_idle_timeout = &quot;4h0m0s&quot;</span><br><span class="line">    stream_server_address = &quot;127.0.0.1&quot;</span><br><span class="line">    stream_server_port = &quot;0&quot;</span><br><span class="line">    systemd_cgroup = false</span><br><span class="line">    tolerate_missing_hugetlb_controller = true</span><br><span class="line">    unset_seccomp_profile = &quot;&quot;</span><br><span class="line"></span><br><span class="line">    [plugins.&quot;io.containerd.grpc.v1.cri&quot;.cni]</span><br><span class="line">      bin_dir = &quot;/opt/cni/bin&quot;</span><br><span class="line">      conf_dir = &quot;/etc/cni/net.d&quot;</span><br><span class="line">      conf_template = &quot;&quot;</span><br><span class="line">      ip_pref = &quot;&quot;</span><br><span class="line">      max_conf_num = 1</span><br><span class="line"></span><br><span class="line">    [plugins.&quot;io.containerd.grpc.v1.cri&quot;.containerd]</span><br><span class="line">      default_runtime_name = &quot;runc&quot;</span><br><span class="line">      disable_snapshot_annotations = true</span><br><span class="line">      discard_unpacked_layers = false</span><br><span class="line">      ignore_rdt_not_enabled_errors = false</span><br><span class="line">      no_pivot = false</span><br><span class="line">      snapshotter = &quot;overlayfs&quot;</span><br><span class="line"></span><br><span class="line">      [plugins.&quot;io.containerd.grpc.v1.cri&quot;.containerd.default_runtime]</span><br><span class="line">        base_runtime_spec = &quot;&quot;</span><br><span class="line">        cni_conf_dir = &quot;&quot;</span><br><span class="line">        cni_max_conf_num = 0</span><br><span class="line">        container_annotations = []</span><br><span class="line">        pod_annotations = []</span><br><span class="line">        privileged_without_host_devices = false</span><br><span class="line">        runtime_engine = &quot;&quot;</span><br><span class="line">        runtime_path = &quot;&quot;</span><br><span class="line">        runtime_root = &quot;&quot;</span><br><span class="line">        runtime_type = &quot;&quot;</span><br><span class="line"></span><br><span class="line">        [plugins.&quot;io.containerd.grpc.v1.cri&quot;.containerd.default_runtime.options]</span><br><span class="line"></span><br><span class="line">      [plugins.&quot;io.containerd.grpc.v1.cri&quot;.containerd.runtimes]</span><br><span class="line"></span><br><span class="line">        [plugins.&quot;io.containerd.grpc.v1.cri&quot;.containerd.runtimes.runc]</span><br><span class="line">          base_runtime_spec = &quot;&quot;</span><br><span class="line">          cni_conf_dir = &quot;&quot;</span><br><span class="line">          cni_max_conf_num = 0</span><br><span class="line">          container_annotations = []</span><br><span class="line">          pod_annotations = []</span><br><span class="line">          privileged_without_host_devices = false</span><br><span class="line">          runtime_engine = &quot;&quot;</span><br><span class="line">          runtime_path = &quot;&quot;</span><br><span class="line">          runtime_root = &quot;&quot;</span><br><span class="line">          runtime_type = &quot;io.containerd.runc.v2&quot;</span><br><span class="line"></span><br><span class="line">          [plugins.&quot;io.containerd.grpc.v1.cri&quot;.containerd.runtimes.runc.options]</span><br><span class="line">            BinaryName = &quot;&quot;</span><br><span class="line">            CriuImagePath = &quot;&quot;</span><br><span class="line">            CriuPath = &quot;&quot;</span><br><span class="line">            CriuWorkPath = &quot;&quot;</span><br><span class="line">            IoGid = 0</span><br><span class="line">            IoUid = 0</span><br><span class="line">            NoNewKeyring = false</span><br><span class="line">            NoPivotRoot = false</span><br><span class="line">            Root = &quot;&quot;</span><br><span class="line">            ShimCgroup = &quot;&quot;</span><br><span class="line">            SystemdCgroup = false</span><br><span class="line"></span><br><span class="line">      [plugins.&quot;io.containerd.grpc.v1.cri&quot;.containerd.untrusted_workload_runtime]</span><br><span class="line">        base_runtime_spec = &quot;&quot;</span><br><span class="line">        cni_conf_dir = &quot;&quot;</span><br><span class="line">        cni_max_conf_num = 0</span><br><span class="line">        container_annotations = []</span><br><span class="line">        pod_annotations = []</span><br><span class="line">        privileged_without_host_devices = false</span><br><span class="line">        runtime_engine = &quot;&quot;</span><br><span class="line">        runtime_path = &quot;&quot;</span><br><span class="line">        runtime_root = &quot;&quot;</span><br><span class="line">        runtime_type = &quot;&quot;</span><br><span class="line"></span><br><span class="line">        [plugins.&quot;io.containerd.grpc.v1.cri&quot;.containerd.untrusted_workload_runtime.options]</span><br><span class="line"></span><br><span class="line">    [plugins.&quot;io.containerd.grpc.v1.cri&quot;.image_decryption]</span><br><span class="line">      key_model = &quot;node&quot;</span><br><span class="line"></span><br><span class="line">    [plugins.&quot;io.containerd.grpc.v1.cri&quot;.registry]</span><br><span class="line">      config_path = &quot;&quot;</span><br><span class="line"></span><br><span class="line">      [plugins.&quot;io.containerd.grpc.v1.cri&quot;.registry.mirrors]</span><br><span class="line">        [plugins.&quot;io.containerd.grpc.v1.cri&quot;.registry.mirrors.&quot;docker.io&quot;]</span><br><span class="line">          endpoint = [&quot;https://registry.cn-hangzhou.aliyuncs.com&quot;]</span><br><span class="line">        [plugins.&quot;io.containerd.grpc.v1.cri&quot;.registry.mirrors.&quot;192.168.31.252:5000&quot;]</span><br><span class="line">          endpoint = [&quot;http://192.168.31.252:5000&quot;]</span><br><span class="line"></span><br><span class="line">  [plugins.&quot;io.containerd.internal.v1.opt&quot;]</span><br><span class="line">    path = &quot;/opt/containerd&quot;</span><br><span class="line"></span><br><span class="line">  [plugins.&quot;io.containerd.internal.v1.restart&quot;]</span><br><span class="line">    interval = &quot;10s&quot;</span><br><span class="line"></span><br><span class="line">  [plugins.&quot;io.containerd.internal.v1.tracing&quot;]</span><br><span class="line">    sampling_ratio = 1.0</span><br><span class="line">    service_name = &quot;containerd&quot;</span><br><span class="line"></span><br><span class="line">  [plugins.&quot;io.containerd.metadata.v1.bolt&quot;]</span><br><span class="line">    content_sharing_policy = &quot;shared&quot;</span><br><span class="line"></span><br><span class="line">  [plugins.&quot;io.containerd.monitor.v1.cgroups&quot;]</span><br><span class="line">    no_prometheus = false</span><br><span class="line"></span><br><span class="line">  [plugins.&quot;io.containerd.runtime.v1.linux&quot;]</span><br><span class="line">    no_shim = false</span><br><span class="line">    runtime = &quot;runc&quot;</span><br><span class="line">    runtime_root = &quot;&quot;</span><br><span class="line">    shim = &quot;containerd-shim&quot;</span><br><span class="line">    shim_debug = false</span><br><span class="line"></span><br><span class="line">  [plugins.&quot;io.containerd.runtime.v2.task&quot;]</span><br><span class="line">    platforms = [&quot;linux/amd64&quot;]</span><br><span class="line">    sched_core = false</span><br><span class="line"></span><br><span class="line">  [plugins.&quot;io.containerd.service.v1.diff-service&quot;]</span><br><span class="line">    default = [&quot;walking&quot;]</span><br><span class="line"></span><br><span class="line">  [plugins.&quot;io.containerd.service.v1.tasks-service&quot;]</span><br><span class="line">    rdt_config_file = &quot;&quot;</span><br><span class="line"></span><br><span class="line">  [plugins.&quot;io.containerd.snapshotter.v1.aufs&quot;]</span><br><span class="line">    root_path = &quot;&quot;</span><br><span class="line"></span><br><span class="line">  [plugins.&quot;io.containerd.snapshotter.v1.btrfs&quot;]</span><br><span class="line">    root_path = &quot;&quot;</span><br><span class="line"></span><br><span class="line">  [plugins.&quot;io.containerd.snapshotter.v1.devmapper&quot;]</span><br><span class="line">    async_remove = false</span><br><span class="line">    base_image_size = &quot;&quot;</span><br><span class="line">    discard_blocks = false</span><br><span class="line">    fs_options = &quot;&quot;</span><br><span class="line">    fs_type = &quot;&quot;</span><br><span class="line">    pool_name = &quot;&quot;</span><br><span class="line">    root_path = &quot;&quot;</span><br><span class="line"></span><br><span class="line">  [plugins.&quot;io.containerd.snapshotter.v1.native&quot;]</span><br><span class="line">    root_path = &quot;&quot;</span><br><span class="line"></span><br><span class="line">  [plugins.&quot;io.containerd.snapshotter.v1.overlayfs&quot;]</span><br><span class="line">    mount_options = []</span><br><span class="line">    root_path = &quot;&quot;</span><br><span class="line">    sync_remove = false</span><br><span class="line">    upperdir_label = false</span><br><span class="line"></span><br><span class="line">  [plugins.&quot;io.containerd.snapshotter.v1.zfs&quot;]</span><br><span class="line">    root_path = &quot;&quot;</span><br><span class="line"></span><br><span class="line">  [plugins.&quot;io.containerd.tracing.processor.v1.otlp&quot;]</span><br><span class="line">    endpoint = &quot;192.168.31.252:5000&quot;</span><br><span class="line">    insecure = true</span><br><span class="line">    protocol = &quot;http&quot;</span><br><span class="line"></span><br><span class="line">[proxy_plugins]</span><br><span class="line"></span><br><span class="line">[stream_processors]</span><br><span class="line"></span><br><span class="line">  [stream_processors.&quot;io.containerd.ocicrypt.decoder.v1.tar&quot;]</span><br><span class="line">    accepts = [&quot;application/vnd.oci.image.layer.v1.tar+encrypted&quot;]</span><br><span class="line">    args = [&quot;--decryption-keys-path&quot;, &quot;/etc/containerd/ocicrypt/keys&quot;]</span><br><span class="line">    env = [&quot;OCICRYPT_KEYPROVIDER_CONFIG=/etc/containerd/ocicrypt/ocicrypt_keyprovider.conf&quot;]</span><br><span class="line">    path = &quot;ctd-decoder&quot;</span><br><span class="line">    returns = &quot;application/vnd.oci.image.layer.v1.tar&quot;</span><br><span class="line"></span><br><span class="line">  [stream_processors.&quot;io.containerd.ocicrypt.decoder.v1.tar.gzip&quot;]</span><br><span class="line">    accepts = [&quot;application/vnd.oci.image.layer.v1.tar+gzip+encrypted&quot;]</span><br><span class="line">    args = [&quot;--decryption-keys-path&quot;, &quot;/etc/containerd/ocicrypt/keys&quot;]</span><br><span class="line">    env = [&quot;OCICRYPT_KEYPROVIDER_CONFIG=/etc/containerd/ocicrypt/ocicrypt_keyprovider.conf&quot;]</span><br><span class="line">    path = &quot;ctd-decoder&quot;</span><br><span class="line">    returns = &quot;application/vnd.oci.image.layer.v1.tar+gzip&quot;</span><br><span class="line"></span><br><span class="line">[timeouts]</span><br><span class="line">  &quot;io.containerd.timeout.bolt.open&quot; = &quot;0s&quot;</span><br><span class="line">  &quot;io.containerd.timeout.shim.cleanup&quot; = &quot;5s&quot;</span><br><span class="line">  &quot;io.containerd.timeout.shim.load&quot; = &quot;5s&quot;</span><br><span class="line">  &quot;io.containerd.timeout.shim.shutdown&quot; = &quot;3s&quot;</span><br><span class="line">  &quot;io.containerd.timeout.task.state&quot; = &quot;2s&quot;</span><br><span class="line"></span><br><span class="line">[ttrpc]</span><br><span class="line">  address = &quot;&quot;</span><br><span class="line">  gid = 0</span><br><span class="line">  uid = 0</span><br><span class="line">[root@master-01 ~]# </span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>复制配置文件并重启containerd</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systemctl daemon-reload &amp;&amp; systemctl restart containerd</span><br></pre></td></tr></table></figure>
+
+ 
+      <!-- reward -->
+      
+      <div id="reword-out">
+        <div id="reward-btn">
+          打赏
+        </div>
+      </div>
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <div class="declare">
+      <ul class="post-copyright">
+        <li>
+          <i class="ri-copyright-line"></i>
+          <strong>版权声明： </strong>
+          
+          本博客所有文章除特别声明外，著作权归作者所有。转载请注明出处！
+          
+        </li>
+      </ul>
+    </div>
+    
+    <footer class="article-footer">
+       
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/K8s%E5%9F%BA%E7%A1%80%E5%AD%A6%E4%B9%A0/" rel="tag">K8s基础学习</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%BC%96%E7%A8%8B%E7%9F%A5%E8%AF%86/" rel="tag">编程知识</a></li></ul>
+
+    </footer>
+  </div>
+
+   
+  <nav class="article-nav">
+    
+      <a href="/2023/11/26/test/" class="article-nav-link">
+        <strong class="article-nav-caption">上一篇</strong>
+        <div class="article-nav-title">
+          
+            test
+          
+        </div>
+      </a>
+    
+    
+      <a href="/2023/11/23/centos7-%E5%8D%B8%E8%BD%BDdocker/" class="article-nav-link">
+        <strong class="article-nav-caption">下一篇</strong>
+        <div class="article-nav-title">centos7 卸载docker</div>
+      </a>
+    
+  </nav>
+
+  
+   
+     
+</article>
+
+</section>
+      <footer class="footer">
+  <div class="outer">
+    <ul>
+      <li>
+        Copyrights &copy;
+        2015-2023
+        <i class="ri-heart-fill heart_icon"></i> 山城冰荔枝
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+        
+        <span>
+  <span><i class="ri-user-3-fill"></i>访问人数:<span id="busuanzi_value_site_uv"></span></span>
+  <span class="division">|</span>
+  <span><i class="ri-eye-fill"></i>浏览次数:<span id="busuanzi_value_page_pv"></span></span>
+</span>
+        
+      </li>
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      <li>
+        <!-- cnzz统计 -->
+        
+        <script type="text/javascript" src='https://s9.cnzz.com/z_stat.php?id=1278069914&amp;web_id=1278069914'></script>
+        
+      </li>
+    </ul>
+  </div>
+</footer>    
+    </main>
+    <div class="float_btns">
+      <div class="totop" id="totop">
+  <i class="ri-arrow-up-line"></i>
+</div>
+
+<div class="todark" id="todark">
+  <i class="ri-moon-line"></i>
+</div>
+
+    </div>
+    <aside class="sidebar on">
+      <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">主页</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/archives">归档</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/categories">分类</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags">标签</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/photos">图库</a>
+    </li>
+    
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+    </aside>
+    <div id="mask"></div>
+
+<!-- #reward -->
+<div id="reward">
+  <span class="close"><i class="ri-close-line"></i></span>
+  <p class="reward-p"><i class="ri-cup-line"></i>请我喝杯咖啡吧~</p>
+  <div class="reward-box">
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/alipay.jpg">
+      <span class="reward-type">支付宝</span>
+    </div>
+    
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/wechat.jpg">
+      <span class="reward-type">微信</span>
+    </div>
+    
+  </div>
+</div>
+    
+<script src="/js/jquery-3.6.0.min.js"></script>
+ 
+<script src="/js/lazyload.min.js"></script>
+
+<!-- Tocbot -->
+ 
+<script src="/js/tocbot.min.js"></script>
+
+<script>
+  tocbot.init({
+    tocSelector: ".tocbot",
+    contentSelector: ".article-entry",
+    headingSelector: "h1, h2, h3, h4, h5, h6",
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    scrollContainer: "main",
+    positionFixedSelector: ".tocbot",
+    positionFixedClass: "is-position-fixed",
+    fixedSidebarOffset: "auto",
+  });
+</script>
+
+<script src="https://cdn.staticfile.org/jquery-modal/0.9.2/jquery.modal.min.js"></script>
+<link
+  rel="stylesheet"
+  href="https://cdn.staticfile.org/jquery-modal/0.9.2/jquery.modal.min.css"
+/>
+<script src="https://cdn.staticfile.org/justifiedGallery/3.8.1/js/jquery.justifiedGallery.min.js"></script>
+
+<script src="/dist/main.js"></script>
+
+<!-- ImageViewer -->
+ <!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" style="display:none" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<link rel="stylesheet" href="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.css">
+<link rel="stylesheet" href="https://cdn.staticfile.org/photoswipe/4.1.3/default-skin/default-skin.min.css">
+<script src="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe.min.js"></script>
+<script src="https://cdn.staticfile.org/photoswipe/4.1.3/photoswipe-ui-default.min.js"></script>
+
+<script>
+    function viewer_init() {
+        let pswpElement = document.querySelectorAll('.pswp')[0];
+        let $imgArr = document.querySelectorAll(('.article-entry img:not(.reward-img)'))
+
+        $imgArr.forEach(($em, i) => {
+            $em.onclick = () => {
+                // slider展开状态
+                // todo: 这样不好，后面改成状态
+                if (document.querySelector('.left-col.show')) return
+                let items = []
+                $imgArr.forEach(($em2, i2) => {
+                    let img = $em2.getAttribute('data-idx', i2)
+                    let src = $em2.getAttribute('data-target') || $em2.getAttribute('src')
+                    let title = $em2.getAttribute('alt')
+                    // 获得原图尺寸
+                    const image = new Image()
+                    image.src = src
+                    items.push({
+                        src: src,
+                        w: image.width || $em2.width,
+                        h: image.height || $em2.height,
+                        title: title
+                    })
+                })
+                var gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, {
+                    index: parseInt(i)
+                });
+                gallery.init()
+            }
+        })
+    }
+    viewer_init()
+</script> 
+<!-- MathJax -->
+
+<!-- Katex -->
+
+<!-- busuanzi  -->
+ 
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+ 
+<!-- ClickLove -->
+
+<!-- ClickBoom1 -->
+
+<!-- ClickBoom2 -->
+
+<!-- CodeCopy -->
+ 
+<link rel="stylesheet" href="/css/clipboard.css">
+ <script src="https://cdn.staticfile.org/clipboard.js/2.0.10/clipboard.min.js"></script>
+<script>
+  function wait(callback, seconds) {
+    var timelag = null;
+    timelag = window.setTimeout(callback, seconds);
+  }
+  !function (e, t, a) {
+    var initCopyCode = function(){
+      var copyHtml = '';
+      copyHtml += '<button class="btn-copy" data-clipboard-snippet="">';
+      copyHtml += '<i class="ri-file-copy-2-line"></i><span>COPY</span>';
+      copyHtml += '</button>';
+      $(".highlight .code pre").before(copyHtml);
+      $(".article pre code").before(copyHtml);
+      var clipboard = new ClipboardJS('.btn-copy', {
+        target: function(trigger) {
+          return trigger.nextElementSibling;
+        }
+      });
+      clipboard.on('success', function(e) {
+        let $btn = $(e.trigger);
+        $btn.addClass('copied');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-checkbox-circle-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPIED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-checkbox-circle-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+      clipboard.on('error', function(e) {
+        e.clearSelection();
+        let $btn = $(e.trigger);
+        $btn.addClass('copy-failed');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-time-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPY FAILED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-time-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+    }
+    initCopyCode();
+  }(window, document);
+</script>
+ 
+<!-- CanvasBackground -->
+
+<script>
+  if (window.mermaid) {
+    mermaid.initialize({ theme: "forest" });
+  }
+</script>
+
+
+    
+    <div id="music">
+    
+    
+    
+    <iframe frameborder="no" border="1" marginwidth="0" marginheight="0" width="200" height="52"
+        src="//music.163.com/outchain/player?type=2&id=22707008&auto=1&height=32"></iframe>
+</div>
+
+<style>
+    #music {
+        position: fixed;
+        right: 15px;
+        bottom: 0;
+        z-index: 998;
+    }
+</style>
+    
+    
+
+  </div>
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"/live2dw/assets/assets/hijiki.model.json"},"display":{"position":"right","width":150,"height":300,"hOffset":400,"vOffset":-38},"mobile":{"show":true},"react":"opacity:1","dialog":{"enable":true,"script":{"every idle 10s":"text1","tap face":"text2","tap body":"text3"}},"log":false});</script></body>
+
+</html>

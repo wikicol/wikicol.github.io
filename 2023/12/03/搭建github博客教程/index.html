@@ -301,7 +301,7 @@
 <blockquote>
 <p>声明：如果遇到什么不懂的可以先百度，在不懂可以微信我wushibo0820</p>
 </blockquote>
-<h2 id="问题：解决-103-x69-x74-x40-103-105-x74-104-x75-98-46-x63-x6f-x6d-Permission-denied-publickey-fatal-Could-not-read-from-remote-repository-Pleas"><a href="#问题：解决-103-x69-x74-x40-103-105-x74-104-x75-98-46-x63-x6f-x6d-Permission-denied-publickey-fatal-Could-not-read-from-remote-repository-Pleas" class="headerlink" title="问题：解决&#103;&#x69;&#x74;&#x40;&#103;&#105;&#x74;&#104;&#x75;&#98;&#46;&#x63;&#x6f;&#x6d;: Permission denied (publickey). fatal: Could not read from remote repository. Pleas"></a>问题：解决<a href="mailto:&#103;&#x69;&#x74;&#x40;&#103;&#105;&#x74;&#104;&#x75;&#98;&#46;&#x63;&#x6f;&#x6d;">&#103;&#x69;&#x74;&#x40;&#103;&#105;&#x74;&#104;&#x75;&#98;&#46;&#x63;&#x6f;&#x6d;</a>: Permission denied (publickey). fatal: Could not read from remote repository. Pleas</h2><p><img src="https://proxy.iximp.top/https://img-blog.csdnimg.cn/20200603101902230.png"></p>
+<h2 id="问题：解决-103-x69-x74-64-x67-x69-116-x68-117-98-x2e-99-x6f-109-Permission-denied-publickey-fatal-Could-not-read-from-remote-repository-Pleas"><a href="#问题：解决-103-x69-x74-64-x67-x69-116-x68-117-98-x2e-99-x6f-109-Permission-denied-publickey-fatal-Could-not-read-from-remote-repository-Pleas" class="headerlink" title="问题：解决&#103;&#x69;&#x74;&#64;&#x67;&#x69;&#116;&#x68;&#117;&#98;&#x2e;&#99;&#x6f;&#109;: Permission denied (publickey). fatal: Could not read from remote repository. Pleas"></a>问题：解决<a href="mailto:&#103;&#x69;&#x74;&#64;&#x67;&#x69;&#116;&#x68;&#117;&#98;&#x2e;&#99;&#x6f;&#109;">&#103;&#x69;&#x74;&#64;&#x67;&#x69;&#116;&#x68;&#117;&#98;&#x2e;&#99;&#x6f;&#109;</a>: Permission denied (publickey). fatal: Could not read from remote repository. Pleas</h2><p><img src="https://proxy.iximp.top/https://img-blog.csdnimg.cn/20200603101902230.png"></p>
 <h4 id="一-原因分析"><a href="#一-原因分析" class="headerlink" title="一:原因分析"></a>一:原因分析</h4><p>Permission denied (publickey) 没有权限的publickey ，出现这错误一般是以下两种原因</p>
 <ul>
 <li>客户端与服务端未生成 ssh key</li>
@@ -309,7 +309,7 @@
 </ul>
 <p>找到问题的原因了，解决办法也就有了，重新生成一次ssh key ，服务端也重新配置一次即可。</p>
 <h4 id="-1"><a href="#-1" class="headerlink" title=""></a></h4><h4 id="二-客户端生成ssh-key"><a href="#二-客户端生成ssh-key" class="headerlink" title="二:客户端生成ssh key"></a>二:客户端生成ssh key</h4><p>在cmd里面输入</p>
-<p>ssh-keygen -t rsa -C “<a href="mailto:&#120;&#x78;&#x78;&#x78;&#120;&#x78;&#120;&#x78;&#64;&#x71;&#113;&#46;&#x63;&#111;&#109;">&#120;&#x78;&#x78;&#x78;&#120;&#x78;&#120;&#x78;&#64;&#x71;&#113;&#46;&#x63;&#111;&#109;</a>“</p>
+<p>ssh-keygen -t rsa -C “<a href="mailto:&#x78;&#x78;&#x78;&#x78;&#x78;&#120;&#120;&#x78;&#64;&#x71;&#113;&#x2e;&#99;&#111;&#109;">&#x78;&#x78;&#x78;&#x78;&#x78;&#120;&#120;&#x78;&#64;&#x71;&#113;&#x2e;&#99;&#111;&#109;</a>“</p>
 <figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh-keygen -t rsa -C <span class="string">&quot;youremail@example.com&quot;</span></span><br></pre></td></tr></table></figure>
 
 <p>xxxxxx<a href="mailto:youremail@example.com">@qq.com</a>改为自己的邮箱即可，途中会让你输入密码啥的，不需要管，一路回车即可，会生成你的ssh key。（如果重新生成的话会覆盖之前的ssh key。）</p>

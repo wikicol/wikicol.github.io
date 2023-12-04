@@ -1,3 +1,6 @@
+body {
+  cursor: url("/images/mouse.cur"), auto;
+}
 .sidebar {
   left: -8rem;
   width: 8rem;
@@ -17,7 +20,7 @@
 @media (min-width: 768px) {
   .outer,
   .wrap {
-    width: 80rem !important;
+    width: 110rem !important;
   }
 }
 @media (max-width: 768px) {

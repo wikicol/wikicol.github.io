@@ -1,3 +1,5 @@
+http://blog.ioimp.top/2023/12/04/%E7%9F%A5%E8%AF%86%E5%BA%93%E5%91%A8%E6%8A%A5%E6%80%BB%E7%BB%93%E6%B1%87%E6%8A%A5-2023-11-27-2023-12-3/
+http://blog.ioimp.top/2023/11/22/%E6%8B%AF%E6%95%91%E5%B0%8F%E7%99%BD%E7%84%A6%E8%99%91%E6%89%8B%E5%86%8C/
 http://blog.ioimp.top/2023/12/03/Scarpy-%E5%88%86%E5%B8%83%E5%BC%8F%E7%88%AC%E8%99%AB/
 http://blog.ioimp.top/2023/12/03/13-Scrapy-Splash%E7%9A%84%E4%BD%BF%E7%94%A8/
 http://blog.ioimp.top/2023/12/03/crawlSpider/
@@ -8,7 +10,6 @@ http://blog.ioimp.top/2023/12/03/%E6%90%AD%E5%BB%BAgithub%E5%8D%9A%E5%AE%A2%E6%9
 http://blog.ioimp.top/photos/index.html
 http://blog.ioimp.top/2023/11/24/kubernetes%E6%A0%B8%E5%BF%83%E6%A6%82%E5%BF%B5/
 http://blog.ioimp.top/2023/11/23/centos7-%E5%8D%B8%E8%BD%BDdocker/
-http://blog.ioimp.top/2023/11/22/%E6%8B%AF%E6%95%91%E5%B0%8F%E7%99%BD%E7%84%A6%E8%99%91%E6%89%8B%E5%86%8C/
 http://blog.ioimp.top/2023/11/22/%E8%AE%B0%E4%B8%80%E6%AC%A1jenkins%E6%9E%84%E5%BB%BA%E5%A4%B1%E8%B4%A5%E7%9A%84%E8%B8%A9%E5%9D%91%E8%AE%B0%E5%BD%95/
 http://blog.ioimp.top/2023/11/21/Ubuntu-18-04-%E5%87%BA%E7%8E%B0GLIBC-2-28-not-found%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95-%E4%BA%B2%E6%B5%8B%E6%9C%89%E6%95%88/
 http://blog.ioimp.top/2023/11/17/%E7%A7%81%E5%9F%9F%E6%96%87%E7%AB%A0%E6%95%B4%E7%90%86%E3%80%90%E4%B8%80%E3%80%91/
@@ -69,6 +70,8 @@ http://blog.ioimp.top/tags/K8s%E5%9F%BA%E7%A1%80%E5%AD%A6%E4%B9%A0/
 http://blog.ioimp.top/tags/%E7%BC%96%E7%A8%8B%E7%9F%A5%E8%AF%86/
 http://blog.ioimp.top/tags/%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA%E6%95%99%E7%A8%8B/
 http://blog.ioimp.top/tags/Scrapy%E7%88%AC%E8%99%AB/
+http://blog.ioimp.top/tags/%E5%91%A8%E6%8A%A5%E6%B1%87%E6%80%BB/
+http://blog.ioimp.top/tags/%E5%B7%A5%E4%BD%9C%E5%AE%A4%E5%86%85%E9%83%A8%E5%91%98%E5%B7%A5%E6%B1%87%E6%8A%A5%E6%80%BB%E7%BB%93/
 http://blog.ioimp.top/categories/proxy/
 http://blog.ioimp.top/categories/%E6%8A%80%E6%9C%AF/
 http://blog.ioimp.top/categories/%E5%AE%9E%E7%94%A8%E6%8A%80%E5%B7%A7/
@@ -85,3 +88,4 @@ http://blog.ioimp.top/categories/%E7%96%91%E9%9A%BE%E8%A7%A3%E7%AD%94/
 http://blog.ioimp.top/categories/K8s/
 http://blog.ioimp.top/categories/%E6%9D%82%E7%B1%BB%E5%AD%A6%E4%B9%A0/
 http://blog.ioimp.top/categories/%E7%88%AC%E8%99%AB%E5%BC%80%E5%8F%91/
+http://blog.ioimp.top/categories/%E5%91%A8%E6%8A%A5/

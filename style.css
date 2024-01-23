@@ -1,0 +1,165 @@
+* {
+    border: 0;
+    margin: 0;
+    padding: 0;
+    outline: none;
+    box-sizing: border-box;
+}
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -520;
+    pointer-events: none;
+}
+body::before {
+    background: linear-gradient( 90deg, rgba(247, 149, 51, .1), rgba(243, 112, 85, .1) 15%, rgba(239, 78, 123, .1) 30%, rgba(161, 102, 171, .1) 44%, rgba(80, 115, 184, .1) 58%, rgba(16, 152, 173, .1) 72%, rgba(7, 179, 155, .1) 86%, rgba(109, 186, 130, .1));
+}
+body {
+    background: #000;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+
+#main {
+    height: calc(100vh - 60px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#player {
+    width: 100%;
+    height: auto;
+    max-height: 100%;
+}
+
+#buttons {
+    height: 60px;
+    padding: 10px;
+}
+
+#switch,
+#next {
+    background: #FFF;
+    background: linear-gradient(to bottom, rgb(1rgb(109, 107, 101)121, 113),#FB0);
+    color: #AF2E08;
+    font-size: 16px;
+    font-weight: bold;
+    height: 40px;
+    padding: 0px 20px;
+    margin: 0px 5px;
+    border-radius: 20px;
+}
+#buttons {
+    display: flex;
+    flex-wrap: nowrap;
+  }
+  
+  #buttons button {
+    font-size: 16px; /* 基本字体大小 */
+  }
+  
+  /* 在视窗宽度小于600px时，字体大小设为12px */
+  @media (max-width: 600px) {
+    #buttons button {
+      font-size: 12px;
+    }
+  }
+  
+  /* 在视窗宽度大于1200px时，字体大小设为20px */
+  @media (min-width: 1200px) {
+    #buttons button {
+      font-size: 20px;
+    }
+  }
+#random {
+    background: #FFF;
+    background: linear-gradient(to bottom, rgb(1rgb(109, 107, 101)121, 113),#FB0);
+    color: #AF2E08;
+    font-size: 16px;
+    font-weight: bold;
+    height: 40px;
+    padding: 0px 20px;
+    margin: 0px 5px;
+    border-radius: 20px;
+}
+#show-hide {
+    background: #FFF;
+    background: linear-gradient(to bottom, rgb(1rgb(109, 107, 101)121, 113),#FB0);
+    color: #AF2E08;
+    font-size: 16px;
+    font-weight: bold;
+    height: 40px;
+    padding: 0px 20px;
+    margin: 0px 5px;
+    border-radius: 20px;
+}
+
+
+   
+#video-list {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 200px;
+  height: 100%;
+  background-color: #000;
+  box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3);
+  overflow-y: auto;
+  z-index: 1;
+  display: none;
+}
+
+#video-list ul {
+  padding: 0;
+  margin: 0;
+}
+
+#video-list li {
+  list-style: none;
+  padding: 10px;
+  cursor: pointer;
+  border-bottom: 1px solid #333;
+  color: #fff;
+  font-size: 16px;
+}
+.playing  {
+  background-color: skyblue;
+}
+.selected  {
+  background-color: red;
+}
+#video-list li:last-child {
+  border-bottom: none;
+}
+
+#video-list li:hover {
+  background-color: #333;
+}
+
+#main {
+  margin-right: 200px;
+}
+
+@media only screen and (max-width: 600px) {
+  #video-list {
+      width: 100%;
+      height: auto;
+      position: relative;
+      box-shadow: none;
+      margin-right: 0;
+  }
+  
+  #main {
+      margin-right: 0;
+  }
+}

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charSet="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta http-equiv="Cache-Control" content="no-transform" /> 
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <meta name="referrer" content="never">
+    <meta name="renderer" content="webkit" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>不见星空系列</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <section id="main">
+        <video id="player" src="" controls webkit-playsinline playsinline></video>
+    </section>
+    <section id="buttons">
+        <button id="switch">连续: 开</button>
+        <button id="next">播放下一个</button>
+        <button id="random">随机播放</button>
+        <button id="show-hide">显示/隐藏列表</button> <!-- Add new button -->
+    </section>
+    <section id="video-list">
+        <ul id="list">
+        </ul>
+    </section>
+    <script>
+    (function (window, document) {
+        if (top != self) {
+            window.top.location.replace(self.location.href);
+        }
+        var get = function (id) {
+            return document.getElementById(id);
+        }
+        var bind = function (element, event, callback) {
+            return element.addEventListener(event, callback);
+        }
+        var auto = true;
+        var player = get('player');
+        var videos = [];
+        var currentVideoIndex = 0;
+        
+        // 从本地txt文件中随机读取视频地址
+        var loadVideos = function () {
+            var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    videos = xhr.responseText.split("\n");
+                    randomm();
+                    displayVideoList();
+                }
+            };
+            xhr.open("GET", "https://img.59420.link/video.php?f=xingkong", true);
+            xhr.send();
+        }
+        
+        var randomm = function () {
+  currentVideoIndex = Math.floor(Math.random() * videos.length);
+  player.src = videos[currentVideoIndex];
+  player.play();
+  // 添加"playing"类名并移除其他元素的"playing"类名
+  var listItems = list.getElementsByTagName('li');
+  for (var j = 0; j < listItems.length; j++) {
+    if (j === currentVideoIndex) {
+      listItems[j].classList.add('playing');
+    } else {
+      listItems[j].classList.remove('playing');
+    }
+  }
+}
+        bind(get('next'), 'click', randomm);
+        bind(get('random'), 'click', randomm);
+        bind(player, 'error', function () {
+            randomm();
+        });
+        bind(get('switch'), 'click', function () {
+            auto = !auto;
+            this.innerText = '连续: ' + (auto ? '开' : '关');
+        });
+        bind(player, 'ended', function () {
+            if (auto) randomm();
+        });
+        
+        loadVideos(); // 加载视频地址
+        
+        var displayVideoList = function () {
+  var list = get('list');
+  for (var i = 0; i < videos.length; i++) {
+    var listItem = document.createElement('li');
+    listItem.innerText = '视频 ' + (i+1);
+    bind(listItem, 'click', function (index) {
+      return function () {
+        currentVideoIndex = index;
+        player.src = videos[currentVideoIndex];
+        player.play();
+        // 添加"selected"类名并移除其他元素的"selected"类名
+        var listItems = list.getElementsByTagName('li');
+        for (var j = 0; j < listItems.length; j++) {
+          if (j === index) {
+            listItems[j].classList.add('selected');
+          } else {
+            listItems[j].classList.remove('selected');
+          }
+        }
+      }
+    }(i));
+    list.appendChild(listItem);
+  }
+}
+        
+        bind(get('show-hide'), 'click', function () {
+            var videoList = get('video-list');
+            if (videoList.style.display === 'none') {
+                videoList.style.display = 'block';
+            } else {
+                videoList.style.display = 'none';
+            }
+        });
+    })(window, document);
+    </script>
+</body>
+</html>

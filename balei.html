@@ -29,6 +29,11 @@
             <button id="remove-blur-button">去除毛玻璃效果</button>
         </div>
     </div>
+        <!-- 添加一个加载动画容器 -->
+        <div class="loader">
+            <span class="loader-text">正在加载，请耐心等待...</span>
+        </div>
+    <div id="video-list"></div>
     
     <div id="video-list"></div>
 
@@ -50,12 +55,16 @@
         // 获取视频数据
         fetch('https://img.59420.link/json.php?f=balei')
             .then(response => response.json())
-            .then(data => {
-                videosData = data;
-                totalPages = Math.ceil(videosData.length / videosPerPage);
-                renderVideos(currentPage);
-                renderPagination();
-            })
+               .then(data => {
+        videosData = data;
+        totalPages = Math.ceil(videosData.length / videosPerPage);
+        renderVideos(currentPage);
+        renderPagination();
+
+        // 隐藏loader加载标签
+        const loader = document.querySelector('.loader');
+        loader.style.display = 'none';
+    })
             .catch(error => {
                 console.log('发生错误:', error);
             });

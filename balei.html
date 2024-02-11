@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>视频播放模块</title>
+    <link rel="stylesheet" href="./2.css">
+</head>
+<body>
+    <div id="video-player">
+        <div class="video-player-content">
+            <h2 id="video-title"></h2>
+            <video controls></video>
+            <div class="video-info">
+                <div class="buttons">
+                    <button id="download-button">下载</button>
+                    <button id="prev-button">上一个</button>
+                    <button id="close-button" style="background-color: red;">关闭</button>
+                    <button id="next-button">下一个</button>
+                    <button id="random-button">随机播放</button>
+                </div>                
+            </div>
+        </div>
+    </div>
+    <h3 style="text-align: center;">注意avi格式的视频无法在线播放请自行下载播放！</h3>
+    <div class="pagination-container" id="pagination-container">
+        <div class="pagination" id="pagination"></div>
+        <div class="buttons">
+            <button id="shuffle-button">点我一次打乱顺序哦~</button>
+            <button id="remove-blur-button">去除毛玻璃效果</button>
+        </div>
+    </div>
+    
+    <div id="video-list"></div>
+
+    <script>
+        const videosPerPage = 40; // 每页显示的视频数量
+        let currentPage = 1; // 当前页码
+        let totalPages = 0; // 总页数
+        let videosData = []; // 视频数据
+        let currentVideoIndex = 0; // 当前视频索引
+
+        const videoList = document.getElementById('video-list');
+        const pagination = document.getElementById('pagination');
+        const videoPlayer = document.querySelector('#video-player video');
+        const closeButton = document.getElementById('close-button');
+        const nextButton = document.getElementById('next-button');
+        const randomButton = document.getElementById('random-button');
+        const videoTitle = document.getElementById('video-title');
+
+        // 获取视频数据
+        fetch('https://img.59420.link/json.php?f=balei')
+            .then(response => response.json())
+            .then(data => {
+                videosData = data;
+                totalPages = Math.ceil(videosData.length / videosPerPage);
+                renderVideos(currentPage);
+                renderPagination();
+            })
+            .catch(error => {
+                console.log('发生错误:', error);
+            });
+            const downloadButton = document.getElementById('download-button');
+
+// 下载视频
+function downloadVideo() {
+    const video = videosData[currentVideoIndex];
+    const userConfirmed = window.confirm('注意：下载的文件请自行重命名并将后缀改成.mp4');
+    if (userConfirmed) {
+        const link = document.createElement('a');
+        link.href = video.video_url;
+        link.download = video.video_name + '.mp4';  // 随机命名并添加.mp4后缀
+        link.style.display = 'none';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+}
+
+// 绑定下载按钮事件
+downloadButton.addEventListener('click', downloadVideo);
+        // 渲染视频块
+        function renderVideos(page) {
+            const start = (page - 1) * videosPerPage;
+            const end = start + videosPerPage;
+            const videos = videosData.slice(start, end);
+
+            videoList.innerHTML = '';
+
+            videos.forEach((video, index) => {
+                const videoContainer = document.createElement('div');
+                videoContainer.className = 'video-container';
+
+                const videoThumb = document.createElement('img');
+                videoThumb.src = video.video_thumb;
+                videoThumb.className = 'video-thumb';
+
+                const videoName = document.createElement('p');
+                videoName.textContent = video.video_name;
+                videoName.className = 'video-name';
+
+                // 存储全局索引
+                videoContainer.dataset.index = start + index;
+
+                // 点击视频块时触发播放
+                videoContainer.addEventListener('click', () => {
+                    const globalIndex = parseInt(videoContainer.dataset.index, 10);
+                    showVideoPlayer(globalIndex);
+                });
+
+                videoContainer.appendChild(videoThumb);
+                videoContainer.appendChild(videoName);
+                videoList.appendChild(videoContainer);
+            });
+        }
+
+        // 渲染分页按钮
+        function renderPagination() {
+            pagination.innerHTML = '';
+
+            for (let i = 1; i <= totalPages; i++) {
+                const pageLink = document.createElement('a');
+                pageLink.href = '#';
+                pageLink.textContent = i;
+
+                if (i === currentPage) {
+                    pageLink.classList.add('active');
+                }
+
+                pageLink.addEventListener('click', () => {
+                    currentPage = i;
+                    renderVideos(currentPage);
+                    renderPagination();
+                });
+
+                pagination.appendChild(pageLink);
+            }
+        }
+        
+        const shuffleButton = document.getElementById('shuffle-button');
+        const removeBlurButton = document.getElementById('remove-blur-button');
+
+        // 打乱视频块顺序
+        function shuffleVideos() {
+            for (let i = videosData.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [videosData[i], videosData[j]] = [videosData[j], videosData[i]];
+            }
+            renderVideos(currentPage);
+        }
+
+        // 去除毛玻璃效果
+        // 去除毛玻璃效果
+        function removeBlurEffect() {
+            const videoThumbs = document.querySelectorAll('.video-container img');
+            videoThumbs.forEach(videoThumb => {
+                videoThumb.style.filter = 'none';
+            });
+        }
+
+        // 绑定打乱顺序按钮事件
+        shuffleButton.addEventListener('click', shuffleVideos);
+
+        // 绑定去除毛玻璃效果按钮事件
+        removeBlurButton.addEventListener('click', removeBlurEffect);
+
+        // 显示视频播放器
+        function showVideoPlayer(index) {
+    const video = videosData[index];
+    currentVideoIndex = index;  // 更新当前视频索引
+
+    // 清空之前的source元素
+    while (videoPlayer.firstChild) {
+        videoPlayer.removeChild(videoPlayer.firstChild);
+    }
+
+    // 创建新的source元素
+    const sourceElement = document.createElement('source');
+    sourceElement.src = video.video_url;
+    
+    // 根据视频文件的扩展名设置正确的MIME类型
+    const fileExtension = video.video_url.split('.').pop();
+    switch (fileExtension) {
+        case 'mp4':
+            sourceElement.type = 'video/mp4';
+            break;
+        case 'webm':
+            sourceElement.type = 'video/webm';
+            break;
+        case 'ogg':
+            sourceElement.type = 'video/ogg';
+        case 'avi':
+        sourceElement.type = 'video/avi';
+            break;
+        // 在这里添加更多的视频格式...
+        default:
+            console.log('未知的视频格式: ' + fileExtension);
+    }
+
+    // 将新的source元素添加到video元素
+    videoPlayer.appendChild(sourceElement);
+
+    videoTitle.textContent = video.video_name;
+    document.getElementById('video-player').style.display = 'block';
+    document.body.style.overflow = 'hidden';
+}
+
+
+        // 关闭视频播放器
+        function closeVideoPlayer() {
+            videoPlayer.pause();
+            document.getElementById('video-player').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        // 下一个视频
+        function playNextVideo() {
+            currentVideoIndex++;
+            if (currentVideoIndex >= videosData.length) {
+                currentVideoIndex = 0;
+            }
+            showVideoPlayer(currentVideoIndex);
+        }
+
+        const prevButton = document.getElementById('prev-button');
+
+        // 上一个视频
+        function playPrevVideo() {
+            currentVideoIndex--;
+            if (currentVideoIndex < 0) {
+                currentVideoIndex = videosData.length - 1;
+            }
+            showVideoPlayer(currentVideoIndex);
+        }
+
+        prevButton.addEventListener('click', playPrevVideo);
+
+        // 随机播放视频
+        function playRandomVideo() {
+            currentVideoIndex = Math.floor(Math.random() * videosData.length);
+            showVideoPlayer(currentVideoIndex);
+        }
+
+        // 绑定关闭按钮事件
+        closeButton.addEventListener('click', closeVideoPlayer);
+
+        // 绑定下一个按钮事件
+        nextButton.addEventListener('click', playNextVideo);
+
+        // 绑定随机播放按钮事件
+        randomButton.addEventListener('click', playRandomVideo);
+    </script>
+</body>
+</html>

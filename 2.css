@@ -1,0 +1,232 @@
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -520;
+    pointer-events: none;
+}
+body::before {
+    background: linear-gradient( 90deg, rgba(247, 149, 51, .1), rgba(243, 112, 85, .1) 15%, rgba(239, 78, 123, .1) 30%, rgba(161, 102, 171, .1) 44%, rgba(80, 115, 184, .1) 58%, rgba(16, 152, 173, .1) 72%, rgba(7, 179, 155, .1) 86%, rgba(109, 186, 130, .1));
+}
+.video-container {
+    width: 200px; /* 设置固定宽度 */
+    height: 220px; /* 设置固定高度，增加高度以防止名称重叠 */
+    flex-grow: 1; /* 允许视频块在有额外空间时进行扩展 */
+    margin: 10px; /* 在每个视频块之间添加间隔 */
+    box-sizing: border-box; /* 使元素的总宽度和高度包括内容、内边距和边框，而不包括外边距 */
+}
+
+.video-name {
+    overflow: hidden; /* 隐藏超出元素宽度的内容 */
+    text-overflow: ellipsis; /* 用省略号显示被裁剪的文本 */
+    white-space: nowrap; /* 防止文本换行 */
+}
+
+#video-list {
+    display: flex; /* 设置为flex容器 */
+    flex-wrap: wrap; /* 允许视频块换行 */
+    justify-content: center; /* 在视频块之间均匀分配空间并居中 */
+    margin: 20px auto; /* 使整个列表居中，并与页面的上下左右保持20px的间隔 */
+    max-width: 90%; /* 限制列表的最大宽度，使其不会占满整个页面 */
+}
+.video-container img {
+    max-width: 200px;
+    max-height: 200px;
+    object-fit: cover;
+    margin: 5px;
+    cursor: pointer;
+    box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.2);
+    filter: blur(5px);
+    transition: all 0.3s ease;
+}
+.video-container img:hover {
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.4);
+    filter: blur(0);
+}
+
+        .video-thumb {
+            width: 100%;
+        }
+
+        .video-name {
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        #video-player {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 9999;
+    display: none;
+    justify-content: center; /* align the content to the center */
+    align-items: center; /* align the content to the center */
+}
+
+.video-player-content {
+    display: flex;
+    flex-direction: column; /* stack the children vertically */
+    align-items: center; /* center the children horizontally */
+    margin-top: 100px;
+}
+
+#video-player video {
+    width: 800px;
+    height: 450px;
+}
+
+#video-player .video-info {
+    text-align: center;
+    color: #fff;
+}
+
+#video-player .video-info h2 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+#video-player .video-info .buttons {
+    margin-top: 10px;
+}
+
+#video-player .video-info .buttons button {
+    padding: 5px 10px;
+    margin-right: 10px;
+    background-color: #333;
+    color: #fff;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+#video-player .video-info .buttons button:hover {
+    background-color: #555;
+}
+
+.pagination {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.pagination a {
+    display: inline-block;
+    padding: 5px 10px;
+    margin: 0 5px;
+    background-color: #f2f2f2;
+    color: #333;
+    text-decoration: none;
+    border-radius: 3px;
+}
+
+.pagination a.active {
+    background-color: #4CAF50;
+    color: white;
+}
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 80%;  /* 你可以根据需要调整宽度 */
+}
+
+
+.pagination-container .buttons {
+    display: flex;
+    gap: 10px;
+    margin-left: 20px;  /* 添加左边距 */
+    margin-top: 20px;
+}
+#video-title {
+    background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet);
+    -webkit-background-clip: text;
+    color: transparent;
+}
+
+@media screen and (max-width: 300px) {
+    .video-container {
+        width: 100%;
+        height: auto;
+    }
+
+    .video-name {
+        font-size: 14px;  /* reduce font size */
+    }
+
+    #video-list {
+        max-width: 100%;
+        margin: 10px;
+    }
+
+    .video-container img {
+        max-width: 100%;
+        max-height: auto;
+    }
+
+    #video-player video {
+        width: 100%;
+        height: auto;
+    }
+
+    #video-player .video-info h2 {
+        font-size: 18px;  /* reduce font size */
+    }
+
+    #video-player .video-info .buttons button {
+        padding: 4px 8px;  /* reduce button size */
+        font-size: 14px;  /* reduce font size */
+    }
+
+    .pagination a {
+        padding: 4px 8px;  /* reduce button size */
+        font-size: 14px;  /* reduce font size */
+    }
+
+    .pagination-container {
+        width: 100%;
+        flex-direction: column;
+    }
+
+    .pagination-container .buttons {
+        margin-left: 0;
+        margin-top: 10px;
+    }
+}
+
+
+
+
+ /* Add CSS for the modal */
+ .modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    text-align: center;
+}
+
+.modal-content p {
+    color: red;
+}

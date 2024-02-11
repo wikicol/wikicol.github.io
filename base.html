@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>加密链接示例</title>
+    <script>
+        function decryptUrl(encryptedUrl) {
+            // 在这里编写解密算法，将加密的链接解密为原始链接
+            // 这里使用Base64解码作为示例
+            var decodedUrl = atob(encryptedUrl);
+            return decodedUrl;
+        }
+
+        window.onload = function() {
+            // 获取所有具有 "encrypted-link" 类的链接元素
+            var encryptedLinks = document.getElementsByClassName("encrypted-link");
+
+            // 遍历每个加密链接元素，替换加密的链接为解密后的链接
+            for (var i = 0; i < encryptedLinks.length; i++) {
+                var encryptedUrl = encryptedLinks[i].getAttribute("data-encrypted-url");
+                var decryptedUrl = decryptUrl(encryptedUrl);
+                encryptedLinks[i].href = decryptedUrl;
+            }
+        };
+    </script>
+</head>
+<body>
+    <a class="encrypted-link" data-encrypted-url="aHR0cHM6Ly9zZy10aHVtYm5haWwtZHJpdmUubXlwaWtwYWsuY29tL3YwL3RodW1ibmFpbHMvRjhGODAxQzExRjY2MDExRkM2RUFEMTJFOEZFREZCRkE3QzhFNTg1MC83MjAvMjA0OA==
+    ">加密链接示例</a>
+</body>
+</html>
